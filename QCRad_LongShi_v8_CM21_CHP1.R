@@ -110,8 +110,8 @@ template_file  <- "/home/athan/DATA/Broad_Band/LAP_CHP1_L1_2016.Rds"
 
 
 ## date to start run
-PROJECT_START <- as.POSIXct("1993-01-01")  ## when both instruments were operational
-LAST_DAY_EXPR <- as.POSIXct("2022-03-31")  ## day of last manual data clean
+PROJECT_START  <- as.POSIXct("1993-01-01")  ## when both instruments were operational
+LAST_DAY_EXPR  <- as.POSIXct("2022-03-31")  ## day of last manual data clean
 
 
 
@@ -152,17 +152,17 @@ DO_TEST_09 <- TRUE   # Test clearness index limits
 
 TESTING_NP <- 10000
 TESTING    <- FALSE
-# TESTING = T
+TESTING    <- TRUE
 
-# DO_TEST_01 = F   # Physically Possible Limits
-# DO_TEST_02 = F   # Extremely Rare Limits
-# DO_TEST_03 = F   # Comparison tests
-# DO_TEST_04 = F   # Climatological (configurable) Limits.
-# DO_TEST_05 = F   # Tracking check
-# DO_TEST_06 = F   # Rayleigh Limit Diffuse Comparison
-# DO_TEST_07 = F   # Obstacles removal
-# DO_TEST_08 = F   # Test for inverted values
-# DO_TEST_09 = F   # Test clearness index limits
+# DO_TEST_01 <- F   # Physically Possible Limits
+# DO_TEST_02 <- F   # Extremely Rare Limits
+# DO_TEST_03 <- F   # Comparison tests
+# DO_TEST_04 <- F   # Climatological (configurable) Limits.
+# DO_TEST_05 <- F   # Tracking check
+# DO_TEST_06 <- F   # Rayleigh Limit Diffuse Comparison
+DO_TEST_07 <- F   # Obstacles removal
+# DO_TEST_08 <- F   # Test for inverted values
+# DO_TEST_09 <- F   # Test clearness index limits
 
 
 ## plot options
@@ -372,6 +372,9 @@ for (YY in yearSTA:yearEND) {
 
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DSWdn_min ] <- "Physical possible limit min (5)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DSWdn_max ] <- "Physical possible limit max (6)"
+        DATA_year[["QCF_DIR_5"]][ GSWdn_min ]                     <- "Physical possible limit min (5)"
+        DATA_year[["QCF_DIR_6"]][ GSWdn_max ]                     <- "Physical possible limit max (6)"
+
 
 
         ## . . Global ----------------------------------------------------------####
@@ -381,7 +384,8 @@ for (YY in yearSTA:yearEND) {
 
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & GSWdn_min ] <- "Physical possible limit min (5)"
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & GSWdn_max ] <- "Physical possible limit max (6)"
-
+        DATA_year[["QCF_GLB_5"]][ GSWdn_min ]                     <- "Physical possible limit min (5)"
+        DATA_year[["QCF_GLB_6"]][ GSWdn_max ]                     <- "Physical possible limit max (6)"
 
         ## . . Info ------------------------------------------------------------####
         cat(sprintf( " %6d    %s\n",      sum(DSWdn_max, na.rm = T), "Direct Records above physical limit (6)"),"\n")
@@ -421,6 +425,7 @@ for (YY in yearSTA:yearEND) {
         cat(sprintf(" %6d    %s\n",      sum(GSWdn_max_ext, na.rm = T), "Global records above extremely rare limit max (4)"),"\n")
         cat(sprintf(" %6d    %s [%s]\n", sum(GSWdn_min_ext, na.rm = T), "Global records below extremely rare limit min (3)",QS$glo_SWdn_min_ext),"\n")
 
+
         rm(DSWdn_max_ext, DSWdn_min_ext, GSWdn_max_ext, GSWdn_min_ext)
     } ##END if DO_TEST_02
 
@@ -457,6 +462,8 @@ for (YY in yearSTA:yearEND) {
         cat(sprintf(" %6d    %s\n", sum(DFR_prop, na.rm = T), "Records above diffuse ratio propose limit     (11)"))
         cat(sprintf(" %6d    %s\n", sum(DFR_low,  na.rm = T), "Records below our extra diffuse ratio limit   (12)"))
         cat(sprintf(" %6d    %s\n", sum(DFR_hig,  na.rm = T), "Records above our extra diffuse ratio limit   (13)"))
+
+        stop()
 
         rm(DFR_prop,DFR_low,DFR_hig,DFR_A,DFR_B)
     } ##END if DO_TEST_03
