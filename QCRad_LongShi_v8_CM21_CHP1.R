@@ -866,7 +866,7 @@ for (YY in yearSTA:yearEND) {
         cat("\n\n")
         plot( DATA_year$Azimuth[Ggood | Dgood], DATA_year$DiffuseFraction_Kd[Ggood | Dgood],
               ylim = yrange,
-              ylab = "Diffuse fraction", ylab = "Azimuth"
+              ylab = "Diffuse fraction", ylab = "Azimuth",
               cex = .1)
 
         ## 3. Diffuse ratio comp max (11)
