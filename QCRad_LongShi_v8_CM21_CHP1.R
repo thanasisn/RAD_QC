@@ -99,7 +99,7 @@ CHP1_BASE_IN   <- "/home/athan/DATA/Broad_Band/LAP_CHP1"
 CM21_BASE_IN   <- "/home/athan/DATA/Broad_Band/CM21_H_global/"
 PRES           <- "/home/athan/DATA/WEATHER/Pressure_M1.Rds"
 
-OUTPUT_BASE    <- "/home/athan/DATA/Broad_Band/LAP_QCRad_CM21_CHP1_"
+OUTPUT_BASE    <- "/home/athan/DATA/Broad_Band/LAP_"
 OUTPUT_STRICT  <- "/home/athan/DATA/Broad_Band/LAP_CM21_QCRad_STRICT_"
 PLOTS_OUT      <- "/home/athan/Aerosols/DATA/Graphs/Level_2/QCRad_id/"
 SUSPECTS_EXP   <- "/home/athan/DATA/Broad_Band/LAP_QCRad_SUSPECTS"
@@ -149,7 +149,7 @@ DO_TEST_07 <- TRUE   # Obstacles removal
 DO_TEST_08 <- TRUE   # Test for inverted values
 DO_TEST_09 <- TRUE   # Test clearness index limits
 
-TESTING_NP <- 10000
+TESTING_NP <- 1000000
 TESTING    <- FALSE
 TESTING    <- TRUE
 
@@ -242,9 +242,9 @@ for (YY in yearSTA:yearEND) {
     cat("\n## Year:", YY, "\n\n" )
 
     ## start graphical device to output not in the pdf report
-    # if(!interactive()) {
-    #     png(paste0(PLOTS_OUT,"QCRad_id_v6_CM21_",YY,"_%04d.png"), pointsize = 18, width = 960, height = 720)
-    # }
+    if (!interactive()) {
+        png(paste0("~/RAD_QC/REPORTS/", basename(sub("\\.R$","_", Script.Name)),YY,"_%04d.png"), pointsize = 18, width = 960, height = 720)
+    }
 
 
     ####  Get Direct if available  #####
@@ -360,6 +360,8 @@ for (YY in yearSTA:yearEND) {
     # summary(DATA_year$wattDIR)
     # summary(DATA_year$wattHOR)
 
+
+    #### ~ ~ ~ ~ START OF FLAGGING ~ ~ ~  ~ ####################################
 
     if (DO_TEST_01) {
         ####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ##########################
@@ -628,7 +630,6 @@ for (YY in yearSTA:yearEND) {
         cat(sprintf( " %6d    %s\n\n", sum(INV_hard, na.rm = T), "Records with inverse radiation Direct > global hard (15)"))
     } ##END if DO_TEST_08
 
-stop()
 
     if (DO_TEST_09) {
         ####  8. Clearness index test  #########################################
@@ -645,12 +646,10 @@ stop()
         DATA_year$QCF_GLB_09[ clid_under ]                         <- "Clearness index limit min (20)"
 
         ## . . Info --------------------------------------------------------####
-        cat(sprintf( " %6d    %s\n", sum(clid_over,  na.rm = T), "Records with extreme clearness index                 (19)"))
-        cat(sprintf( " %6d    %s\n", sum(clid_under, na.rm = T), "Records with negative clearness index                (20)"))
+        cat(sprintf( " %6d    %s\n\n", sum(clid_over,  na.rm = T), "Records with extreme clearness index                 (19)"))
+        cat(sprintf( " %6d    %s\n\n", sum(clid_under, na.rm = T), "Records with negative clearness index                (20)"))
     } ##END if DO_TEST_09
 
-
-stop()
 
 
     ####  All unflagged data are good  #########################################
@@ -658,23 +657,22 @@ stop()
     DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) ] <- "good"
 
     ## make them factors
-    DATA_year$QCF_DIR <- as.factor(DATA_year$QCF_DIR)
-    DATA_year$QCF_GLB <- as.factor(DATA_year$QCF_GLB)
+    wecare <- grep("QCF_.*", names(DATA_year), value = TRUE )
+    for (avar in wecare) {
+        DATA_year[[avar]] <- as.factor(DATA_year[[avar]])
+    }
 
     ## put good first for coloring
     DATA_year$QCF_DIR <- relevel(DATA_year$QCF_DIR, "good" )
     DATA_year$QCF_GLB <- relevel(DATA_year$QCF_GLB, "good" )
 
-
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    ####  END OF FILTERING  ###################################################
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+    #### ~ ~ ~ ~ END OF FLAGGING ~ ~ ~  ~ ######################################
 
 
 
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-    ####    Plot each test action    ##########################################
-    # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+    #### ~ ~ ~ ~  Plot each test action  ~ ~ ~ ~   #############################
+
 
     ## get valid data vectors
     Dgood <- DATA_year$QCF_DIR == "good"
@@ -1216,6 +1214,7 @@ stop()
     ####    Plot problematic data    ##########################################
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
+
     ##-- Plot all problems on Direct -------------------------------------------
 
     ## by SZA
@@ -1392,8 +1391,8 @@ stop()
     cat(pander::pander(table(DATA_year$QCF_GLB)))
     cat("\n\n")
 
-    kkk = 10
-
+    # kkk = 10
+    #
     # colorss = colorRampPalette(colors = c("blue","red"))
     # collors = colorss(    length(unique( (DATA_year$wattGLB %/% kkk)*kkk )))
     #
@@ -1490,13 +1489,10 @@ stop()
     # stop("loop can wait")
 
 
+    #### ~ ~ ~ ~  Data export ~ ~ ~ ~ ##########################################
+    cat(paste("\nExport Data.\n\n"))
 
-    # # # # # # # # # # # # # #
-    ####    Data export    ####
-    # # # # # # # # # # # # # #
-    cat(paste("\nExport Data.\n"))
-
-    ##-- gather all suspect points for export ----------------------------------
+    ## . . gather all suspect points for export ----------------------------####
     suspect_choose  <- DATA_year$QCF_DIR != "good" | DATA_year$QCF_GLB != "good"
     SUS_DATA        <- DATA_year[suspect_choose,]
     SUS_DATA        <- SUS_DATA[order(SUS_DATA$Date30),]
@@ -1511,7 +1507,7 @@ stop()
     # daysinfo_gather <- rbind(daysinfo_gather, daysinfo)
 
 
-    ##-- Prepare main data for export ------------------------------------------
+    ## . . Prepare main data for export ------------------------------------####
 
     ## Drop some columns ##
     DATA_year <- subset( DATA_year, select = c(-pressure,
@@ -1569,11 +1565,11 @@ stop()
     DATA_year <- DATA_year[ DATA_year$Date > PROJECT_START , ]
 
 
-    ##-- Export main data ----------------------------------------------------##
-    if ( !TESTING & dim(DATA_year)[1] > 0 ) {
-        myRtools::write_RDS(object = DATA_year, file = paste0(OUTPUT_BASE, YY))
-    }
-    ##------------------------------------------------------------------------##
+#    ## . . Export main data -----------------------------------------------####
+#    if ( !TESTING & dim(DATA_year)[1] > 0 ) {
+#        myRtools::write_RDS(object = DATA_year, file = paste0(OUTPUT_BASE, YY))
+#    }
+#    ##------------------------------------------------------------------------##
 
 
     ##-- Strict output for clear sky use ---------------------------------------
@@ -1588,10 +1584,10 @@ stop()
                                                    -TSIextEARTH_comb
                                                    ))
 
-    ##-- Export strict data --------------------------------------------------##
-    if ( !TESTING & dim(STRICT_data)[1] > 0 ) {
-        myRtools::write_RDS(object = STRICT_data, paste0(OUTPUT_STRICT,YY)) }
-    ##------------------------------------------------------------------------##
+#    ##-- Export strict data --------------------------------------------------##
+#    if ( !TESTING & dim(STRICT_data)[1] > 0 ) {
+#        myRtools::write_RDS(object = STRICT_data, paste0(OUTPUT_STRICT,YY)) }
+#    ##------------------------------------------------------------------------##
 
 }
 
