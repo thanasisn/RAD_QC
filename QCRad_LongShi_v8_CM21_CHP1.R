@@ -6,7 +6,7 @@
 #' affiliation: "Laboratory of Atmospheric Physics"
 #' abstract:    "Data quality for radiation measurements as described by
 #'               CN Long and Y Shi, September 2006, DOE/SC-ARM/TR-074.
-#'               Quality Control Procedures/The QCRad Value Added Product Surface
+#'               - The QCRad Value Added Product Surface
 #'               Radiation Measurement Quality Control Testing Including
 #'               Climatology_Long2006.pdf"
 #'
@@ -95,14 +95,19 @@ source("~/CM_21_GLB/Functions_write_data.R")
 ### Variables init ###
 
 ## data files pattern
-CHP1_BASE_IN  <- "/home/athan/DATA/Broad_Band/LAP_CHP1"
-CM21_BASE_IN  <- "/home/athan/DATA/Broad_Band/CM21_H_global/"
-PRES          <- "/home/athan/DATA/WEATHER/Pressure_M1.Rds"
+CHP1_BASE_IN   <- "/home/athan/DATA/Broad_Band/LAP_CHP1"
+CM21_BASE_IN   <- "/home/athan/DATA/Broad_Band/CM21_H_global/"
+PRES           <- "/home/athan/DATA/WEATHER/Pressure_M1.Rds"
 
-OUTPUT_BASE   <- "/home/athan/DATA/Broad_Band/LAP_QCRad_CM21_CHP1_"
-OUTPUT_STRICT <- "/home/athan/DATA/Broad_Band/LAP_CM21_QCRad_STRICT_"
-PLOTS_OUT     <- "/home/athan/Aerosols/DATA/Graphs/Level_2/QCRad_id/"
-SUSPECTS_EXP  <- "/home/athan/DATA/Broad_Band/LAP_QCRad_SUSPECTS"
+OUTPUT_BASE    <- "/home/athan/DATA/Broad_Band/LAP_QCRad_CM21_CHP1_"
+OUTPUT_STRICT  <- "/home/athan/DATA/Broad_Band/LAP_CM21_QCRad_STRICT_"
+PLOTS_OUT      <- "/home/athan/Aerosols/DATA/Graphs/Level_2/QCRad_id/"
+SUSPECTS_EXP   <- "/home/athan/DATA/Broad_Band/LAP_QCRad_SUSPECTS"
+
+## other inputs
+tsi_build_Rdat <- "/home/athan/DATA/SUN/TSI_COMPOSITE.Rds"
+template_file  <- "/home/athan/DATA/Broad_Band/LAP_CHP1_L1_2016.Rds"
+
 
 ## date to start run
 PROJECT_START <- as.POSIXct("1993-01-01")  ## when both instruments were operational
@@ -130,20 +135,20 @@ QS <- list(
     ClrSW_lim        = 0.85,       # 5. Tracker off test Threshold
     CL_idx_max       = 1.3,        # 8. Clearness index test
     CL_idx_min       = -0.001,     # 8. Clearness index test
-    9999999
+    NULL
 )
 ## Obstacles definitions
 load("~/Aerosols/source_R/Obstacles.Rda")
 
-DO_TEST_01 = T   # Physically Possible Limits
-DO_TEST_02 = T   # Extremely Rare Limits
-DO_TEST_03 = T   # Comparison tests
-DO_TEST_04 = T   # Climatological (configurable) Limits.
-DO_TEST_05 = T   # Tracking check
-DO_TEST_06 = T   # Rayleigh Limit Diffuse Comparison
-DO_TEST_07 = T   # Obstacles removal
-DO_TEST_08 = T   # Test for inverted values
-DO_TEST_09 = T   # Test clearness index limits
+DO_TEST_01 <- TRUE   # Physically Possible Limits
+DO_TEST_02 <- TRUE   # Extremely Rare Limits
+DO_TEST_03 <- TRUE   # Comparison tests
+DO_TEST_04 <- TRUE   # Climatological (configurable) Limits.
+DO_TEST_05 <- TRUE   # Tracking check
+DO_TEST_06 <- TRUE   # Rayleigh Limit Diffuse Comparison
+DO_TEST_07 <- TRUE   # Obstacles removal
+DO_TEST_08 <- TRUE   # Test for inverted values
+DO_TEST_09 <- TRUE   # Test clearness index limits
 
 TESTING_NP <- 10000
 TESTING    <- FALSE
@@ -193,7 +198,6 @@ categories = c(
 
 
 ## . Load TSI data  ------------------------------------------------------- ####
-tsi_build_Rdat <- "/home/athan/DATA/SUN/TSI_COMPOSITE.Rds"
 tsi_build      <- data.table(readRDS( file = tsi_build_Rdat ))
 names(tsi_build)[names(tsi_build) == "Date"] <- "nominal_dates"
 tsi_build      <- tsi_build[,c("nominal_dates", "TSIextEARTH_comb", "tsi_1au_comb", "sun_dist")]
@@ -251,7 +255,7 @@ for (YY in yearSTA:yearEND) {
     if ( !file.exists(year_file1) ) {
         warning("Missing input file ", year_file1)
         ## create dummy data
-        CHP1_year <- data.table(readRDS("/home/athan/DATA/Broad_Band/LAP_CHP1_L1_2016.Rds"))
+        CHP1_year <- data.table(readRDS(template_file))
         cols      <- grep("Date" ,names(CHP1_year), value = T, invert = T)
 
         Date      <- seq.POSIXt( as.POSIXct(paste0(YY,"-01-01 00:00")),
