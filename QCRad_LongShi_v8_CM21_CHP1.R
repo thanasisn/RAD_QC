@@ -719,7 +719,7 @@ for (YY in yearSTA:yearEND) {
             plot( DATA_year$Azimuth[Dgood], DATA_year$wattDIR[Dgood],
                   cex = .1,
                   ylim = ylim,
-                  xlab = "SZA", ylab = "Direct Irradiance" )
+                  xlab = "Azimuth", ylab = "Direct Irradiance" )
             ## 1. Physical possible limit max (6)
             points(DATA_year$Azimuth, DATA_year$TSIextEARTH_comb,  cex = .1,  col = alpha("red", 0.05))
             ## 2. Extremely rare limits max (4)
@@ -793,7 +793,7 @@ for (YY in yearSTA:yearEND) {
             plot(  DATA_year$Azimuth[Ggood], DATA_year$wattGLB[Ggood],
                    cex = .1,
                    ylim = ylim,
-                   xlab = "SZA", ylab = "Global Irradiance" )
+                   xlab = "Azimuth", ylab = "Global Irradiance" )
             ## 1. Physical possible limit max (6)
             points(DATA_year$Azimuth, Global_max_physical_limit, cex = .1,  col = alpha("red", 0.05))
             ## 2. Extremely rare limits max (4)
@@ -866,7 +866,7 @@ for (YY in yearSTA:yearEND) {
         cat("\n\n")
         plot( DATA_year$Azimuth[Ggood | Dgood], DATA_year$DiffuseFraction_Kd[Ggood | Dgood],
               ylim = yrange,
-              ylab = "Diffuse fraction",
+              ylab = "Diffuse fraction", ylab = "Azimuth"
               cex = .1)
 
         ## 3. Diffuse ratio comp max (11)
@@ -930,7 +930,7 @@ for (YY in yearSTA:yearEND) {
             plot( DATA_year$Azimuth[Dgood], DATA_year$wattDIR[Dgood],
                   cex = .1,
                   ylim = ylim,
-                  xlab = "SZA", ylab = "Direct Irradiance" )
+                  xlab = "Azimuth", ylab = "Direct Irradiance" )
             ## 4. Second climatological limit (16)
             points(DATA_year$Azimuth, second_level_D,  cex = .1,  col = alpha("red", 0.05))
             ## 4. First climatological limit (17)
@@ -1024,7 +1024,7 @@ for (YY in yearSTA:yearEND) {
         ## plot by Azimuth
         plot( DATA_year$Azimuth[Dgood], DATA_year$wattDIR[Dgood],
               cex = .1,
-              xlab = "SZA", ylab = "Direct Irradiance" )
+              xlab = "Azimuth", ylab = "Direct Irradiance" )
         title(main = paste("Tracker off test 5.",YY))
         points( DATA_year$Azimuth[ss], DATA_year$wattDIF[ss],
                 cex = .5, col = "cyan" )
@@ -1056,7 +1056,7 @@ for (YY in yearSTA:yearEND) {
         cat("\n\n")
         plot( DATA_year$Azimuth[Dgood | Ggood], DATA_year$wattDIF[Dgood | Ggood],
               cex = .1,
-              xlab = "SZA", ylab = "Diffuse Irradiance" )
+              xlab = "Azimuth", ylab = "Diffuse Irradiance" )
         title(main = paste("Rayleigh Limit Diffuse Comparison test 6.",YY))
 
         ## plot flagged
@@ -1186,7 +1186,7 @@ for (YY in yearSTA:yearEND) {
         plot(DATA_year$Azimuth[!dddd], DATA_year$Clearness_Kt[!dddd],
              cex = .1,
              ylim = ylim,
-             xlab = "SZA", ylab = "Clearness Index (Global)" )
+             xlab = "Azimuth", ylab = "Clearness Index (Global)" )
 
         ppmax <- DATA_year$QCF_GLB == "Clearness index limit max (19)"
         ppmin <- DATA_year$QCF_GLB == "Clearness index limit min (20)"
@@ -1245,7 +1245,7 @@ for (YY in yearSTA:yearEND) {
         cat("\n\n")
         plot( DATA_year$Azimuth, DATA_year$wattDIR,
               cex = .1,
-              xlab = "SZA", ylab = "Direct Irradiance" )
+              xlab = "Azimuth", ylab = "Direct Irradiance" )
 
         ## plot flagged
         prob <- !(DATA_year$QCF_DIR %in% c("good", "Diffuse ratio comp min (12)"))
@@ -1292,7 +1292,7 @@ for (YY in yearSTA:yearEND) {
     cat("\n\n")
     plot( DATA_year$Azimuth, DATA_year$wattGLB,
           cex = .1,
-          xlab = "SZA", ylab = "Global Irradiance" )
+          xlab = "Azimuth", ylab = "Global Irradiance" )
 
     ## plot flagged
     prob <- !(DATA_year$QCF_GLB %in% c("good", "Diffuse ratio comp min (12)"))
