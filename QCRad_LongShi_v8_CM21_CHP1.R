@@ -47,7 +47,6 @@
 #'
 #+ echo=F, include=T
 
-
 ####_  Document options _####
 
 #+ echo=F, include=F
@@ -84,12 +83,13 @@ if (!interactive()) {
 }
 
 
-#+ echo=F, include=F
+#+ echo=F, include=T
 ####  External code  ####
-library(RAerosols,  warn.conflicts = F, quietly = T)
+# library(RAerosols,  warn.conflicts = F, quietly = T)
 library(scales,     warn.conflicts = F, quietly = T)
 library(data.table, warn.conflicts = F, quietly = T)
-source("~/CM_21_GLB/Functions_write_data.R")
+source("~/CODE/FUNCTIONS/R/trig_deg.R")
+source("~/RAD_QC/Functions_write_data.R")
 
 
 ### Variables init ###
@@ -107,7 +107,6 @@ SUSPECTS_EXP   <- "/home/athan/DATA/Broad_Band/LAP_QCRad_SUSPECTS"
 ## other inputs
 tsi_build_Rdat <- "/home/athan/DATA/SUN/TSI_COMPOSITE.Rds"
 template_file  <- "/home/athan/DATA/Broad_Band/LAP_CHP1_L1_2016.Rds"
-
 
 ## date to start run
 PROJECT_START  <- as.POSIXct("1993-01-01")  ## when both instruments were operational
@@ -221,8 +220,8 @@ yearSTA <- as.numeric( format(PROJECT_START, format = "%Y") )
 yearEND <- as.numeric( format(x = as.POSIXct(Sys.Date()), format = "%Y")     )
 
 ## override years
-yearSTA <- 2014
-yearEND <- 2014
+yearSTA <- 2016
+yearEND <- 2016
 
 # yearSTA <- 1993
 # yearEND <- 1993
@@ -281,7 +280,7 @@ for (YY in yearSTA:yearEND) {
                                                -rel_Time,
                                                -rel_Elev,
                                                -Times
-    )  )
+    ))
 
     names(CHP1_year)[names(CHP1_year) == "Date30"] <- "Date"
 
@@ -301,7 +300,7 @@ for (YY in yearSTA:yearEND) {
 
     ####  Get Global  #####
     year_file <- paste0(CM21_BASE_IN, "LAP_CM21_H_L1_", YY, ".Rds")
-    cat( paste(year_file), sep = "\n")
+    cat( paste(year_file), "\n\n")
     if ( !file.exists(year_file) ) { stop("Missing input file ", year_file) }
 
     CM21_year <- data.table(readRDS(year_file))
@@ -363,78 +362,77 @@ for (YY in yearSTA:yearEND) {
 
 
     if (DO_TEST_01) {
-        ####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ##############################
+        ####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ##########################
         cat(paste("\n1. Physically Possible Limits.\n\n"))
 
-        ## . . Direct ----------------------------------------------------------####
+        ## . . Direct ------------------------------------------------------####
         DSWdn_min <- DATA_year$wattDIR  <  QS$dir_SWdn_min
         DSWdn_max <- DATA_year$wattDIR  >  DATA_year$TSIextEARTH_comb
 
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DSWdn_min ] <- "Physical possible limit min (5)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DSWdn_max ] <- "Physical possible limit max (6)"
-        DATA_year[["QCF_DIR_5"]][ GSWdn_min ]                     <- "Physical possible limit min (5)"
-        DATA_year[["QCF_DIR_6"]][ GSWdn_max ]                     <- "Physical possible limit max (6)"
+        DATA_year$QCF_DIR_01[ DSWdn_min ]                         <- "Physical possible limit min (5)"
+        DATA_year$QCF_DIR_01[ DSWdn_max ]                         <- "Physical possible limit max (6)"
 
-
-
-        ## . . Global ----------------------------------------------------------####
+        ## . . Global ------------------------------------------------------####
         GSWdn_min                 <- DATA_year$wattGLB  <  QS$glo_SWdn_min
         Global_max_physical_limit <- DATA_year$TSIextEARTH_comb * 1.5 * cosde(DATA_year$SZA)^1.2 + 100
         GSWdn_max                 <- DATA_year$wattGLB  >  Global_max_physical_limit
 
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & GSWdn_min ] <- "Physical possible limit min (5)"
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & GSWdn_max ] <- "Physical possible limit max (6)"
-        DATA_year[["QCF_GLB_5"]][ GSWdn_min ]                     <- "Physical possible limit min (5)"
-        DATA_year[["QCF_GLB_6"]][ GSWdn_max ]                     <- "Physical possible limit max (6)"
+        DATA_year$QCF_GLB_01[ GSWdn_min ]                         <- "Physical possible limit min (5)"
+        DATA_year$QCF_GLB_02[ GSWdn_max ]                         <- "Physical possible limit max (6)"
 
-        ## . . Info ------------------------------------------------------------####
-        cat(sprintf( " %6d    %s\n",      sum(DSWdn_max, na.rm = T), "Direct Records above physical limit (6)"),"\n")
-        cat(sprintf( " %6d    %s [%s]\n", sum(DSWdn_min, na.rm = T), "Direct Records below physical limit (5)",QS$dir_SWdn_min),"\n")
-        cat(sprintf( " %6d    %s\n",      sum(GSWdn_max, na.rm = T), "Global Records above physical limit (6)"),"\n")
-        cat(sprintf( " %6d    %s [%s]\n", sum(GSWdn_min, na.rm = T), "Global Records below physical limit (5)",QS$glo_SWdn_min),"\n")
+        ## . . Info --------------------------------------------------------####
+        cat(sprintf( " %6d    %s\n\n",      sum(DSWdn_max, na.rm = T), "Direct Records above physical limit (6)"))
+        cat(sprintf( " %6d    %s [%s]\n\n", sum(DSWdn_min, na.rm = T), "Direct Records below physical limit (5)", QS$dir_SWdn_min))
+        cat(sprintf( " %6d    %s\n\n",      sum(GSWdn_max, na.rm = T), "Global Records above physical limit (6)"))
+        cat(sprintf( " %6d    %s [%s]\n\n", sum(GSWdn_min, na.rm = T), "Global Records below physical limit (5)", QS$glo_SWdn_min))
 
         rm(DSWdn_max,DSWdn_min,GSWdn_max,GSWdn_min)
     } ##END if DO_TEST_01
 
 
     if (DO_TEST_02) {
-        ####  2. EXTREMELY RARE LIMITS PER BSRN  ###################################
+        ####  2. EXTREMELY RARE LIMITS PER BSRN  ###############################
         cat(paste("\n2. Extremely Rare Limits.\n\n"))
 
-        ## . . Direct ----------------------------------------------------------####
+        ## . . Direct ------------------------------------------------------####
         Direct_max_extremely_rare <- DATA_year$TSIextEARTH_comb * 0.95 * cosde(DATA_year$SZA)^0.2 + 10
         DSWdn_min_ext             <- DATA_year$wattDIR  <  QS$dir_SWdn_min_ext
         DSWdn_max_ext             <- DATA_year$wattDIR  >  Direct_max_extremely_rare
 
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DSWdn_min_ext ] <- "Extremely rare limits min (3)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DSWdn_max_ext ] <- "Extremely rare limits max (4)"
+        DATA_year$QCF_DIR_02[ DSWdn_min_ext ]                         <- "Extremely rare limits min (3)"
+        DATA_year$QCF_DIR_02[ DSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
 
-
-        ## . . Global ----------------------------------------------------------####
+        ## . . Global ------------------------------------------------------####
         Global_max_extremely_rare <- DATA_year$TSIextEARTH_comb * 1.2 * cosde(DATA_year$SZA)^1.2 + 50
         GSWdn_min_ext             <- DATA_year$wattGLB  <  QS$glo_SWdn_min_ext
         GSWdn_max_ext             <- DATA_year$wattGLB  >  Global_max_extremely_rare
 
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & GSWdn_min_ext ] <- "Extremely rare limits min (3)"
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & GSWdn_max_ext ] <- "Extremely rare limits max (4)"
+        DATA_year$QCF_GLB_02[ GSWdn_min_ext ]                         <- "Extremely rare limits min (3)"
+        DATA_year$QCF_GLB_02[ GSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
 
-        ## . . Info ------------------------------------------------------------####
-        cat(sprintf(" %6d    %s\n",      sum(DSWdn_max_ext, na.rm = T), "Direct records above extremely rare limit max (4)"),"\n")
-        cat(sprintf(" %6d    %s [%s]\n", sum(DSWdn_min_ext, na.rm = T), "Direct records below extremely rare limit min (3)",QS$dir_SWdn_min_ext),"\n")
-
-        cat(sprintf(" %6d    %s\n",      sum(GSWdn_max_ext, na.rm = T), "Global records above extremely rare limit max (4)"),"\n")
-        cat(sprintf(" %6d    %s [%s]\n", sum(GSWdn_min_ext, na.rm = T), "Global records below extremely rare limit min (3)",QS$glo_SWdn_min_ext),"\n")
-
+        ## . . Info --------------------------------------------------------####
+        cat(sprintf(" %6d    %s\n\n",      sum(DSWdn_max_ext, na.rm = T), "Direct records above extremely rare limit max (4)"))
+        cat(sprintf(" %6d    %s [%s]\n\n", sum(DSWdn_min_ext, na.rm = T), "Direct records below extremely rare limit min (3)", QS$dir_SWdn_min_ext))
+        cat(sprintf(" %6d    %s\n\n",      sum(GSWdn_max_ext, na.rm = T), "Global records above extremely rare limit max (4)"))
+        cat(sprintf(" %6d    %s [%s]\n\n", sum(GSWdn_min_ext, na.rm = T), "Global records below extremely rare limit min (3)", QS$glo_SWdn_min_ext))
 
         rm(DSWdn_max_ext, DSWdn_min_ext, GSWdn_max_ext, GSWdn_min_ext)
     } ##END if DO_TEST_02
 
 
     if (DO_TEST_03) {
-        ####  3. COMPARISON TESTS PER BSRN “non-definitive” ########################
+        ####  3. COMPARISON TESTS PER BSRN “non-definitive” ####################
         cat(paste("\n3. Comparison tests.\n\n"))
 
-        ##-- Proposed filter -----------------------------------------------------##
+        ## . . Proposed filter ---------------------------------------------####
         DFR_A    <- DATA_year$DiffuseFraction_Kd >   1.05 &
                     DATA_year$SZA                <= 75    &
                     DATA_year$wattGLB            >  50
@@ -445,72 +443,75 @@ for (YY in yearSTA:yearEND) {
         DFR_prop <- DFR_A | DFR_B
 
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & DFR_prop ] <- "Diffuse ratio comp max (11)"
+        DATA_year$QCF_GLB_03[ DFR_prop ]                         <- "Diffuse ratio comp max (11)"
+
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DFR_prop ] <- "Diffuse ratio comp max (11)"
+        DATA_year$QCF_DIR_03[ DFR_prop ]                         <- "Diffuse ratio comp max (11)"
 
-
-        ##-- Extra filters by me -------------------------------------------------##
+        ## . . Extra filters by me -----------------------------------------####
         DFR_low <- DATA_year$DiffuseFraction_Kd < QS$dif_rati_min
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & DFR_low ] <- "Diffuse ratio comp min (12)"
+        DATA_year$QCF_GLB_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DFR_low ] <- "Diffuse ratio comp min (12)"
+        DATA_year$QCF_DIR_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
 
         DFR_hig <- DATA_year$DiffuseFraction_Kd > QS$dif_rati_max
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & DFR_hig ] <- "Diffuse ratio comp max (13)"
+        DATA_year$QCF_GLB_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DFR_hig ] <- "Diffuse ratio comp max (13)"
+        DATA_year$QCF_DIR_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
 
-
-        ##-- Info ----------------------------------------------------------------##
-        cat(sprintf(" %6d    %s\n", sum(DFR_prop, na.rm = T), "Records above diffuse ratio propose limit     (11)"))
-        cat(sprintf(" %6d    %s\n", sum(DFR_low,  na.rm = T), "Records below our extra diffuse ratio limit   (12)"))
-        cat(sprintf(" %6d    %s\n", sum(DFR_hig,  na.rm = T), "Records above our extra diffuse ratio limit   (13)"))
-
-        stop()
+        ## . . Info --------------------------------------------------------####
+        cat(sprintf(" %6d    %s\n\n", sum(DFR_prop, na.rm = T), "Records above diffuse ratio propose limit     (11)"))
+        cat(sprintf(" %6d    %s\n\n", sum(DFR_low,  na.rm = T), "Records below our extra diffuse ratio limit   (12)"))
+        cat(sprintf(" %6d    %s\n\n", sum(DFR_hig,  na.rm = T), "Records above our extra diffuse ratio limit   (13)"))
 
         rm(DFR_prop,DFR_low,DFR_hig,DFR_A,DFR_B)
     } ##END if DO_TEST_03
 
 
     if (DO_TEST_04) {
-        ####  4. Climatological (configurable) Limits  #############################
+        ####  4. Climatological (configurable) Limits  #########################
         cat(paste("\n4. Climatological (configurable) Limits.\n\n"))
 
-        ##-- Direct --------------------------------------------------------------##
+        ## . . Direct ------------------------------------------------------####
         second_level_D <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D3 * cosde( DATA_year$SZA )**0.2 + 15
         first_level_D  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C3 * cosde( DATA_year$SZA )**0.2 + 10
-
-        CL_first_D <- DATA_year$wattDIR > first_level_D
-        CL_secon_D <- DATA_year$wattDIR > second_level_D
+        CL_first_D     <- DATA_year$wattDIR > first_level_D
+        CL_secon_D     <- DATA_year$wattDIR > second_level_D
 
         ## Apply second limit first as it is looser than first
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_secon_D ] <- "Second climatological limit (16)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_first_D ] <- "First climatological limit (17)"
+        DATA_year$QCF_DIR_04[ CL_secon_D ]                         <- "Second climatological limit (16)"
+        DATA_year$QCF_DIR_04[ CL_first_D ]                         <- "First climatological limit (17)"
 
-
-        ##-- Global --------------------------------------------------------------##
+        ## . . Global ------------------------------------------------------####
         second_level_G <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D1 * cosde( DATA_year$SZA )**1.2 + 60
         first_level_G  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C1 * cosde( DATA_year$SZA )**1.2 + 55
-
-        CL_first_G <- DATA_year$wattGLB > first_level_G
-        CL_secon_G <- DATA_year$wattGLB > second_level_G
+        CL_first_G     <- DATA_year$wattGLB > first_level_G
+        CL_secon_G     <- DATA_year$wattGLB > second_level_G
 
         ## Apply second limit first as it is looser than first
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & CL_secon_G ] <- "Second climatological limit (16)"
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & CL_first_G ] <- "First climatological limit (17)"
+        DATA_year$QCF_DIR_04[ CL_secon_G ]                         <- "Second climatological limit (16)"
+        DATA_year$QCF_DIR_04[ CL_first_G ]                         <- "First climatological limit (17)"
 
+        ## . . Info --------------------------------------------------------####
+        cat(sprintf( " %6d    %s\n\n", sum(CL_secon_D, na.rm = T), "Records above Second climatological limit     (16)"))
+        cat(sprintf( " %6d    %s\n\n", sum(CL_first_D, na.rm = T), "Records above First climatological limit      (17)"))
+        cat(sprintf( " %6d    %s\n\n", sum(CL_secon_G, na.rm = T), "Records above Second climatological limit     (16)"))
+        cat(sprintf( " %6d    %s\n\n", sum(CL_first_G, na.rm = T), "Records above First climatological limit      (17)"))
 
-        ##-- Info ----------------------------------------------------------------##
-        cat(sprintf( " %6d    %s\n", sum(CL_secon_D, na.rm = T), "Records above Second climatological limit     (16)"))
-        cat(sprintf( " %6d    %s\n", sum(CL_first_D, na.rm = T), "Records above First climatological limit      (17)"))
-
-        cat(sprintf( " %6d    %s\n", sum(CL_secon_G, na.rm = T), "Records above Second climatological limit     (16)"))
-        cat(sprintf( " %6d    %s\n", sum(CL_first_G, na.rm = T), "Records above First climatological limit      (17)"))
-
-        rm(CL_secon_D,CL_first_D,CL_secon_G,CL_first_G)
+        rm(CL_secon_D, CL_first_D, CL_secon_G, CL_first_G)
     } ##END if DO_TEST_04
 
 
     if (DO_TEST_05) {
-        ####  5. Tracker off test  #################################################
+        ####  5. Tracker off test  #############################################
         cat(paste("\n5. Tracking test.\n\n"))
+        ## . . Direct ------------------------------------------------------####
         ## This test use a diffuse model will be implemented when one is produced
         ## and accepted. For now we omit it to protect from over-fitting prior to
         ## make one such model.
@@ -518,22 +519,28 @@ for (YY in yearSTA:yearEND) {
         ## Create Clear Sky Sort-Wave model
         DATA_year[ , ClrSW := ( QS$ClrSW_a / sun_dist**2 ) * cosde(SZA)**QS$ClrSW_b ]
 
-        sel <- DATA_year[ is.na(DATA_year$QCF_DIR) &
-                              wattGLB / ClrSW > QS$ClrSW_lim &
-                              wattDIF / wattGLB > QS$ClrSW_lim, .N ]
+        # sel <- DATA_year[ is.na(DATA_year$QCF_DIR) &
+        #                       wattGLB / ClrSW   > QS$ClrSW_lim &
+        #                       wattDIF / wattGLB > QS$ClrSW_lim, .N ]
+
         ## apply test
         DATA_year[ is.na(DATA_year$QCF_DIR) &
-                       wattGLB / ClrSW > QS$ClrSW_lim &
+                       wattGLB / ClrSW   > QS$ClrSW_lim &
                        wattDIF / wattGLB > QS$ClrSW_lim,
                    QCF_DIR := "No tracking possible (24)" ]
+        DATA_year[ wattGLB / ClrSW   > QS$ClrSW_lim &
+                   wattDIF / wattGLB > QS$ClrSW_lim,
+                   QCF_DIR_05 := "No tracking possible (24)" ]
 
-        ##-- Info ----------------------------------------------------------------##
-        cat(sprintf( " %6d    %s\n", sel, "Records marked with possible tracking problem    (24)"))
+        sel <- sum(!is.na(DATA_year$QCF_DIR_05))
+
+        ## . . Info --------------------------------------------------------####
+        cat(sprintf( " %6d    %s\n\n", sel, "Records marked with possible tracking problem    (24)"))
     } ##END if TEST DO_TEST_05
 
 
     if (DO_TEST_06) {
-        ####  6. Rayleigh Limit Diffuse Comparison  ################################
+        ####  6. Rayleigh Limit Diffuse Comparison  ############################
         cat(paste("\n6. Rayleigh Limit Diffuse Comparison.\n\n"))
 
         a =   209.3
@@ -551,25 +558,28 @@ for (YY in yearSTA:yearEND) {
                          e * mu_0**5 +
                          f * mu_0 * DATA_year$pressure
 
-        selg <-  DATA_year$wattGLB  > 50
+        selg <-  DATA_year$wattGLB > 50
         seld <- (DATA_year$wattDIF / DATA_year$wattGLB) < 0.8
         selr <-  DATA_year$wattDIF < (Rayleigh_diff - 1.0)
 
         Rayleigh_lim <- selg & seld & selr
 
-        ## Apply limit
+        ## . . Both --------------------------------------------------------####
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & Rayleigh_lim ] <- "Rayleigh diffuse limit (18)"
+        DATA_year$QCF_GLB_06[ Rayleigh_lim ]                         <- "Rayleigh diffuse limit (18)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & Rayleigh_lim ] <- "Rayleigh diffuse limit (18)"
+        DATA_year$QCF_DIR_06[ Rayleigh_lim ]                         <- "Rayleigh diffuse limit (18)"
 
-        ##-- Info ----------------------------------------------------------------##
-        cat(sprintf( " %6d    %s\n", sum(Rayleigh_lim, na.rm = T), "Rayleigh diffuse limit              (18)"))
+        ## . .  Info -------------------------------------------------------####
+        cat(sprintf( " %6d    %s\n\n", sum(Rayleigh_lim, na.rm = T), "Rayleigh diffuse limit              (18)"))
         rm(selg,seld,selr,Rayleigh_lim)
     } ##END if DO_TEST_06
 
 
     if (DO_TEST_07) {
-        ####  7. Test for obstacles  #########################################
+        ####  7. Test for obstacles  ###########################################
         cat(paste("\n7. Obstacles test.\n\n"))
+        ## . . Direct ------------------------------------------------------####
 
         ## get biology building tag
         biol     <- biolog_build(DATA_year$Azimuth, DATA_year$Elevat )
@@ -581,60 +591,66 @@ for (YY in yearSTA:yearEND) {
         existing <- which(is.na(DATA_year$QCF_DIR))
         exclude  <- building %in% existing
 
-        DATA_year$QCF_DIR[ building[exclude] ] <- "Biology Building (22)"
+        DATA_year$QCF_DIR[    building[exclude] ] <- "Biology Building (22)"
+        DATA_year$QCF_DIR_07[ building[exclude] ] <- "Biology Building (22)"
 
-        ## Pole obfuscation is a possibility, should combine with Direct to decide
+        ## Pole obstraction is a possibility, should combine with Direct to decide
         suspects <- DATA_year$Azimuth > Pole_az_lim[1] & DATA_year$Azimuth < Pole_az_lim[2]
-        DATA_year$QCF_DIR[ suspects ] <- "Possible Direct Obstruction (23)"
+        DATA_year$QCF_DIR[    suspects ]          <- "Possible Direct Obstruction (23)"
+        DATA_year$QCF_DIR_07[ suspects ]          <- "Possible Direct Obstruction (23)"
 
-        ##-- Info ----------------------------------------------------------------##
-        cat(sprintf( " %6d    %s\n", length(exclude),             "Direct Records obscured by biology building          (22)"))
-        cat(sprintf( " %6d    %s\n", sum(suspects, na.rm = T),    "Direct maybe obscured near sunset                    (23)"))
+        ## . . Info --------------------------------------------------------####
+        cat(sprintf( " %6d    %s\n\n", length(exclude),             "Direct Records obscured by biology building          (22)"))
+        cat(sprintf( " %6d    %s\n\n", sum(suspects, na.rm = T),    "Direct maybe obscured near sunset                    (23)"))
         rm(biol,building,existing,exclude)
     }
 
 
     if (DO_TEST_08) {
-        ####  8. Test for inversed values  #########################################
+        ####  8. Test for inversed values  #####################################
         cat(paste("\n8. Inversion test.\n\n"))
 
-        ##------------------------------------------------------------------------##
         INV_hard = DATA_year$wattHOR > DATA_year$wattGLB
         INV_soft = DATA_year$wattHOR > DATA_year$wattGLB & DATA_year$wattGLB > 50
 
+        ## . . Both --------------------------------------------------------####
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & INV_soft ] <- "Direct > global soft (14)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & INV_soft ] <- "Direct > global soft (14)"
-
+        DATA_year$QCF_GLB_08[ INV_soft ]                         <- "Direct > global soft (14)"
+        DATA_year$QCF_DIR_08[ INV_soft ]                         <- "Direct > global soft (14)"
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & INV_hard ] <- "Direct > global hard (15)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & INV_hard ] <- "Direct > global hard (15)"
-        ##------------------------------------------------------------------------##
+        DATA_year$QCF_GLB_08[ INV_hard ]                         <- "Direct > global hard (15)"
+        DATA_year$QCF_DIR_08[ INV_hard ]                         <- "Direct > global hard (15)"
 
-        cat(sprintf( " %6d    %s\n", sum(INV_soft, na.rm = T), "Records with inverse radiation Direct > global soft (14)"))
-        cat(sprintf( " %6d    %s\n", sum(INV_hard, na.rm = T), "Records with inverse radiation Direct > global hard (15)"))
+        ## . . Info --------------------------------------------------------####
+        cat(sprintf( " %6d    %s\n\n", sum(INV_soft, na.rm = T), "Records with inverse radiation Direct > global soft (14)"))
+        cat(sprintf( " %6d    %s\n\n", sum(INV_hard, na.rm = T), "Records with inverse radiation Direct > global hard (15)"))
     } ##END if DO_TEST_08
 
-    DATA_year[ wattDIF < 0 ]
-
+stop()
 
     if (DO_TEST_09) {
-        ####  8. Clearness index test  #############################################
+        ####  8. Clearness index test  #########################################
         cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
 
-        ##-- Extra filters by me -------------------------------------------------##
+        ## . . Extra filters by me -----------------------------------------####
         clid_over  <- DATA_year$Clearness_Kt > QS$CL_idx_max
         clid_under <- DATA_year$Clearness_Kt < QS$CL_idx_min
 
-        ## This effect only global radiation
+        ## . . Global ------------------------------------------------------####
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & clid_over  ] <- "Clearness index limit max (19)"
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & clid_under ] <- "Clearness index limit min (20)"
+        DATA_year$QCF_GLB_09[ clid_over  ]                         <- "Clearness index limit max (19)"
+        DATA_year$QCF_GLB_09[ clid_under ]                         <- "Clearness index limit min (20)"
 
-        ##-- info ----------------------------------------------------------------##
+        ## . . Info --------------------------------------------------------####
         cat(sprintf( " %6d    %s\n", sum(clid_over,  na.rm = T), "Records with extreme clearness index                 (19)"))
         cat(sprintf( " %6d    %s\n", sum(clid_under, na.rm = T), "Records with negative clearness index                (20)"))
     } ##END if DO_TEST_09
 
 
-
+stop()
 
 
     ####  All unflagged data are good  #########################################
