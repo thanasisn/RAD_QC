@@ -73,9 +73,7 @@ knitr::opts_chunk$set(fig.align  = "center" )
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- tryCatch({ funr::sys.script() },
-                        error = function(e) { cat(paste("\nUnresolved script name: ", e),"\n\n")
-                            return("QCRad_appl_") })
+Script.Name <- "./QCRad_LongShi_v8_CM21_CHP1.R"
 if (!interactive()) {
     pdf(    file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
     sink(   file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
@@ -85,7 +83,6 @@ if (!interactive()) {
 
 #+ echo=F, include=T
 ####  External code  ####
-# library(RAerosols,  warn.conflicts = F, quietly = T)
 library(scales,     warn.conflicts = F, quietly = T)
 library(data.table, warn.conflicts = F, quietly = T)
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
@@ -99,8 +96,8 @@ CHP1_BASE_IN   <- "/home/athan/DATA/Broad_Band/LAP_CHP1"
 CM21_BASE_IN   <- "/home/athan/DATA/Broad_Band/CM21_H_global/"
 PRES           <- "/home/athan/DATA/WEATHER/Pressure_M1.Rds"
 
-OUTPUT_BASE    <- "/home/athan/DATA/Broad_Band/LAP_"
-OUTPUT_STRICT  <- "/home/athan/DATA/Broad_Band/LAP_CM21_QCRad_STRICT_"
+OUTPUT_BASE    <- "/home/athan/DATA/Broad_Band/QCRad_LongShi/LAP_"
+# OUTPUT_STRICT  <- "/home/athan/DATA/Broad_Band/LAP_CM21_QCRad_STRICT_"
 PLOTS_OUT      <- "/home/athan/Aerosols/DATA/Graphs/Level_2/QCRad_id/"
 SUSPECTS_EXP   <- "/home/athan/DATA/Broad_Band/LAP_QCRad_SUSPECTS"
 
@@ -151,7 +148,7 @@ DO_TEST_09 <- TRUE   # Test clearness index limits
 
 TESTING_NP <- 1000000
 TESTING    <- FALSE
-TESTING    <- TRUE
+# TESTING    <- TRUE
 
 # DO_TEST_01 <- F   # Physically Possible Limits
 # DO_TEST_02 <- F   # Extremely Rare Limits
@@ -220,8 +217,8 @@ yearSTA <- as.numeric( format(PROJECT_START, format = "%Y") )
 yearEND <- as.numeric( format(x = as.POSIXct(Sys.Date()), format = "%Y")     )
 
 ## override years
-yearSTA <- 2016
-yearEND <- 2016
+# yearSTA <- 2016
+# yearEND <- 2016
 
 # yearSTA <- 1993
 # yearEND <- 1993
@@ -1493,10 +1490,10 @@ for (YY in yearSTA:yearEND) {
     cat(paste("\nExport Data.\n\n"))
 
     ## . . gather all suspect points for export ----------------------------####
-    suspect_choose  <- DATA_year$QCF_DIR != "good" | DATA_year$QCF_GLB != "good"
-    SUS_DATA        <- DATA_year[suspect_choose,]
-    SUS_DATA        <- SUS_DATA[order(SUS_DATA$Date30),]
-    SUS_DATA_gather <- rbind(SUS_DATA_gather, SUS_DATA)
+    # suspect_choose  <- DATA_year$QCF_DIR != "good" | DATA_year$QCF_GLB != "good"
+    # SUS_DATA        <- DATA_year[suspect_choose,]
+    # SUS_DATA        <- SUS_DATA[order(SUS_DATA$Date30),]
+    # SUS_DATA_gather <- rbind(SUS_DATA_gather, SUS_DATA)
 
     # ## gather all suspect dates for export
     # daysinfo        <- SUS_DATA[,c("Date30","QCF_DIR","QCF_GLB")]
@@ -1516,74 +1513,76 @@ for (YY in yearSTA:yearEND) {
     ))
 
 
-    ## Do some filtering (data drop) ##
-
-    ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
-    ## Drop all data if
-    ## "Physical possible limit min (5)" or  "Physical possible limit max (6)"
-
-    ## find
-    sel_d <- DATA_year$QCF_DIR %in% c("Physical possible limit min (5)", "Physical possible limit max (6)")
-    sel_g <- DATA_year$QCF_GLB %in% c("Physical possible limit min (5)", "Physical possible limit max (6)")
-    ## remove
-    DATA_year$wattDIR[sel_d] <- NA
-    DATA_year$wattGLB[sel_g] <- NA
-    ## info
-    cat(sprintf( " %6d  %s\n", sum(sel_d, na.rm = T), "Direct Records removed due to: 'Physical possible limit min (5)' and 'Physical possible limit max (6)'"))
-    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due to: 'Physical possible limit min (5)' and 'Physical possible limit max (6)'"))
-
-
-    ## 4. Climatological (configurable) Limits
-    ## Drop all data if
-    ## "Second climatological limit (16)"
-
-    ## find
-    sel_d <- DATA_year$QCF_DIR %in% "Second climatological limit (16)"
-    sel_g <- DATA_year$QCF_GLB %in% "Second climatological limit (16)"
-    ## remove
-    DATA_year$wattDIR[sel_d] <- NA
-    DATA_year$wattGLB[sel_g] <- NA
-    ## info
-    cat(sprintf( " %6d  %s\n", sum(sel_d, na.rm = T), "Direct Records removed due to: 'Second climatological limit (16)'"))
-    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due to: 'Second climatological limit (16)'"))
-
-    ## 8. Clearness index test
-    ## this values are mostly due to too low global values in retention with
-    ## cos(SZA) and TSI
-
-    sel_g <- DATA_year$QCF_GLB %in% c("Clearness index limit max (19)", "Clearness index limit min (20)")
-    DATA_year$wattGLB[sel_g] <- NA
-    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due clearness index limits      (19) (20)'"))
-
-
-    ## Drop empty records
-    empty     <- is.na(DATA_year$wattDIR) & is.na(DATA_year$wattGLB)
-    DATA_year <- DATA_year[ !empty, ]
-
-    ## save data identification
-    DATA_year <- DATA_year[ DATA_year$Date < LAST_DAY_EXPR , ]
-    DATA_year <- DATA_year[ DATA_year$Date > PROJECT_START , ]
-
-
-#    ## . . Export main data -----------------------------------------------####
-#    if ( !TESTING & dim(DATA_year)[1] > 0 ) {
-#        myRtools::write_RDS(object = DATA_year, file = paste0(OUTPUT_BASE, YY))
-#    }
-#    ##------------------------------------------------------------------------##
+#    ## Do some filtering (data drop) ##
+#
+#    ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
+#    ## Drop all data if
+#    ## "Physical possible limit min (5)" or  "Physical possible limit max (6)"
+#
+#    ## find
+#    sel_d <- DATA_year$QCF_DIR %in% c("Physical possible limit min (5)", "Physical possible limit max (6)")
+#    sel_g <- DATA_year$QCF_GLB %in% c("Physical possible limit min (5)", "Physical possible limit max (6)")
+#    ## remove
+#    DATA_year$wattDIR[sel_d] <- NA
+#    DATA_year$wattGLB[sel_g] <- NA
+#    ## info
+#    cat(sprintf( " %6d  %s\n", sum(sel_d, na.rm = T), "Direct Records removed due to: 'Physical possible limit min (5)' and 'Physical possible limit max (6)'"))
+#    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due to: 'Physical possible limit min (5)' and 'Physical possible limit max (6)'"))
+#
+#
+#    ## 4. Climatological (configurable) Limits
+#    ## Drop all data if
+#    ## "Second climatological limit (16)"
+#
+#    ## find
+#    sel_d <- DATA_year$QCF_DIR %in% "Second climatological limit (16)"
+#    sel_g <- DATA_year$QCF_GLB %in% "Second climatological limit (16)"
+#    ## remove
+#    DATA_year$wattDIR[sel_d] <- NA
+#    DATA_year$wattGLB[sel_g] <- NA
+#    ## info
+#    cat(sprintf( " %6d  %s\n", sum(sel_d, na.rm = T), "Direct Records removed due to: 'Second climatological limit (16)'"))
+#    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due to: 'Second climatological limit (16)'"))
+#
+#    ## 8. Clearness index test
+#    ## this values are mostly due to too low global values in retention with
+#    ## cos(SZA) and TSI
+#
+#    sel_g <- DATA_year$QCF_GLB %in% c("Clearness index limit max (19)", "Clearness index limit min (20)")
+#    DATA_year$wattGLB[sel_g] <- NA
+#    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due clearness index limits      (19) (20)'"))
+#
+#
+#    ## Drop empty records
+#    empty     <- is.na(DATA_year$wattDIR) & is.na(DATA_year$wattGLB)
+#    DATA_year <- DATA_year[ !empty, ]
+#
+#    ## save data identification
+#    DATA_year <- DATA_year[ DATA_year$Date < LAST_DAY_EXPR , ]
+#    DATA_year <- DATA_year[ DATA_year$Date > PROJECT_START , ]
 
 
-    ##-- Strict output for clear sky use ---------------------------------------
-    allow <- c( "good", "Possible Direct Obstruction (23)")
-    sels  <- DATA_year$QCF_DIR %in% allow | DATA_year$QCF_GLB %in% allow
-    STRICT_data <- DATA_year[sels,]
 
-    STRICT_data <- subset(STRICT_data, select = c( -CHP1temp,
-                                                   -CHP1tempSD,
-                                                   -CHP1tempUNC,
-                                                   -chp1TempCF,
-                                                   -TSIextEARTH_comb
-                                                   ))
+   ## . . Export main data -------------------------------------------------####
+   if ( !TESTING & dim(DATA_year)[1] > 0 ) {
+       write_RDS(object = DATA_year,
+                 file = paste0(OUTPUT_BASE, basename(sub("\\.R$","_", Script.Name)),YY))
+   }
+    ##-------------------------------------------------------------------------##
 
+
+#    ##-- Strict output for clear sky use ---------------------------------------
+#    allow <- c( "good", "Possible Direct Obstruction (23)")
+#    sels  <- DATA_year$QCF_DIR %in% allow | DATA_year$QCF_GLB %in% allow
+#    STRICT_data <- DATA_year[sels,]
+#
+#    STRICT_data <- subset(STRICT_data, select = c( -CHP1temp,
+#                                                   -CHP1tempSD,
+#                                                   -CHP1tempUNC,
+#                                                   -chp1TempCF,
+#                                                   -TSIextEARTH_comb
+#                                                   ))
+#
 #    ##-- Export strict data --------------------------------------------------##
 #    if ( !TESTING & dim(STRICT_data)[1] > 0 ) {
 #        myRtools::write_RDS(object = STRICT_data, paste0(OUTPUT_STRICT,YY)) }

@@ -24,12 +24,11 @@ OUTPUT_FORMAT = NULL
 # system("./get_data_from_sirena.sh")
 
 
-# render("./CHP1_R10_Read_raw_LAP.R",
-#        params = list( ALL_YEARS = TRUE ),
-#        clean                = T  ,
-#        output_dir           = "./REPORTS/")
-#
-#
+render("./QCRad_LongShi_v8_CM21_CHP1.R",
+       clean                = TRUE,
+       output_dir           = "./REPORTS/")
+
+
 # render("./CHP1_R11_Read_raw_SNC.R",
 #        params = list( ALL_YEARS = TRUE ),
 #        clean                = T  ,
