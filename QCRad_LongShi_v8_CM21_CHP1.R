@@ -794,7 +794,7 @@ for (YY in yearSTA:yearEND) {
 
             ## plot flagged
             rare <- which(DATA_year$QCF_GLB %in%
-                              c("Extremely rare limits min (3)", "Extremely rare limits max (4)"))
+                              c("Extremely rare limits min (3)",   "Extremely rare limits max (4)"))
             phys <- which(DATA_year$QCF_GLB %in%
                               c("Physical possible limit min (5)", "Physical possible limit max (6)"))
 
@@ -874,7 +874,7 @@ for (YY in yearSTA:yearEND) {
 
         title(main = paste("Comparison test 3.", YY))
         legend("topright",
-               legend = c("Global measurements", "Max diff proposed", "Our limits", "Rare measurements", "Extreme measurements" ),
+               legend = c("Global measurements", "Max diff proposed", "Our limits", "Rare measurements", "Extreme measurements"),
                col    = c("black",               "red",               "blue",       "cyan",              "magenta"),
                pch = 19, bty = "n", cex = 0.8 )
 
@@ -963,8 +963,8 @@ for (YY in yearSTA:yearEND) {
 
             title(main = paste("Global climatological test 4.",YY))
             legend("topright",
-                   legend = c("Global measurements","Second limit","First limit","First measurements","Second measurements" ),
-                   col    = c("black",              "red",         "blue",       "cyan",              "magenta"),
+                   legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements"),
+                   col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
                    pch = 19, bty = "n", cex = 0.8 )
 
             ####  plot global by Azimuth  ####
@@ -984,8 +984,8 @@ for (YY in yearSTA:yearEND) {
 
             title(main = paste("Global climatological test 4.",YY))
             legend("topright",
-                   legend = c("Global measurements","Second limit","First limit","First measurements","Second measurements" ),
-                   col    = c("black",              "red",         "blue",       "cyan",              "magenta"),
+                   legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements"),
+                   col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
                    pch = 19, bty = "n", cex = 0.8 )
 
             ## clean
@@ -1030,7 +1030,7 @@ for (YY in yearSTA:yearEND) {
               cex = .1,
               xlim = xlim,
               xlab = "SZA", ylab = "Diffuse Irradiance" )
-        title(main = paste("Rayleigh Limit Diffuse Comparison test 6.",YY))
+        title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", YY))
 
         ## plot flagged
         ss <- which(DATA_year$QCF_DIR == "Rayleigh diffuse limit (18)")
@@ -1046,7 +1046,7 @@ for (YY in yearSTA:yearEND) {
         plot( DATA_year$Azimuth[Dgood | Ggood], DATA_year$wattDIF[Dgood | Ggood],
               cex = .1,
               xlab = "Azimuth", ylab = "Diffuse Irradiance" )
-        title(main = paste("Rayleigh Limit Diffuse Comparison test 6.",YY))
+        title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", YY))
 
         ## plot flagged
         ss <- which(DATA_year$QCF_DIR == "Rayleigh diffuse limit (18)")
@@ -1067,7 +1067,7 @@ for (YY in yearSTA:yearEND) {
             plot( DATA_year$Azimuth, DATA_year$Elevat,
                   cex = .1,
                   xlab = "Azimuth", ylab = "Elevat" )
-            title(main = paste("Obstacle test 7.",YY))
+            title(main = paste("Obstacle test 7.", YY))
 
             ## plot flagged
             ss = which(DATA_year$QCF_DIR == "Biology Building (22)")
@@ -1083,8 +1083,6 @@ for (YY in yearSTA:yearEND) {
                    col    = c("black",              "magenta",       "Cyan"      ),
                    pch = 19, bty = "n", cex = 0.8 )
 
-        # } else {
-        #     cat(paste("No obstacles found\n"))
         }
     }
 
@@ -1111,7 +1109,7 @@ for (YY in yearSTA:yearEND) {
                 cex = .7, col = "cyan" )
 
         legend("topright",
-               legend = c("Diffuse (inferred)", "Inversion hard", "Inversion soft" ),
+               legend = c("Diffuse (inferred)", "Inversion hard", "Inversion soft"),
                col    = c("black",              "magenta",        "cyan"  ),
                pch = 19, bty = "n", cex = 0.8 )
 
@@ -1120,7 +1118,7 @@ for (YY in yearSTA:yearEND) {
         cat("\n\n")
         plot( DATA_year$Azimuth[Dgood | Ggood], DATA_year$wattDIF[Dgood | Ggood],
               cex = .1,
-              xlab = "Azimuth", ylab = "Diffuse Irradiance" )
+              xlab = "Azimuth", ylab = "Diffuse Irradiance")
         title(main = paste("Diffuse inversion test 8.",YY))
 
         ## plot flagged
@@ -1146,7 +1144,8 @@ for (YY in yearSTA:yearEND) {
         if (ylim[1] < -1 ) ylim[1] = -1
         if (ylim[2] >  3 ) ylim[2] =  3
 
-        dddd <- DATA_year$QCF_GLB %in% c("Clearness index limit max (19)", "Clearness index limit min (20)")
+        dddd <- DATA_year$QCF_GLB %in%
+                    c("Clearness index limit max (19)", "Clearness index limit min (20)")
 
         ## by SZA
         cat("\n\n")
@@ -1165,10 +1164,10 @@ for (YY in yearSTA:yearEND) {
                 cex = .7, col = "magenta")
 
         legend("topleft",
-               legend = c("Clearness index","Extreme clearness index","Too low clearness index" ),
-               col    = c("black",          "cyan",                   "magenta"                 ),
+               legend = c("Clearness index", "Extreme clearness index", "Too low clearness index"),
+               col    = c("black",           "cyan",                    "magenta"                ),
                pch = 19, bty = "n", cex = 0.8 )
-        title(main = paste("Clearness index test 9.",YY))
+        title(main = paste("Clearness index test 9.", YY))
 
         ## by Azimuth
         cat("\n\n")
@@ -1187,10 +1186,10 @@ for (YY in yearSTA:yearEND) {
                 cex = .7, col = "magenta")
 
         legend("topleft",
-               legend = c("Clearness index","Extreme clearness index","Too low clearness index" ),
-               col    = c("black",          "cyan",                   "magenta"                 ),
+               legend = c("Clearness index", "Extreme clearness index", "Too low clearness index"),
+               col    = c("black",           "cyan",                    "magenta"                ),
                pch = 19, bty = "n", cex = 0.8 )
-        title(main = paste("Clearness index test 9.",YY))
+        title(main = paste("Clearness index test 9.", YY))
     }##END if DO_TEST_09
 
 
@@ -1220,11 +1219,11 @@ for (YY in yearSTA:yearEND) {
         cnames = unique(DATA_year$QCF_DIR[prob])
         if ( length(cnames) > 0 ) {
             legend("topright",
-                   title = "Suspicious measurements",
+                   title  = "Suspicious measurements",
                    legend = cnames,
-                   col = palete_rand[cnames],
+                   col    = palete_rand[cnames],
                    pch = 19, bty = "n", cex = 0.7 ) }
-        title(paste("All suspects on Direct (excl. Diffuse ratio comp min (12)) for",YY))
+        title(paste("All suspects on Direct (excl. Diffuse ratio comp min (12)) for", YY))
     }
 
 
@@ -1246,11 +1245,11 @@ for (YY in yearSTA:yearEND) {
         cnames = unique(DATA_year$QCF_DIR[prob])
         if (length(cnames) > 0) {
             legend("topleft",
-                   title = "Suspicious measurements",
+                   title  = "Suspicious measurements",
                    legend = cnames,
-                   col = palete_rand[cnames],
+                   col    = palete_rand[cnames],
                    pch = 19, bty = "n", cex = 0.7 ) }
-        title(paste("All suspects on Direct (excl. Diffuse ratio comp min (12)) for",YY))
+        title(paste("All suspects on Direct (excl. Diffuse ratio comp min (12)) for", YY))
     }
 
 
@@ -1294,9 +1293,9 @@ for (YY in yearSTA:yearEND) {
     cnames <- unique(DATA_year$QCF_GLB[prob])
     if (length(cnames) > 0) {
         legend("topleft",
-               title = "Suspicious measurements",
+               title  = "Suspicious measurements",
                legend = cnames,
-               col = palete_rand[cnames],
+               col    = palete_rand[cnames],
                pch = 19, bty = "n", cex = 0.7 ) }
     title(paste("All suspects on Direct (excl. Diffuse ratio comp min (12)) for", YY))
 
@@ -1314,12 +1313,12 @@ for (YY in yearSTA:yearEND) {
         prob1 <- !(DATA_year$QCF_DIR %in% c("good"))
         prob2 <- !(DATA_year$QCF_GLB %in% c("good"))
 
-        points( DATA_year$SZA[prob1], DATA_year$wattDIF[prob1],
-                cex = 0.7,
-                col = palete_rand[ DATA_year$QCF_DIR[prob1] ])
-        points( DATA_year$SZA[prob2], DATA_year$wattDIF[prob2],
-                cex = 0.7,
-                col = palete_rand[ DATA_year$QCF_GLB[prob2] ])
+        points(DATA_year$SZA[prob1], DATA_year$wattDIF[prob1],
+               cex = 0.7,
+               col = palete_rand[ DATA_year$QCF_DIR[prob1] ])
+        points(DATA_year$SZA[prob2], DATA_year$wattDIF[prob2],
+               cex = 0.7,
+               col = palete_rand[ DATA_year$QCF_GLB[prob2] ])
 
 
         ## annotations
@@ -1328,9 +1327,9 @@ for (YY in yearSTA:yearEND) {
         cnames  <- unique(cnames1, cnames2)
         if (length(cnames) > 0) {
             legend("topright",
-                   title = "Suspicious measurements",
+                   title  = "Suspicious measurements",
                    legend = cnames,
-                   col = palete_rand[cnames],
+                   col    = palete_rand[cnames],
                    pch = 19, bty = "n", cex = 0.7 ) }
         title(paste("Suspects on Diffuse for",YY))
 
@@ -1362,14 +1361,13 @@ for (YY in yearSTA:yearEND) {
         cnames  <- unique(cnames1, cnames2)
         if (length(cnames) > 0) {
             legend("topleft",
-                   title = "Suspicious measurements",
+                   title  = "Suspicious measurements",
                    legend = cnames,
-                   col = palete_rand[cnames],
+                   col    = palete_rand[cnames],
                    pch = 19, bty = "n", cex = 0.7 ) }
         title(paste("Suspects on Diffuse fraction for",YY))
 
     }
-
 
 
     cat(pander::pander(table(DATA_year$QCF_DIR)))
@@ -1378,47 +1376,24 @@ for (YY in yearSTA:yearEND) {
     cat(pander::pander(table(DATA_year$QCF_GLB)))
     cat("\n\n")
 
-    # kkk = 10
-    #
-    # colorss = colorRampPalette(colors = c("blue","red"))
-    # collors = colorss(    length(unique( (DATA_year$wattGLB %/% kkk)*kkk )))
-    #
-    # collors = heat.colors(length(unique( (DATA_year$wattGLB %/% kkk)*kkk )))
-    #
-    # ccv = collors[as.factor( (DATA_year$wattGLB %/% kkk)*kkk )]
-    # plot(DATA_year$Azimuth,DATA_year$Elevat,col=ccv,pch=15,cex=0.2)
-    #
-    # colorss = colorRampPalette(colors = c("blue","red"))
-    # collors = heat.colors(length(unique( (DATA_year$wattHOR %/% kkk)*kkk )))
-    # collors = colorss(    length(unique( (DATA_year$wattHOR %/% kkk)*kkk )))
-    #
-    # ccv = collors[as.factor( (DATA_year$wattHOR %/% kkk)*kkk )]
-    # plot(DATA_year$Azimuth,DATA_year$Elevat,col=ccv,pch=15,cex=0.6)
-    #
-    # colorss = colorRampPalette(colors = c("blue","red"))
-    # collors = heat.colors(length(unique( (DATA_year$wattDIF %/% kkk)*kkk )))
-    # collors = colorss(    length(unique( (DATA_year$wattDIF %/% kkk)*kkk )))
-    #
-    # ccv = collors[as.factor( (DATA_year$wattDIF %/% kkk)*kkk )]
-    # plot(DATA_year$Azimuth,DATA_year$Elevat,col=ccv,pch=15,cex=0.6)
-
-
 
     ## . . Plot sun path for direct ----------------------------------------####
 
-    isgood <- DATA_year$QCF_DIR %in% c("good", "Diffuse ratio comp min (12)") & !is.na(DATA_year$wattDIR)
+    isgood <- DATA_year$QCF_DIR %in% c("good", "Diffuse ratio comp min (12)") &
+              !is.na(DATA_year$wattDIR)
     if (all(isgood)) {
         cat("\n\n")
         plot(DATA_year$Azimuth[isgood], DATA_year$Elevat[isgood],
              xlab = "Azimuth", ylab = "Sun Elevation",
              col = alpha("black", 0.3), pch = 15, cex = 0.5)
 
-        isgood <- !(DATA_year$QCF_DIR %in% c("good", "Diffuse ratio comp min (12)")) & !is.na(DATA_year$wattDIR)
+        isgood <- !(DATA_year$QCF_DIR %in% c("good", "Diffuse ratio comp min (12)")) &
+                  !is.na(DATA_year$wattDIR)
         points(DATA_year$Azimuth[isgood], DATA_year$Elevat[isgood],
                pch = 15, cex = 0.65, col = palete_rand[ DATA_year$QCF_DIR[isgood] ])
 
         cnames <- unique(DATA_year$QCF_DIR[isgood])
-        if (length(cnames) > 0) {
+        if (length(cnames) >0) {
             legend("topleft",
                    legend = cnames,
                    col = palete_rand[cnames],
@@ -1448,8 +1423,7 @@ for (YY in yearSTA:yearEND) {
                legend = cnames,
                col = palete_rand[cnames],
                pch = 19, bty = "n", cex = 0.7 ) }
-    title(paste("Problems on Global (excl. Diffuse ratio comp min (12)) for",YY))
-
+    title(paste("Problems on Global (excl. Diffuse ratio comp min (12)) for", YY))
 
 
     # tempplto = aggregate_CF( DATA_year$Date30, DATA_year[ ,c("wattGLB","Azimuth","Elevat") ], n_minutes = 1 )
@@ -1473,8 +1447,6 @@ for (YY in yearSTA:yearEND) {
     # require(lattice)
     # levelplot( tempplto$wattGLB ~ tempplto$Azimuth * DATA_year$Elevat )
     # m <- with(tempplto, tapply(wattGLB, list(Azimuth, Elevat), I))
-
-    # stop("loop can wait")
 
 
     #### ~ ~ ~ ~  Data export ~ ~ ~ ~ ##########################################
