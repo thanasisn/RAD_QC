@@ -817,7 +817,7 @@ for (YY in yearSTA:yearEND) {
                    pch = 19, bty = "n", cex = 0.8 )
 
             ## clean
-            rm(Global_max_physical_limit,Global_max_extremely_rare,rare,phys)
+            rm(Global_max_physical_limit, Global_max_extremely_rare, rare, phys)
         }
     } ##END if all(DO_TEST_01, DO_TEST_02)
 
@@ -909,9 +909,9 @@ for (YY in yearSTA:yearEND) {
                   xlim = xlim,  ylim = ylim,
                   xlab = "SZA", ylab = "Direct Irradiance")
             ## 4. Second climatological limit (16)
-            points(DATA_year$SZA, second_level_D,  cex = .1,  col = alpha("red",  0.05))
+            points(DATA_year$SZA, second_level_D, cex = .2, col = alpha("red",  0.05))
             ## 4. First climatological limit (17)
-            points(DATA_year$SZA, first_level_D,   cex = .1,  col = alpha("blue", 0.05))
+            points(DATA_year$SZA, first_level_D,  cex = .2, col = alpha("blue", 0.05))
 
             ## plot flagged
             points(DATA_year$SZA[soft], DATA_year$wattDIR[soft], cex = .7, col = "cyan")
@@ -930,9 +930,9 @@ for (YY in yearSTA:yearEND) {
                   ylim = ylim,
                   xlab = "Azimuth", ylab = "Direct Irradiance" )
             ## 4. Second climatological limit (16)
-            points(DATA_year$Azimuth, second_level_D,  cex = .2,  col = alpha("red",  0.05))
+            points(DATA_year$Azimuth, second_level_D, cex = .2,  col = alpha("red",  0.05))
             ## 4. First climatological limit (17)
-            points(DATA_year$Azimuth, first_level_D,   cex = .2,  col = alpha("blue", 0.05))
+            points(DATA_year$Azimuth, first_level_D,  cex = .2,  col = alpha("blue", 0.05))
 
             ## plot flagged
             points(DATA_year$Azimuth[soft], DATA_year$wattDIR[soft], cex = .7, col = "cyan")
@@ -962,9 +962,9 @@ for (YY in yearSTA:yearEND) {
                   xlim = xlim,  ylim = ylim,
                   xlab = "SZA", ylab = "Global Irradiance" )
             ## 4. Second climatological limit (16)
-            points(DATA_year$SZA, second_level_G,  cex = .1,  col = alpha("red", 0.05))
+            points(DATA_year$SZA, second_level_G, cex = .2,  col = alpha("red", 0.05))
             ## 4. First climatological limit (17)
-            points(DATA_year$SZA, first_level_G,   cex = .1,  col = alpha("blue",0.05))
+            points(DATA_year$SZA, first_level_G,  cex = .2,  col = alpha("blue",0.05))
 
             ## plot flagged
             points(DATA_year$SZA[soft], DATA_year$wattGLB[soft], cex = .7, col = "cyan")
@@ -983,9 +983,9 @@ for (YY in yearSTA:yearEND) {
                   ylim = ylim,
                   xlab = "Azimuth", ylab = "Global Irradiance" )
             ## 4. Second climatological limit (16)
-            points(DATA_year$Azimuth, second_level_G,  cex = .1,  col = alpha("red", 0.05))
+            points(DATA_year$Azimuth, second_level_G, cex = .2,  col = alpha("red", 0.05))
             ## 4. First climatological limit (17)
-            points(DATA_year$Azimuth, first_level_G,   cex = .1,  col = alpha("blue",0.05))
+            points(DATA_year$Azimuth, first_level_G,  cex = .2,  col = alpha("blue",0.05))
 
             ## plot flagged
             points(DATA_year$Azimuth[soft], DATA_year$wattGLB[soft], cex = .7, col = "cyan")
@@ -1150,7 +1150,7 @@ for (YY in yearSTA:yearEND) {
 
 
     if (DO_TEST_09 & !all(is.na(DATA_year$Clearness_Kt)) ) {
-        ##-- Clearness index test 9. -----------------------------------------------
+        ## . . Clearness index test 9. -------------------------------------####
         ylim = range(DATA_year$Clearness_Kt, na.rm = T)
         if (ylim[1] < -1 ) ylim[1] = -1
         if (ylim[2] >  3 ) ylim[2] =  3
@@ -1396,15 +1396,14 @@ for (YY in yearSTA:yearEND) {
     #
     # ccv = collors[as.factor( (DATA_year$wattGLB %/% kkk)*kkk )]
     # plot(DATA_year$Azimuth,DATA_year$Elevat,col=ccv,pch=15,cex=0.2)
-
-
+    #
     # colorss = colorRampPalette(colors = c("blue","red"))
     # collors = heat.colors(length(unique( (DATA_year$wattHOR %/% kkk)*kkk )))
     # collors = colorss(    length(unique( (DATA_year$wattHOR %/% kkk)*kkk )))
     #
     # ccv = collors[as.factor( (DATA_year$wattHOR %/% kkk)*kkk )]
     # plot(DATA_year$Azimuth,DATA_year$Elevat,col=ccv,pch=15,cex=0.6)
-
+    #
     # colorss = colorRampPalette(colors = c("blue","red"))
     # collors = heat.colors(length(unique( (DATA_year$wattDIF %/% kkk)*kkk )))
     # collors = colorss(    length(unique( (DATA_year$wattDIF %/% kkk)*kkk )))
