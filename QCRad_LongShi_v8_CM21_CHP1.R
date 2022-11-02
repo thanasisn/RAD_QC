@@ -194,9 +194,9 @@ categories = c(
 
 
 ## . Load TSI data  ------------------------------------------------------- ####
-tsi_build      <- data.table(readRDS( file = tsi_build_Rdat ))
+tsi_build     <- data.table(readRDS( file = tsi_build_Rdat ))
 names(tsi_build)[names(tsi_build) == "Date"] <- "nominal_dates"
-tsi_build      <- tsi_build[,c("nominal_dates", "TSIextEARTH_comb", "tsi_1au_comb", "sun_dist")]
+tsi_build     <- tsi_build[, c("nominal_dates", "TSIextEARTH_comb", "tsi_1au_comb", "sun_dist")]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
@@ -236,7 +236,7 @@ for (YY in yearSTA:yearEND) {
 
     cat("\n\n\\FloatBarrier\n\n")
     cat("\\newpage\n\n")
-    cat("\n## Year:", YY, "\n\n" )
+    cat("\n## Year:", YY, "\n\n")
 
     ## start graphical device to output not in the pdf report
     if (!interactive()) {
@@ -259,7 +259,7 @@ for (YY in yearSTA:yearEND) {
                                  as.POSIXct(paste0(YY,"-12-31 23:59")), by = "mins" )
         Date30    <- Date + 30
         temp      <- data.table(Date, Date30)
-        temp[, (cols):=NA ]
+        temp[, (cols) := NA ]
         CHP1_year <- temp
         rm(temp)
     } else {
@@ -313,7 +313,7 @@ for (YY in yearSTA:yearEND) {
 
     ## Don't allow negative values when sun is too low
     sel <- CM21_year[ Elevat < QS$sun_elev_no_neg & wattGLB < 0, .N ]
-    CM21_year[ Elevat < QS$sun_elev_no_neg & wattGLB < 0, wattGLB    := 0 ]
+    CM21_year[        Elevat < QS$sun_elev_no_neg & wattGLB < 0, wattGLB := 0 ]
     cat(sprintf( " %6d   %s\n", sel, "Negative Records from CM21 near sunset sunrise set to zero!"),"\n")
 
     ## unify data
@@ -349,7 +349,6 @@ for (YY in yearSTA:yearEND) {
 
 
 
-
     #### ~ ~ ~ ~ START OF FLAGGING ~ ~ ~  ~ ####################################
 
     if (DO_TEST_01) {
@@ -381,7 +380,7 @@ for (YY in yearSTA:yearEND) {
         cat(sprintf( " %6d    %s\n\n",      sum(GSWdn_max, na.rm = T), "Global Records above physical limit (6)"))
         cat(sprintf( " %6d    %s [%s]\n\n", sum(GSWdn_min, na.rm = T), "Global Records below physical limit (5)", QS$glo_SWdn_min))
 
-        rm(DSWdn_max,DSWdn_min,GSWdn_max,GSWdn_min)
+        rm(DSWdn_max, DSWdn_min, GSWdn_max, GSWdn_min)
     } ##END if DO_TEST_01
 
 
@@ -781,7 +780,7 @@ for (YY in yearSTA:yearEND) {
             ####  plot global by azimuth  ####
             cat("\n\n")
             plot(  DATA_year$Azimuth[Ggood], DATA_year$wattGLB[Ggood],
-                   cex = .1,
+                   cex  = .1,
                    ylim = ylim,
                    xlab = "Azimuth", ylab = "Global Irradiance" )
             ## 1. Physical possible limit max (6)
@@ -847,8 +846,8 @@ for (YY in yearSTA:yearEND) {
 
         title(main = paste("Comparison test 3.", YY))
         legend("topleft",
-               legend = c("Global measurements","Max diff proposed","Our limits","Rare measurements","Extreme measurements" ),
-               col    = c("black",              "red",              "blue",      "cyan",             "magenta"),
+               legend = c("Global measurements", "Max diff proposed", "Our limits", "Rare measurements", "Extreme measurements"),
+               col    = c("black",               "red",               "blue",       "cyan",              "magenta"),
                pch = 19, bty = "n", cex = 0.8 )
 
 
@@ -860,8 +859,8 @@ for (YY in yearSTA:yearEND) {
               cex = .1)
 
         ## 3. Diffuse ratio comp max (11)
-        segments( 0, 1.05, 360, 1.05, lwd = 2, lty = 2, col = "red" )
-        segments( 0, 1.10, 360, 1.10, lwd = 2, lty = 2, col = "red" )
+        segments(0, 1.05, 360, 1.05, lwd = 2, lty = 2, col = "red")
+        segments(0, 1.10, 360, 1.10, lwd = 2, lty = 2, col = "red")
         ## 3. Diffuse ratio comp min (12)
         abline(h = QS$dif_rati_max, lwd = 2, col = "blue")
         ## 3. Diffuse ratio comp max (13)
@@ -887,12 +886,12 @@ for (YY in yearSTA:yearEND) {
         ## . . Plot climatological test 4. ---------------------------------####
         if (any(!is.na(DATA_year$wattDIR))) {
             ## For Direct
-            ylim = range( second_level_D,
+            ylim <- range(second_level_D,
                           first_level_D,
                           DATA_year$wattDIR,
                           na.rm = T)
-            hard <- which( DATA_year$QCF_DIR %in% "Second climatological limit (16)")
-            soft <- which( DATA_year$QCF_DIR %in% "First climatological limit (17)")
+            hard <- which(DATA_year$QCF_DIR %in% "Second climatological limit (16)")
+            soft <- which(DATA_year$QCF_DIR %in% "First climatological limit (17)")
 
             ####  plot direct by SZA  ####
             cat("\n\n")
