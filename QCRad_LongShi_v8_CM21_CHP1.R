@@ -227,7 +227,7 @@ yearEND <- as.numeric( format(x = as.POSIXct(Sys.Date()), format = "%Y")     )
 ## graph options
 par(mar = c(2,4,1.1,.5))
 par(pch = 19)
-xlim = c(18, 92)
+xlim <- c(18, 92)
 
 
 #+ echo=F, include=T, results="asis"
@@ -240,7 +240,8 @@ for (YY in yearSTA:yearEND) {
 
     ## start graphical device to output not in the pdf report
     if (!interactive()) {
-        png(paste0("~/RAD_QC/REPORTS/", basename(sub("\\.R$","_", Script.Name)),YY,"_%04d.png"), pointsize = 18, width = 960, height = 720)
+        png(paste0("~/RAD_QC/REPORTS/", basename(sub("\\.R$","_", Script.Name)), YY ,"_%04d.png"), 
+            pointsize = 18, width = 960, height = 720)
     }
 
 
@@ -313,7 +314,6 @@ for (YY in yearSTA:yearEND) {
     ## Don't allow negative values when sun is too low
     sel <- CM21_year[ Elevat < QS$sun_elev_no_neg & wattGLB < 0, .N ]
     CM21_year[ Elevat < QS$sun_elev_no_neg & wattGLB < 0, wattGLB    := 0 ]
-    # CM21_year[ Elevat < QS$sun_elev_no_neg & wattGLB < 0, wattGLB_SD := 0 ]
     cat(sprintf( " %6d   %s\n", sel, "Negative Records from CM21 near sunset sunrise set to zero!"),"\n")
 
     ## unify data
@@ -348,14 +348,6 @@ for (YY in yearSTA:yearEND) {
     DATA_year[ is.infinite(DiffuseFraction_Kd) & DiffuseFraction_Kd < 0, DiffuseFraction_Kd := NA ]
 
 
-
-    # summary(CM21_year)
-    # summary(CHP1_year)
-    # summary(DATA_year)
-    # summary(DATA_year$DiffuseFraction_Kd)
-    # summary(DATA_year$wattGLB)
-    # summary(DATA_year$wattDIR)
-    # summary(DATA_year$wattHOR)
 
 
     #### ~ ~ ~ ~ START OF FLAGGING ~ ~ ~  ~ ####################################
@@ -1151,7 +1143,7 @@ for (YY in yearSTA:yearEND) {
 
     if (DO_TEST_09 & !all(is.na(DATA_year$Clearness_Kt)) ) {
         ## . . Clearness index test 9. -------------------------------------####
-        ylim = range(DATA_year$Clearness_Kt, na.rm = T)
+        ylim <- range(DATA_year$Clearness_Kt, na.rm = T)
         if (ylim[1] < -1 ) ylim[1] = -1
         if (ylim[2] >  3 ) ylim[2] =  3
 
@@ -1566,7 +1558,7 @@ for (YY in yearSTA:yearEND) {
    ## . . Export main data -------------------------------------------------####
    if ( !TESTING & dim(DATA_year)[1] > 0 ) {
        write_RDS(object = DATA_year,
-                 file = paste0(OUTPUT_BASE, basename(sub("\\.R$","_", Script.Name)),YY))
+                 file   = paste0(OUTPUT_BASE, basename(sub("\\.R$","_", Script.Name)),YY))
    }
     ##-------------------------------------------------------------------------##
 
