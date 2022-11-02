@@ -907,7 +907,7 @@ for (YY in yearSTA:yearEND) {
             plot( DATA_year$SZA[Dgood], DATA_year$wattDIR[Dgood],
                   cex = .1,
                   xlim = xlim,  ylim = ylim,
-                  xlab = "SZA", ylab = "Direct Irradiance")
+                  xlab = "SZA", ylab = "Direct Irradiance" )
             ## 4. Second climatological limit (16)
             points(DATA_year$SZA, second_level_D,  cex = .1,  col = alpha("red",  0.05))
             ## 4. First climatological limit (17)
@@ -917,7 +917,7 @@ for (YY in yearSTA:yearEND) {
             points(DATA_year$SZA[soft], DATA_year$wattDIR[soft], cex = .7, col = "cyan")
             points(DATA_year$SZA[hard], DATA_year$wattDIR[hard], cex = .7, col = "magenta")
 
-            title(main = paste("Direct Beam climatological test 4.", YY))
+            title(main = paste("Direct Beam climatological test 4.",YY))
             legend("topright",
                    legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements" ),
                    col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
@@ -938,7 +938,7 @@ for (YY in yearSTA:yearEND) {
             points(DATA_year$Azimuth[soft], DATA_year$wattDIR[soft], cex = .7, col = "cyan")
             points(DATA_year$Azimuth[hard], DATA_year$wattDIR[hard], cex = .7, col = "magenta")
 
-            title(main = paste("Direct Beam climatological test 4.", YY))
+            title(main = paste("Direct Beam climatological test 4.",YY))
             legend("topright",
                    legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements" ),
                    col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
