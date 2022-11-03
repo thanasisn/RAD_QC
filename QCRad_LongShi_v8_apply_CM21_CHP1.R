@@ -107,15 +107,56 @@ for (afl in fileslist) {
 }
 
 
+
+
+
 ####  Check Quality factors  ####
 
-wecare <- grep("QCF_" , names(DATA), value = T )
+#'
+#' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
+#'
+#' Drop all data with flag
+#' "Physical possible limit min (5)" or  "Physical possible limit max (6)"
+#'
+#+ echo=F, include=T
+
+## find
+sel_d <- DATA$QCF_DIR_01 %in% c("Physical possible limit min (5)", "Physical possible limit max (6)")
+sel_g <- DATA$QCF_GLB_01 %in% c("Physical possible limit min (5)", "Physical possible limit max (6)")
+## remove
+DATA_year$wattDIR[sel_d] <- NA
+DATA_year$wattGLB[sel_g] <- NA
+## info
+cat(sprintf( " %6d  %s\n", sum(sel_d, na.rm = T), "Direct Records removed due to: 'Physical possible limit min (5)' and 'Physical possible limit max (6)'"))
+cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due to: 'Physical possible limit min (5)' and 'Physical possible limit max (6)'"))
+
+
+
+
+
+
+
+
+wecare <- grep("QCF_DIR_|QCF_GLB_" , names(DATA), value = T )
+
+
+
+
+for (fg in wecare) {
+    cat(paste(fg),"\n")
+    cat(levels(DATA[[fg]]),"\n")
+}
+
+
+# "Physical possible limit min (5)"
+# "Physical possible limit max (6)"
+
 
 
 for (fg in wecare) {
     if (any(!is.na(DATA[[fg]]))) {
-        try(hist( as.numeric( factor(DATA[[fg]]) )))
-        try(plot(DATA$Date, factor(DATA[[fg]])))
+        try(hist( as.numeric( factor(DATA[[fg]]), main = fg)))
+        try(plot(DATA$Date, factor(DATA[[fg]]), main = fg))
     }
 }
 
@@ -124,6 +165,12 @@ for (fg in wecare) {
 
 
 stop()
+
+
+
+
+
+
 
 
 
@@ -965,22 +1012,7 @@ for (YY in yearSTA:yearEND) {
 
 
 #    ## Do some filtering (data drop) ##
-#
-#    ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
-#    ## Drop all data if
-#    ## "Physical possible limit min (5)" or  "Physical possible limit max (6)"
-#
-#    ## find
-#    sel_d <- DATA_year$QCF_DIR %in% c("Physical possible limit min (5)", "Physical possible limit max (6)")
-#    sel_g <- DATA_year$QCF_GLB %in% c("Physical possible limit min (5)", "Physical possible limit max (6)")
-#    ## remove
-#    DATA_year$wattDIR[sel_d] <- NA
-#    DATA_year$wattGLB[sel_g] <- NA
-#    ## info
-#    cat(sprintf( " %6d  %s\n", sum(sel_d, na.rm = T), "Direct Records removed due to: 'Physical possible limit min (5)' and 'Physical possible limit max (6)'"))
-#    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due to: 'Physical possible limit min (5)' and 'Physical possible limit max (6)'"))
-#
-#
+
 #    ## 4. Climatological (configurable) Limits
 #    ## Drop all data if
 #    ## "Second climatological limit (16)"

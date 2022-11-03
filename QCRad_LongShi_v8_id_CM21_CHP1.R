@@ -241,7 +241,7 @@ for (YY in yearSTA:yearEND) {
 
     ## start graphical device to output not in the pdf report
     if (!interactive()) {
-        png(paste0("~/RAD_QC/REPORTS/", basename(sub("\\.R$","_", Script.Name)), YY ,"_%04d.png"),
+        png(paste0("~/RAD_QC/REPORTS/", basename(sub("\\.R$","_", Script.Name)), YY, "_%04d.png"),
             pointsize = 18, width = 960, height = 720)
     }
 
@@ -254,10 +254,10 @@ for (YY in yearSTA:yearEND) {
         warning("Missing input file ", year_file1)
         ## create dummy data
         CHP1_year <- data.table(readRDS(template_file))
-        cols      <- grep("Date" ,names(CHP1_year), value = T, invert = T)
+        cols      <- grep("Date", names(CHP1_year), value = T, invert = T)
 
-        Date      <- seq.POSIXt( as.POSIXct(paste0(YY,"-01-01 00:00")),
-                                 as.POSIXct(paste0(YY,"-12-31 23:59")), by = "mins" )
+        Date      <- seq.POSIXt(as.POSIXct(paste0(YY, "-01-01 00:00")),
+                                as.POSIXct(paste0(YY, "-12-31 23:59")), by = "mins" )
         Date30    <- Date + 30
         temp      <- data.table(Date, Date30)
         temp[, (cols) := NA ]
