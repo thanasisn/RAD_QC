@@ -92,18 +92,18 @@ source("~/RAD_QC/Functions_write_data.R")
 ### Variables init ###
 
 ## data files pattern
-CHP1_BASE_IN   <- "/home/athan/DATA/Broad_Band/LAP_CHP1"
-CM21_BASE_IN   <- "/home/athan/DATA/Broad_Band/CM21_H_global/"
-PRES           <- "/home/athan/DATA/WEATHER/Pressure_M1.Rds"
+CHP1_BASE_IN   <- "~/DATA/Broad_Band/LAP_CHP1"
+CM21_BASE_IN   <- "~/DATA/Broad_Band/CM21_H_global/"
+PRES           <- "~/DATA/WEATHER/Pressure_M1.Rds"
 
-OUTPUT_BASE    <- "/home/athan/DATA/Broad_Band/QCRad_LongShi/LAP_"
-# OUTPUT_STRICT  <- "/home/athan/DATA/Broad_Band/LAP_CM21_QCRad_STRICT_"
-PLOTS_OUT      <- "/home/athan/Aerosols/DATA/Graphs/Level_2/QCRad_id/"
-SUSPECTS_EXP   <- "/home/athan/DATA/Broad_Band/LAP_QCRad_SUSPECTS"
+OUTPUT_BASE    <- "~/DATA/Broad_Band/QCRad_LongShi/LAP_"
+# OUTPUT_STRICT  <- "~/DATA/Broad_Band/LAP_CM21_QCRad_STRICT_"
+PLOTS_OUT      <- "~/Aerosols/DATA/Graphs/Level_2/QCRad_id/"
+SUSPECTS_EXP   <- "~/DATA/Broad_Band/LAP_QCRad_SUSPECTS"
 
 ## other inputs
-tsi_build_Rdat <- "/home/athan/DATA/SUN/TSI_COMPOSITE.Rds"
-template_file  <- "/home/athan/DATA/Broad_Band/LAP_CHP1_L1_2016.Rds"
+tsi_build_Rdat <- "~/DATA/SUN/TSI_COMPOSITE.Rds"
+template_file  <- "~/DATA/Broad_Band/LAP_CHP1_L1_2016.Rds"
 
 ## date to start run
 PROJECT_START  <- as.POSIXct("1993-01-01")  ## when both instruments were operational
@@ -1464,6 +1464,7 @@ for (YY in yearSTA:yearEND) {
 
     ## Drop some columns ##
     DATA_year <- subset( DATA_year, select = c(-pressure,
+                                               -Pressure_Source,
                                                -Times,
                                                -ClrSW
     ))
