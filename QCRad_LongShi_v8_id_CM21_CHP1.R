@@ -434,10 +434,10 @@ for (YY in yearSTA:yearEND) {
         DFR_prop <- DFR_A | DFR_B
 
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & DFR_prop ] <- "Diffuse ratio comp max (11)"
-        DATA_year$QCF_GLB_03[ DFR_prop ]                         <- "Diffuse ratio comp max (11)"
+        DATA_year$QCF_GLB_03.1[ DFR_prop ]                       <- "Diffuse ratio comp max (11)"
 
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DFR_prop ] <- "Diffuse ratio comp max (11)"
-        DATA_year$QCF_DIR_03[ DFR_prop ]                         <- "Diffuse ratio comp max (11)"
+        DATA_year$QCF_DIR_03.1[ DFR_prop ]                       <- "Diffuse ratio comp max (11)"
 
         ## . . Extra filters by me -----------------------------------------####
         DFR_low <- DATA_year$DiffuseFraction_Kd < QS$dif_rati_min
@@ -474,8 +474,8 @@ for (YY in yearSTA:yearEND) {
         ## Apply second limit first as it is looser than first
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_secon_D ] <- "Second climatological limit (16)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_first_D ] <- "First climatological limit (17)"
-        DATA_year$QCF_DIR_04[ CL_secon_D ]                         <- "Second climatological limit (16)"
-        DATA_year$QCF_DIR_04[ CL_first_D ]                         <- "First climatological limit (17)"
+        DATA_year$QCF_DIR_04.2[ CL_secon_D ]                       <- "Second climatological limit (16)"
+        DATA_year$QCF_DIR_04.1[ CL_first_D ]                       <- "First climatological limit (17)"
 
         ## . . Global ------------------------------------------------------####
         second_level_G <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D1 * cosde( DATA_year$SZA )**1.2 + 60
@@ -486,8 +486,8 @@ for (YY in yearSTA:yearEND) {
         ## Apply second limit first as it is looser than first
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & CL_secon_G ] <- "Second climatological limit (16)"
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & CL_first_G ] <- "First climatological limit (17)"
-        DATA_year$QCF_DIR_04[ CL_secon_G ]                         <- "Second climatological limit (16)"
-        DATA_year$QCF_DIR_04[ CL_first_G ]                         <- "First climatological limit (17)"
+        DATA_year$QCF_DIR_04.2[ CL_secon_G ]                       <- "Second climatological limit (16)"
+        DATA_year$QCF_DIR_04.1[ CL_first_G ]                       <- "First climatological limit (17)"
 
         ## . . Info --------------------------------------------------------####
         cat(sprintf( " %6d    %s\n\n", sum(CL_secon_D, na.rm = T), "Records above Second climatological limit     (16)"))
