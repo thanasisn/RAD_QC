@@ -150,8 +150,8 @@ keys  <- c("Second climatological limit (16)")
 #+ echo=F, include=T
 
 ## find
-sel_d <- DATA$QCF_DIR_04 %in% keys
-sel_g <- DATA$QCF_GLB_04 %in% keys
+sel_d <- DATA$QCF_DIR_04.1 %in% keys
+sel_g <- DATA$QCF_GLB_04.1 %in% keys
 ## remove
 DATA$wattDIR[sel_d] <- NA
 DATA$wattGLB[sel_g] <- NA
@@ -159,13 +159,15 @@ DATA$wattGLB[sel_g] <- NA
 cat(c(sum(sel_d, na.rm = T), " Direct Records removed with:", keys), ".\n\n")
 cat(c(sum(sel_g, na.rm = T), " Global Records removed with:", keys), ".\n\n")
 
-levels(DATA$QCF_GLB_04)
-levels(DATA$QCF_DIR_04)
+levels(DATA$QCF_GLB_04.1)
+levels(DATA$QCF_DIR_04.1)
+
+levels(DATA$QCF_GLB_04.2)
+levels(DATA$QCF_DIR_04.2)
 
 
-#
-# wecare <- grep("QCF_DIR_|QCF_GLB_" , names(DATA), value = T )
-#
+wecare <- grep("QCF_DIR_|QCF_GLB_" , names(DATA), value = T )
+
 #
 # for (fg in wecare) {
 #     cat(paste(fg),"\n")
