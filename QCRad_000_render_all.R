@@ -11,36 +11,21 @@ Script.Name <- tryCatch({ funr::sys.script() },
 library(rmarkdown)
 library(knitr)
 
-
+## Work in this dir only
 setwd("~/RAD_QC/")
 
 
 ## environmental variables are killed by rm(ls) inside each script
 
-OUTPUT_FORMAT = NULL
+OUTPUT_FORMAT <- NULL
 
 
-####  update raw data  ####
-# system("./get_data_from_sirena.sh")
+####  render scritps  ####
 
 
-render("./QCRad_LongShi_v8_CM21_CHP1.R",
+render("./QCRad_LongShi_v8_id_CM21_CHP1.R",
        clean                = TRUE,
        output_dir           = "./REPORTS/")
-
-
-# render("./CHP1_R11_Read_raw_SNC.R",
-#        params = list( ALL_YEARS = TRUE ),
-#        clean                = T  ,
-#        output_dir           = "./REPORTS/")
-#
-#
-# render("./CHP1_R12_Read_raw_TMP.R",
-#        params = list( ALL_YEARS = TRUE ),
-#        clean                = T  ,
-#        output_dir           = "./REPORTS/")
-#
-
 
 
 
@@ -49,8 +34,6 @@ render("./QCRad_LongShi_v8_CM21_CHP1.R",
 ## some more nice plots
 
 # source("./CM21_P98_Plot_all_years_LAP.R")
-
-# source("./CM21_P99_Plot_all_daily_LAP.R")
 
 
 
