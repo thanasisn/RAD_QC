@@ -87,74 +87,46 @@ source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/RAD_QC/Functions_write_data.R")
 
 
+
 ### Variables init ###
-
-## data files pattern
-
-INPUT_BASE     <- "~/DATA/Broad_Band/QCRad_LongShi/LAP_QCRad_LongShi_v8_id_"
-OUTPUT_BASE    <- "~/DATA/Broad_Band/QCRad_LongShi/LAP_QCRad_LongShi_v8_apply_"
-
-PLOTS_OUT      <- "/home/athan/Aerosols/DATA/Graphs/Level_2/QCRad_id/"
-SUSPECTS_EXP   <- "/home/athan/DATA/Broad_Band/LAP_QCRad_SUSPECTS"
+DATA_BASE     <- "~/DATA/Broad_Band/QCRad_LongShi/"
+IN_PREFIX     <- "LAP_QCRad_LongShi_v8_id_CM21_CHP1_"
 
 
 
+####  Load all data  ####
+fileslist <- list.files( path    = DATA_BASE,
+                         pattern = paste0(IN_PREFIX, ".*.Rds"),
+                         full.names = TRUE)
+fileslist <- sort(fileslist)
+DATA <- data.table()
+for (afl in fileslist) {
+    tmp  <- readRDS(afl)
+    DATA <- rbind(DATA, tmp, fill = TRUE)
+    rm(tmp)
+}
 
-## plot options
-palete_rand = c("#995732", "#BFE46C", "#CB45BE", "#675CA8",
-                "#85BA0C", "#01855B", "#43F44D", "#AB4243",
-                "#521DCC", "#6E3F65", "#6D3D19", "#E85571",
-                "#18652C", "#867AF6", "#87DCA8")
-# pie(rep(1, length(palete_rand)), col = palete_rand)
+
+####  Check Quality factors  ####
+
+wecare <- grep("QCF_" , names(DATA), value = T )
+
+
+for (fg in wecare) {
+    if (any(!is.na(DATA[[fg]]))) {
+        try(hist( as.numeric( factor(DATA[[fg]]) )))
+        try(plot(DATA$Date, factor(DATA[[fg]])))
+    }
+}
 
 
 
-
-
-## loop all input files
-list.files( path = INPUT_BASE,
-            pattern = ".*.Rds")
 
 
 stop()
 
 
 
-## . Load TSI data  ------------------------------------------------------- ####
-tsi_build     <- data.table(readRDS( file = tsi_build_Rdat ))
-names(tsi_build)[names(tsi_build) == "Date"] <- "nominal_dates"
-tsi_build     <- tsi_build[, c("nominal_dates", "TSIextEARTH_comb", "tsi_1au_comb", "sun_dist")]
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-## . Load atmospheric pressure data --------------------------------------- ####
-pressure      <- data.table(readRDS(PRES))
-pressure$Date <- pressure$Date + 30
-names(pressure)[names(pressure) == "Source"] <- "Pressure_Source"
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-## Will Loop for all years ##
-
-daysinfo_gather <- data.table()
-SUS_DATA_gather <- data.table()
-
-## get year range
-yearSTA <- as.numeric( format(PROJECT_START, format = "%Y") )
-yearEND <- as.numeric( format(x = as.POSIXct(Sys.Date()), format = "%Y")     )
-
-## override years
-# yearSTA <- 2016
-# yearEND <- 2016
-
-# yearSTA <- 1993
-# yearEND <- 1993
-
-
-## graph options
-par(mar = c(2,4,1.1,.5))
-par(pch = 19)
-xlim <- c(18, 92)
 
 
 #+ echo=F, include=T, results="asis"
@@ -165,118 +137,12 @@ for (YY in yearSTA:yearEND) {
     cat("\\newpage\n\n")
     cat("\n## Year:", YY, "\n\n")
 
-    ## start graphical device to output not in the pdf report
-    if (!interactive()) {
-        png(paste0("~/RAD_QC/REPORTS/", basename(sub("\\.R$","_", Script.Name)), YY ,"_%04d.png"),
-            pointsize = 18, width = 960, height = 720)
-    }
+    # ## start graphical device to output not in the pdf report
+    # if (!interactive()) {
+    #     png(paste0("~/RAD_QC/REPORTS/", basename(sub("\\.R$","_", Script.Name)), YY ,"_%04d.png"),
+    #         pointsize = 18, width = 960, height = 720)
+    # }
 
-
-    ####  Get Direct if available  #####
-    year_file1 <- paste0(CHP1_BASE_IN, "_L1_", YY, ".Rds")
-    cat( paste(year_file1), "\n\n")
-
-    if ( !file.exists(year_file1) ) {
-        warning("Missing input file ", year_file1)
-        ## create dummy data
-        CHP1_year <- data.table(readRDS(template_file))
-        cols      <- grep("Date" ,names(CHP1_year), value = T, invert = T)
-
-        Date      <- seq.POSIXt( as.POSIXct(paste0(YY,"-01-01 00:00")),
-                                 as.POSIXct(paste0(YY,"-12-31 23:59")), by = "mins" )
-        Date30    <- Date + 30
-        temp      <- data.table(Date, Date30)
-        temp[, (cols) := NA ]
-        CHP1_year <- temp
-        rm(temp)
-    } else {
-        CHP1_year <- data.table(readRDS(year_file1))
-    }
-
-    if (TESTING) { CHP1_year <- CHP1_year[ 1:TESTING_NP, ] }
-
-    ## drop some columns
-    CHP1_year <- subset( CHP1_year, select = c(-Async,
-                                               -AsynStep,
-                                               -CHP1value,
-                                               -CHP1sd,
-                                               -DumDarkCHP1,
-                                               -Date,
-                                               -rel_Time,
-                                               -rel_Elev,
-                                               -Times
-    ))
-
-    names(CHP1_year)[names(CHP1_year) == "Date30"] <- "Date"
-
-    ## Drop night data
-    CHP1_year <- CHP1_year[ Elevat > QS$sun_elev_min,    ]
-    cat(sprintf(" %6d   %s\n", nrow(CHP1_year), "Records without night from CHP-1"),"\n")
-
-    ## don't allow negative values when sun is too low
-    sel <- CHP1_year[ Elevat < QS$sun_elev_no_neg & wattDIR < 0, .N ]
-    CHP1_year[ Elevat < QS$sun_elev_no_neg & wattDIR < 0, wattDIR        := 0 ]
-    CHP1_year[ Elevat < QS$sun_elev_no_neg & wattDIR < 0, wattDIR_tmp_cr := 0 ]
-    CHP1_year[ Elevat < QS$sun_elev_no_neg & wattDIR < 0, wattHOR        := 0 ]
-    CHP1_year[ Elevat < QS$sun_elev_no_neg & wattDIR < 0, wattHOR_tmp_cr := 0 ]
-    cat(sprintf(" %6d   %s\n", sel, "Negative Records from CHP1 near sunset sunrise set to zero!"),"\n")
-
-
-
-    ####  Get Global  #####
-    year_file <- paste0(CM21_BASE_IN, "LAP_CM21_H_L1_", YY, ".Rds")
-    cat( paste(year_file), "\n\n")
-    if ( !file.exists(year_file) ) { stop("Missing input file ", year_file) }
-
-    CM21_year <- data.table(readRDS(year_file))
-
-    if (TESTING) { CM21_year <- CM21_year[ 1:TESTING_NP, ] }
-
-
-    ## Drop night data
-    CM21_year <- CM21_year[ Elevat > QS$sun_elev_min ]
-    cat(sprintf( " %6d   %s\n", nrow(CM21_year), "Records without night from CM-21"),"\n")
-
-
-    ## Don't allow negative values when sun is too low
-    sel <- CM21_year[ Elevat < QS$sun_elev_no_neg & wattGLB < 0, .N ]
-    CM21_year[        Elevat < QS$sun_elev_no_neg & wattGLB < 0, wattGLB := 0 ]
-    cat(sprintf( " %6d   %s\n", sel, "Negative Records from CM21 near sunset sunrise set to zero!"),"\n")
-
-    ## unify data
-    DATA_year <- merge( CHP1_year, CM21_year, all  = TRUE  )
-    DATA_year <- merge( DATA_year, tsi_build, by.x = "Date", by.y = "nominal_dates", all.x = T)
-    DATA_year <- merge( DATA_year, pressure,  by.x = "Date", by.y = "Date", all.x = T)
-    ## forget this year source data
-    rm(CM21_year, CHP1_year)
-
-
-    ## init QCRad flag quality flag for the measurements
-    DATA_year[ , QCF_DIR := NA ]
-    DATA_year[ , QCF_GLB := NA ]
-    levels(DATA_year$QCF_DIR) <- categories
-    levels(DATA_year$QCF_GLB) <- categories
-
-
-    ## create diffuse irradiance
-    DATA_year[ , wattDIF            := DATA_year$wattGLB - DATA_year$wattHOR ]
-
-    ## create clearness index k_t
-    DATA_year[ , Clearness_Kt       := wattGLB / ( cosde(SZA) * TSIextEARTH_comb ) ]
-
-    ## Diffuse fraction k_d
-    DATA_year[ , DiffuseFraction_Kd := wattDIF / wattGLB ]
-
-    ## create a time of day representation
-    DATA_year$Times <- as.POSIXct(strftime(DATA_year$Date, format = "%H:%M:%S"), format = "%H:%M:%S" )
-
-    ## replace infinite values
-    DATA_year[ is.infinite(DiffuseFraction_Kd) & DiffuseFraction_Kd > 0, DiffuseFraction_Kd := NA ]
-    DATA_year[ is.infinite(DiffuseFraction_Kd) & DiffuseFraction_Kd < 0, DiffuseFraction_Kd := NA ]
-
-
-
-    #### ~ ~ ~ ~ START OF FLAGGING ~ ~ ~  ~ ####################################
 
 
 
@@ -2216,18 +2082,14 @@ for (YY in yearSTA:yearEND) {
 #    empty     <- is.na(DATA_year$wattDIR) & is.na(DATA_year$wattGLB)
 #    DATA_year <- DATA_year[ !empty, ]
 #
-#    ## save data identification
-#    DATA_year <- DATA_year[ DATA_year$Date < LAST_DAY_EXPR , ]
-#    DATA_year <- DATA_year[ DATA_year$Date > PROJECT_START , ]
 
-
-
-   ## . . Export main data -------------------------------------------------####
-   if ( !TESTING & dim(DATA_year)[1] > 0 ) {
-       write_RDS(object = DATA_year,
-                 file   = paste0(OUTPUT_BASE, basename(sub("\\.R$","_", Script.Name)),YY))
-   }
-    ##-------------------------------------------------------------------------##
+#
+#    ## . . Export main data -------------------------------------------------####
+#    if ( !TESTING & dim(DATA_year)[1] > 0 ) {
+#        write_RDS(object = DATA_year,
+#                  file   = paste0(OUTPUT_BASE, basename(sub("\\.R$","_", Script.Name)),YY))
+#    }
+#     ##-------------------------------------------------------------------------##
 
 
 #    ##-- Strict output for clear sky use ---------------------------------------
