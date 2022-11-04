@@ -259,9 +259,56 @@ levels(DATA$QCF_GLB_09)
 hist(DATA[ QCF_GLB_09 %in% keys, wattGLB], breaks = 100 )
 hist(DATA[ QCF_GLB_09 %in% keys, Elevat ], breaks = 100 )
 
-tmp <- DATA[ Elevat < 16 ]
 
-unique(as.Date(tmp$Date))
+
+test <- DATA[ , .(Min_kt =  min(Clearness_Kt, na.rm = T),
+                  Max_kt =  max(Clearness_Kt, na.rm = T)),
+              by = .(Elevat = (Elevat %/% 1) ) ]
+
+plot(test$Elevat, test$Max_kt)
+plot(test$Elevat, test$Min_kt)
+
+
+tmp <- DATA[ Elevat < 120 ]
+
+DATA[ Clearness_Kt > 100 , ]
+
+
+for (ay in unique(year(tmp$Date))) {
+    pp <- tmp[year(tmp$Date) == ay]
+
+    # plot(pp$Azimuth, pp$wattGLB, main = ay, pch = 19, cex = 0.1)
+    # points(pp[QCF_GLB_09 %in% keys,Azimuth],
+    #      pp[QCF_GLB_09 %in% keys,wattGLB],
+    #      pch = 19, cex = 0.2, col = "red")
+
+    ylim = c(-20, 20)
+    # plot(pp$Azimuth, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
+    # points(pp[QCF_GLB_09 %in% keys,Azimuth],
+    #        pp[QCF_GLB_09 %in% keys,Clearness_Kt],
+    #        pch = 19, cex = 0.2, col = "red")
+    #
+    # abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
+    # abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+
+    ylim = c(-0.5, 2)
+    plot(pp$Elevat, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
+    points(pp[Clearness_Kt > QS$CL_idx_max, Elevat],
+           pp[Clearness_Kt > QS$CL_idx_max, Clearness_Kt],
+           pch = 19, cex = 0.2, col = "red")
+    points(pp[Clearness_Kt < QS$CL_idx_min, Elevat],
+           pp[Clearness_Kt < QS$CL_idx_min, Clearness_Kt],
+           pch = 19, cex = 0.2, col = "blue")
+
+
+    abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
+    abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+
+
+}
+
+
+
 
 # plot(tmp$SZA, tmp$wattGLB)
 
