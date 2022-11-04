@@ -254,6 +254,19 @@ keys  <- c("Clearness index limit max (19)", "Clearness index limit min (20)")
 #'
 #+ echo=F, include=T
 
+levels(DATA$QCF_GLB_09)
+
+hist(DATA[ QCF_GLB_09 %in% keys, wattGLB], breaks = 100 )
+hist(DATA[ QCF_GLB_09 %in% keys, Elevat ], breaks = 100 )
+
+tmp <- DATA[ Elevat < 16 ]
+
+unique(as.Date(tmp$Date))
+
+# plot(tmp$SZA, tmp$wattGLB)
+
+
+
 # #    ## this values are mostly due to too low global values in retention with
 # #    ## cos(SZA) and TSI
 # #
