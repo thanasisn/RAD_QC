@@ -514,7 +514,7 @@ for (YY in yearSTA:yearEND) {
 
         ## . . Info --------------------------------------------------------####
         cat(sprintf( " %6d    %s\n\n", sel, "Records marked with possible tracking problem        (24)"))
-    } ##END if TEST DO_TEST_05
+    } ##END if DO_TEST_05
 
 
     if (DO_TEST_06) {
@@ -581,7 +581,7 @@ for (YY in yearSTA:yearEND) {
         cat(sprintf( " %6d    %s\n\n", length(exclude),          "Direct Records obscured by biology building          (22)"))
         cat(sprintf( " %6d    %s\n\n", sum(suspects, na.rm = T), "Direct maybe obscured near sunset                    (23)"))
         rm(biol,building,existing,exclude)
-    }
+    } ##END if DO_TEST_07
 
 
     if (DO_TEST_08) {
@@ -621,6 +621,7 @@ for (YY in yearSTA:yearEND) {
 
 
     ####  All unflagged data are good  #########################################
+    ## This is too aggresive
     DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) ] <- "good"
     DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) ] <- "good"
 
@@ -1003,7 +1004,7 @@ for (YY in yearSTA:yearEND) {
         title(main = paste("Tracker off test 5.",YY))
         points( DATA_year$Azimuth[ss], DATA_year$wattDIF[ss],
                 cex = .5, col = "cyan" )
-    }
+    }##END if DO_TEST_05
 
 
     if (DO_TEST_06 & !all(is.na(DATA_year$wattDIF)) ) {
@@ -1068,7 +1069,7 @@ for (YY in yearSTA:yearEND) {
                    col    = c("black",              "magenta",       "Cyan"      ),
                    pch = 19, bty = "n", cex = 0.8 )
         }
-    }
+    }##END if DO_TEST_07
 
 
     if (DO_TEST_08 & !all(is.na(DATA_year$wattDIF))) {
@@ -1456,43 +1457,6 @@ for (YY in yearSTA:yearEND) {
 
 
 #    ## Do some filtering (data drop) ##
-#
-#    ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
-#    ## Drop all data if
-#    ## "Physical possible limit min (5)" or  "Physical possible limit max (6)"
-#
-#    ## find
-#    sel_d <- DATA_year$QCF_DIR %in% c("Physical possible limit min (5)", "Physical possible limit max (6)")
-#    sel_g <- DATA_year$QCF_GLB %in% c("Physical possible limit min (5)", "Physical possible limit max (6)")
-#    ## remove
-#    DATA_year$wattDIR[sel_d] <- NA
-#    DATA_year$wattGLB[sel_g] <- NA
-#    ## info
-#    cat(sprintf( " %6d  %s\n", sum(sel_d, na.rm = T), "Direct Records removed due to: 'Physical possible limit min (5)' and 'Physical possible limit max (6)'"))
-#    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due to: 'Physical possible limit min (5)' and 'Physical possible limit max (6)'"))
-#
-#
-#    ## 4. Climatological (configurable) Limits
-#    ## Drop all data if
-#    ## "Second climatological limit (16)"
-#
-#    ## find
-#    sel_d <- DATA_year$QCF_DIR %in% "Second climatological limit (16)"
-#    sel_g <- DATA_year$QCF_GLB %in% "Second climatological limit (16)"
-#    ## remove
-#    DATA_year$wattDIR[sel_d] <- NA
-#    DATA_year$wattGLB[sel_g] <- NA
-#    ## info
-#    cat(sprintf( " %6d  %s\n", sum(sel_d, na.rm = T), "Direct Records removed due to: 'Second climatological limit (16)'"))
-#    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due to: 'Second climatological limit (16)'"))
-#
-#    ## 8. Clearness index test
-#    ## this values are mostly due to too low global values in retention with
-#    ## cos(SZA) and TSI
-#
-#    sel_g <- DATA_year$QCF_GLB %in% c("Clearness index limit max (19)", "Clearness index limit min (20)")
-#    DATA_year$wattGLB[sel_g] <- NA
-#    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due clearness index limits      (19) (20)'"))
 #
 #
 #    ## Drop empty records

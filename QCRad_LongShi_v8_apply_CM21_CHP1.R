@@ -139,7 +139,7 @@ QS <- list(
 range(DATA$Date)
 
 
-
+#### ~ 1. PHYSICALLY POSSIBLE LIMITS PER BSRN ~ ####
 keys  <- c("Physical possible limit min (5)", "Physical possible limit max (6)")
 #'
 #' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
@@ -165,7 +165,7 @@ if (sum(sel_d, sel_g) > 0) {
 }
 
 
-
+#### ~ 4. Climatological (configurable) Limits ~ ####
 keys  <- c("Second climatological limit (16)", "First climatological limit (17)")
 #'
 #' ## 4. Climatological (configurable) Limits
@@ -237,6 +237,8 @@ DATA$QCF_DIR_04.1   <- NULL
 DATA$QCF_DIR_04.2   <- NULL
 DATA$QCF_GLB_04.1   <- NULL
 DATA$QCF_GLB_04.2   <- NULL
+## remove empty entries
+DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
 ## info
 cat(c(sum(sel_d, na.rm = T), " Direct Records removed with:", keys), ".\n\n")
 cat(c(sum(sel_g, na.rm = T), " Global Records removed with:", keys), ".\n\n")
@@ -244,101 +246,109 @@ cat(c(sum(sel_g, na.rm = T), " Global Records removed with:", keys), ".\n\n")
 
 
 
-
+#### ~ 9. Clearness index test ~ ####
 keys  <- c("Clearness index limit max (19)", "Clearness index limit min (20)")
-
 #'
 #' ## 9. Clearness index test
 #'
 #' Drop all data with flag: `r paste(keys)`.
 #'
+#' These data are near Elevation 0 and caused by the cos(SZA)
+#' kt = GLB / (cos(sza) * TSI)
+#' low GLB value end extreme cos(sza) values
+#'
 #+ echo=F, include=T
 
-levels(DATA$QCF_GLB_09)
-
-hist(DATA[ QCF_GLB_09 %in% keys, wattGLB], breaks = 100 )
-hist(DATA[ QCF_GLB_09 %in% keys, Elevat ], breaks = 100 )
-
-
-
-test <- DATA[ , .(Min_kt =  min(Clearness_Kt, na.rm = T),
-                  Max_kt =  max(Clearness_Kt, na.rm = T)),
-              by = .(Elevat = (Elevat %/% 1) ) ]
-
-plot(test$Elevat, test$Max_kt)
-plot(test$Elevat, test$Min_kt)
-
-
-tmp <- DATA[ Elevat < 120 ]
-
-DATA[ Clearness_Kt > 100 , ]
-
-
-for (ay in unique(year(tmp$Date))) {
-    pp <- tmp[year(tmp$Date) == ay]
-
-    # plot(pp$Azimuth, pp$wattGLB, main = ay, pch = 19, cex = 0.1)
-    # points(pp[QCF_GLB_09 %in% keys,Azimuth],
-    #      pp[QCF_GLB_09 %in% keys,wattGLB],
-    #      pch = 19, cex = 0.2, col = "red")
-
-    ylim = c(-20, 20)
-    # plot(pp$Azimuth, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
-    # points(pp[QCF_GLB_09 %in% keys,Azimuth],
-    #        pp[QCF_GLB_09 %in% keys,Clearness_Kt],
-    #        pch = 19, cex = 0.2, col = "red")
-    #
-    # abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
-    # abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
-
-    ylim = c(-0.5, 2)
-    plot(pp$Elevat, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
-    points(pp[Clearness_Kt > QS$CL_idx_max, Elevat],
-           pp[Clearness_Kt > QS$CL_idx_max, Clearness_Kt],
-           pch = 19, cex = 0.2, col = "red")
-    points(pp[Clearness_Kt < QS$CL_idx_min, Elevat],
-           pp[Clearness_Kt < QS$CL_idx_min, Clearness_Kt],
-           pch = 19, cex = 0.2, col = "blue")
-
-
-    abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
-    abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+# levels(DATA$QCF_GLB_09)
+# hist(DATA[ QCF_GLB_09 %in% keys, wattGLB], breaks = 100 )
+# hist(DATA[ QCF_GLB_09 %in% keys, Elevat ], breaks = 100 )
+# hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, wattGLB], breaks = 100 )
+# hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, Elevat ], breaks = 100 )
+#
+# test <- DATA[ , .(Min_kt =  min(Clearness_Kt, na.rm = T),
+#                   Max_kt =  max(Clearness_Kt, na.rm = T)),
+#               by = .(Elevat = (Elevat %/% 0.01) * 0.01 ) ]
+#
+# plot(test$Elevat, test$Max_kt)
+# plot(test$Elevat, test$Min_kt)
+#
+# DATA[ Clearness_Kt >  10 , Clearness_Kt := NA]
+# DATA[ Clearness_Kt < -20 , Clearness_Kt := NA]
+# min(DATA$SZA)
+# max(DATA$SZA)
+# cosde(90.00000001)
+# cosde(89.99999999)
+#
+# tmp <- DATA[ Elevat < 120 ]
+# for (ay in unique(year(tmp$Date))) {
+#     pp <- tmp[year(tmp$Date) == ay]
+#     # plot(pp$Azimuth, pp$wattGLB, main = ay, pch = 19, cex = 0.1)
+#     # points(pp[QCF_GLB_09 %in% keys,Azimuth],
+#     #      pp[QCF_GLB_09 %in% keys,wattGLB],
+#     #      pch = 19, cex = 0.2, col = "red")
+#     ylim = c(-20, 20)
+#     # plot(pp$Azimuth, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
+#     # points(pp[QCF_GLB_09 %in% keys,Azimuth],
+#     #        pp[QCF_GLB_09 %in% keys,Clearness_Kt],
+#     #        pch = 19, cex = 0.2, col = "red")
+#     #
+#     # abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
+#     # abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+#     ylim = c(-0.5, 2)
+#     plot(pp$Elevat, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
+#     points(pp[Clearness_Kt > QS$CL_idx_max, Elevat],
+#            pp[Clearness_Kt > QS$CL_idx_max, Clearness_Kt],
+#            pch = 19, cex = 0.3, col = "red")
+#     points(pp[Clearness_Kt < QS$CL_idx_min, Elevat],
+#            pp[Clearness_Kt < QS$CL_idx_min, Clearness_Kt],
+#            pch = 19, cex = 0.3, col = "blue")
+#     abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
+#     abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+# }
 
 
+## remove
+DATA[ QCF_GLB_09 %in% keys, wattGLB := NA ]
+## info
+cat(c(DATA[ QCF_GLB_09 %in% keys, .N ], " Global Records removed with:", keys), ".\n\n")
+## remove empty entries
+DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
+DATA$QCF_GLB_09 <- NULL
+
+
+
+
+
+
+
+all(DATA$QCF_DIR_08 == DATA$QCF_GLB_08, na.rm = T)
+
+
+test <- DATA[ !is.na(QCF_DIR_08), ]
+
+unique(as.Date(test$Date))
+
+
+
+
+####  Rest of the flags to check ####
+
+wecare <- grep("QCF_DIR_|QCF_GLB_" , names(DATA), value = T )
+for (fg in wecare) {
+    if (all(is.na(DATA[[fg]]))) {
+        DATA[[fg]] <- NULL
+    }
 }
-
-
-
-
-# plot(tmp$SZA, tmp$wattGLB)
-
-
-
-# #    ## this values are mostly due to too low global values in retention with
-# #    ## cos(SZA) and TSI
-# #
-# #    sel_g <- DATA_year$QCF_GLB %in% c("Clearness index limit max (19)", "Clearness index limit min (20)")
-# #    DATA_year$wattGLB[sel_g] <- NA
-# #    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due clearness index limits      (19) (20)'"))
-# #
-# #
-
-
-
-
-
-
 
 
 wecare <- grep("QCF_DIR_|QCF_GLB_" , names(DATA), value = T )
 
-#
-# for (fg in wecare) {
-#     cat(paste(fg),"\n")
-#     cat(levels(DATA[[fg]]),"\n")
-# }
-#
-#
+for (fg in wecare) {
+    cat(paste(fg),"\n")
+    cat(levels(DATA[[fg]]),"\n")
+}
+
+
 #
 # for (fg in wecare) {
 #     if (any(!is.na(DATA[[fg]]))) {
