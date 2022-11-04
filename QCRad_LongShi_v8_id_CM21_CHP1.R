@@ -122,10 +122,10 @@ QS <- list(
     dir_SWdn_min_ext = -2,         # 2. MIN Extremely Rare Minimum Limits
     dif_rati_min     =  0.001,     # 3. (12) extra comparison to check data
     dif_rati_max     =  1.01,      # 3. (13) extra comparison to check data 1
-    clim_lim_C3      = .81,        # 4. Climatological (configurable) Limit first level
-    clim_lim_D3      = .90,        # 4. Climatological (configurable) Limit second level
-    clim_lim_C1      = 1.15,       # 4. Climatological (configurable) Limit first level
-    clim_lim_D1      = 1.35,       # 4. Climatological (configurable) Limit second level
+    clim_lim_C3      =  .81,       # 4. Direct Climatological (configurable) Limit first level
+    clim_lim_D3      =  .90,       # 4. Direct Climatological (configurable) Limit second level
+    clim_lim_C1      = 1.15,       # 4. Global Climatological (configurable) Limit first level
+    clim_lim_D1      = 1.35,       # 4. Global Climatological (configurable) Limit second level
     ClrSW_a          = 1050.5,     # 5. Tracker off test Clear Sky factor a
     ClrSW_b          = 1.095,      # 5. Tracker off test Clear Sky factor b
     ClrSW_lim        = 0.85,       # 5. Tracker off test Threshold
@@ -470,7 +470,7 @@ for (YY in yearSTA:yearEND) {
         first_level_D  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C3 * cosde( DATA_year$SZA )**0.2 + 10
         CL_first_D     <- DATA_year$wattDIR > first_level_D
         CL_secon_D     <- DATA_year$wattDIR > second_level_D
-
+stop()
         ## Apply second limit first as it is looser than first
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_secon_D ] <- "Second climatological limit (16)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_first_D ] <- "First climatological limit (17)"

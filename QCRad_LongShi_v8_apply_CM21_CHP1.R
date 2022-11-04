@@ -160,10 +160,17 @@ cat(c(sum(sel_d, na.rm = T), " Direct Records removed with:", keys), ".\n\n")
 cat(c(sum(sel_g, na.rm = T), " Global Records removed with:", keys), ".\n\n")
 
 levels(DATA$QCF_GLB_04.1)
-levels(DATA$QCF_DIR_04.1)
-
 levels(DATA$QCF_GLB_04.2)
+
+
+levels(DATA$QCF_DIR_04.1)
 levels(DATA$QCF_DIR_04.2)
+
+
+
+DATA[ !is.na(QCF_DIR_04.1) ]
+DATA[ !is.na(QCF_DIR_04.2) ]
+
 
 
 wecare <- grep("QCF_DIR_|QCF_GLB_" , names(DATA), value = T )
