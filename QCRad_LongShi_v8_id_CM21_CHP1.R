@@ -124,7 +124,7 @@ QS <- list(
     dif_rati_max     =  1.01,      # 3. (13) extra comparison to check data 1
     clim_lim_C3      =  .81,       # 4. Direct Climatological (configurable) Limit first level
     clim_lim_D3      =  .90,       # 4. Direct Climatological (configurable) Limit second level
-    clim_lim_C1      = 1.15,       # 4. Global Climatological (configurable) Limit first level
+    clim_lim_C1      = 1.22,       # 4. Global Climatological (configurable) Limit first level
     clim_lim_D1      = 1.35,       # 4. Global Climatological (configurable) Limit second level
     ClrSW_a          = 1050.5,     # 5. Tracker off test Clear Sky factor a
     ClrSW_b          = 1.095,      # 5. Tracker off test Clear Sky factor b
@@ -464,34 +464,25 @@ for (YY in yearSTA:yearEND) {
     if (DO_TEST_04) {
         ####  4. Climatological (configurable) Limits  #########################
         cat(paste("\n4. Climatological (configurable) Limits.\n\n"))
-
+        ##
+        ## Limits the maximum expected irradiance based on climatological
+        ## observations and the value of TSI.
+        ##
         ## . . Direct ------------------------------------------------------####
-        # second_level_D <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D3 * cosde( DATA_year$SZA )**0.2 + 15
-        # first_level_D  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C3 * cosde( DATA_year$SZA )**0.2 + 10
-        # CL_first_D     <- DATA_year$wattDIR > first_level_D
-        # CL_secon_D     <- DATA_year$wattDIR > second_level_D
-        #
-        # ## Apply second limit first as it is looser than first
-        # DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_secon_D ] <- "Second climatological limit (16)"
-        # DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_first_D ] <- "First climatological limit (17)"
-
         DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10,
                   QCF_DIR_04.1 := "First climatological limit (17)"]
         DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15,
                   QCF_DIR_04.2 := "Second climatological limit (16)"]
 
-
         ## . . Global ------------------------------------------------------####
+        ##
         ## This have to allow for the enhancement cases of Global.
-
-
+        ##
         DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60,
                   QCF_GLB_04.1 := "First climatological limit (17)"]
         DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60,
                   QCF_GLB_04.2 := "Second climatological limit (16)"]
 
-
-        rm(CL_secon_D, CL_first_D, CL_secon_G, CL_first_G)
     } ##END if DO_TEST_04
 
 
@@ -617,22 +608,14 @@ for (YY in yearSTA:yearEND) {
 
 
     if (DO_TEST_09) {
-        ####  8. Clearness index test  #########################################
+        ####  9. Clearness index test  #########################################
         cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
-
-        ## . . Extra filters by me -----------------------------------------####
-        clid_over  <- DATA_year$Clearness_Kt > QS$CL_idx_max
-        clid_under <- DATA_year$Clearness_Kt < QS$CL_idx_min
+        ## This is my filter
 
         ## . . Global ------------------------------------------------------####
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & clid_over  ] <- "Clearness index limit max (19)"
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & clid_under ] <- "Clearness index limit min (20)"
-        DATA_year$QCF_GLB_09[ clid_over  ]                         <- "Clearness index limit max (19)"
-        DATA_year$QCF_GLB_09[ clid_under ]                         <- "Clearness index limit min (20)"
+        DATA_year[ Clearness_Kt > QS$CL_idx_max, QCF_GLB_09 := "Clearness index limit max (19)" ]
+        DATA_year[ Clearness_Kt < QS$CL_idx_min, QCF_GLB_09 := "Clearness index limit min (20)" ]
 
-        ## . . Info --------------------------------------------------------####
-        cat(sprintf( " %6d    %s\n\n", sum(clid_over,  na.rm = T), "Records with extreme clearness index                 (19)"))
-        cat(sprintf( " %6d    %s\n\n", sum(clid_under, na.rm = T), "Records with negative clearness index                (20)"))
     } ##END if DO_TEST_09
 
 
@@ -1145,7 +1128,7 @@ for (YY in yearSTA:yearEND) {
         if (ylim[1] < -1 ) ylim[1] = -1
         if (ylim[2] >  3 ) ylim[2] =  3
 
-        dddd <- DATA_year$QCF_GLB %in%
+        dddd <- DATA_year$QCF_GLB_09 %in%
                     c("Clearness index limit max (19)", "Clearness index limit min (20)")
 
         ## by SZA
@@ -1155,8 +1138,8 @@ for (YY in yearSTA:yearEND) {
              ylim = ylim, xlim = xlim,
              xlab = "SZA", ylab = "Clearness Index (Global)" )
 
-        ppmax <- DATA_year$QCF_GLB == "Clearness index limit max (19)"
-        ppmin <- DATA_year$QCF_GLB == "Clearness index limit min (20)"
+        ppmax <- DATA_year$QCF_GLB_09 == "Clearness index limit max (19)"
+        ppmin <- DATA_year$QCF_GLB_09 == "Clearness index limit min (20)"
 
         points( DATA_year$SZA[ppmax], DATA_year$Clearness_Kt[ppmax],
                 cex = .7, col = "cyan" )
@@ -1177,8 +1160,8 @@ for (YY in yearSTA:yearEND) {
              ylim = ylim,
              xlab = "Azimuth", ylab = "Clearness Index (Global)" )
 
-        ppmax <- DATA_year$QCF_GLB == "Clearness index limit max (19)"
-        ppmin <- DATA_year$QCF_GLB == "Clearness index limit min (20)"
+        ppmax <- DATA_year$QCF_GLB_09 == "Clearness index limit max (19)"
+        ppmin <- DATA_year$QCF_GLB_09 == "Clearness index limit min (20)"
 
         points( DATA_year$Azimuth[ppmax], DATA_year$Clearness_Kt[ppmax],
                 cex = .7, col = "cyan")

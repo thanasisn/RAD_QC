@@ -67,6 +67,8 @@ knitr::opts_chunk$set(cache      =  TRUE    )
 ##          strict QCRad dat
 ##          all bad data points
 ##
+## The chosen levels have to be evaluated with the available data
+##
 
 #+ include=F, echo=F
 ####  Set environment  ####
@@ -110,23 +112,23 @@ for (afl in fileslist) {
 
 ## Limits definition
 QS <- list(
-    sun_elev_min     = -2 * 0.103, # 0. Drop all data when sun is below this point
-    sun_elev_no_neg  =  0,         # 0. Don't allow negative values below this sun angle
-    glo_SWdn_min     = -4,         # 1. MIN Physically Possible Limits
-    dir_SWdn_min     = -4,         # 1. MIN Physically Possible Limits
-    glo_SWdn_min_ext = -2,         # 2. MIN Extremely Rare Minimum Limits
-    dir_SWdn_min_ext = -2,         # 2. MIN Extremely Rare Minimum Limits
-    dif_rati_min     =  0.001,     # 3. (12) extra comparison to check data
-    dif_rati_max     =  1.01,      # 3. (13) extra comparison to check data 1
-    clim_lim_C3      =  .81,       # 4. Direct Climatological (configurable) Limit first level
-    clim_lim_D3      =  .90,       # 4. Direct Climatological (configurable) Limit second level
-    clim_lim_C1      = 1.22,       # 4. Global Climatological (configurable) Limit first level
-    clim_lim_D1      = 1.35,       # 4. Global Climatological (configurable) Limit second level
-    ClrSW_a          = 1050.5,     # 5. Tracker off test Clear Sky factor a
-    ClrSW_b          = 1.095,      # 5. Tracker off test Clear Sky factor b
-    ClrSW_lim        = 0.85,       # 5. Tracker off test Threshold
-    CL_idx_max       = 1.3,        # 8. Clearness index test
-    CL_idx_min       = -0.001,     # 8. Clearness index test
+    sun_elev_min     =  -2 * 0.103, # 0. Drop all data when sun is below this point
+    sun_elev_no_neg  =   0,         # 0. Don't allow negative values below this sun angle
+    glo_SWdn_min     =  -4,         # 1. MIN Physically Possible Limits
+    dir_SWdn_min     =  -4,         # 1. MIN Physically Possible Limits
+    glo_SWdn_min_ext =  -2,         # 2. MIN Extremely Rare Minimum Limits
+    dir_SWdn_min_ext =  -2,         # 2. MIN Extremely Rare Minimum Limits
+    dif_rati_min     =   0.001,     # 3. (12) extra comparison to check data
+    dif_rati_max     =   1.01,      # 3. (13) extra comparison to check data 1
+    clim_lim_C3      =   .81,       # 4. Direct Climatological (configurable) Limit first level
+    clim_lim_D3      =   .90,       # 4. Direct Climatological (configurable) Limit second level
+    clim_lim_C1      =  1.22,       # 4. Global Climatological (configurable) Limit first level
+    clim_lim_D1      =  1.35,       # 4. Global Climatological (configurable) Limit second level
+    ClrSW_a          = 1050.5,      # 5. Tracker off test Clear Sky factor a
+    ClrSW_b          =  1.095,      # 5. Tracker off test Clear Sky factor b
+    ClrSW_lim        =  0.85,       # 5. Tracker off test Threshold
+    CL_idx_max       =  1.3,        # 8. Clearness index test
+    CL_idx_min       = -0.001,      # 8. Clearness index test
     NULL
 )
 
@@ -164,7 +166,7 @@ if (sum(sel_d, sel_g) > 0) {
 
 
 
-keys  <- c("Second climatological limit (16)")
+keys  <- c("Second climatological limit (16)", "First climatological limit (17)")
 #'
 #' ## 4. Climatological (configurable) Limits
 #'
@@ -172,79 +174,95 @@ keys  <- c("Second climatological limit (16)")
 #'
 #+ echo=F, include=T
 
+# levels(DATA$QCF_GLB_04.1)
+# levels(DATA$QCF_GLB_04.2)
+# levels(DATA$QCF_DIR_04.1)
+# levels(DATA$QCF_DIR_04.2)
+#
+# ## test direct
+# temp1 <- DATA[ !is.na(QCF_DIR_04.1) ]
+# temp2 <- DATA[ !is.na(QCF_DIR_04.2) ]
+# for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
+#     pp <- DATA[ as.Date(Date) == ad, ]
+#     if (any(!is.na(pp$wattDIR))) {
+#         second <- pp[,TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15 ]
+#         first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10 ]
+#         ylim <- range(second,first,pp$wattDIR, na.rm = T)
+#         plot(pp$Date, pp$wattDIR, "l", ylim = ylim)
+#         lines(pp$Date, second, col = "pink" )
+#         lines(pp$Date, first,  col = "red" )
+#         title(as.Date(ad, origin = "1970-01-01"))
+#         # points(pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , Date],
+#         #        pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , wattDIR],
+#         #        ylim = ylim, col = "blue")
+#         points(pp[wattDIR > second | wattDIR > first , Date],
+#                pp[wattDIR > second | wattDIR > first , wattGLB],
+#                ylim = ylim, col = "red", pch = 1)
+#     }
+# }
+#
+# ## test global
+# temp1 <- DATA[ !is.na(QCF_GLB_04.1) ]
+# temp2 <- DATA[ !is.na(QCF_GLB_04.2) ]
+# for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
+#     pp <- DATA[ as.Date(Date) == ad, ]
+#     if (any(!is.na(pp$wattGLB))) {
+#         second <- pp[,TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60 ]
+#         first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60 ]
+#         ylim <- range(second,first,pp$wattDIR, na.rm = T)
+#         plot(pp$Date, pp$wattGLB, "l", ylim = ylim)
+#         lines(pp$Date, second, col = "pink" )
+#         lines(pp$Date, first,  col = "red" )
+#         title(as.Date(ad, origin = "1970-01-01"))
+#         # points(pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , Date],
+#         #        pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , wattGLB],
+#         #        ylim = ylim, col = "blue")
+#         points(pp[wattGLB > first, Date],
+#                pp[wattGLB > first, wattGLB],
+#                ylim = ylim, col = "red", pch = 1)
+#         points(pp[wattGLB > second, Date],
+#                pp[wattGLB > second, wattGLB],
+#                ylim = ylim, col = "blue", pch = 1)
+#     }
+# }
+
 
 ## find
-sel_d <- DATA$QCF_DIR_04.1 %in% keys
-sel_g <- DATA$QCF_GLB_04.1 %in% keys
+sel_d <- DATA$QCF_DIR_04.1 %in% keys | DATA$QCF_DIR_04.2 %in% keys
+sel_g <- DATA$QCF_GLB_04.1 %in% keys | DATA$QCF_GLB_04.2 %in% keys
 ## remove
 DATA$wattDIR[sel_d] <- NA
 DATA$wattGLB[sel_g] <- NA
+DATA$QCF_DIR_04.1   <- NULL
+DATA$QCF_DIR_04.2   <- NULL
+DATA$QCF_GLB_04.1   <- NULL
+DATA$QCF_GLB_04.2   <- NULL
 ## info
 cat(c(sum(sel_d, na.rm = T), " Direct Records removed with:", keys), ".\n\n")
 cat(c(sum(sel_g, na.rm = T), " Global Records removed with:", keys), ".\n\n")
 
-levels(DATA$QCF_GLB_04.1)
-levels(DATA$QCF_GLB_04.2)
-
-
-levels(DATA$QCF_DIR_04.1)
-levels(DATA$QCF_DIR_04.2)
 
 
 
-## test direct
-temp1 <- DATA[ !is.na(QCF_DIR_04.1) ]
-temp2 <- DATA[ !is.na(QCF_DIR_04.2) ]
-for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
-    pp <- DATA[ as.Date(Date) == ad, ]
-    if (any(!is.na(pp$wattDIR))) {
-        second <- pp[,TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15 ]
-        first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10 ]
-        cat(any(pp$wattDIR > second),"\n")
-        cat(any(pp$wattDIR > first),"\n")
 
-        ylim <- range(second,first,pp$wattDIR, na.rm = T)
+keys  <- c("Clearness index limit max (19)", "Clearness index limit min (20)")
 
-        plot(pp$Date, pp$wattDIR, "l", ylim = ylim)
-        lines(pp$Date, second, col = "pink" )
-        lines(pp$Date, first,  col = "red" )
-        title(as.Date(ad, origin = "1970-01-01"))
+#'
+#' ## 9. Clearness index test
+#'
+#' Drop all data with flag: `r paste(keys)`.
+#'
+#+ echo=F, include=T
 
-        points(pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , Date],
-               pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , wattDIR],
-               ylim = ylim, col = "blue")
+# #    ## this values are mostly due to too low global values in retention with
+# #    ## cos(SZA) and TSI
+# #
+# #    sel_g <- DATA_year$QCF_GLB %in% c("Clearness index limit max (19)", "Clearness index limit min (20)")
+# #    DATA_year$wattGLB[sel_g] <- NA
+# #    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due clearness index limits      (19) (20)'"))
+# #
+# #
 
-        pp[, wattDIR > TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15 ]
-        pp[, wattDIR > TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10 ]
-    }
-}
-
-## test global
-temp1 <- DATA[ !is.na(QCF_GLB_04.1) ]
-temp2 <- DATA[ !is.na(QCF_GLB_04.2) ]
-for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
-    pp <- DATA[ as.Date(Date) == ad, ]
-    if (any(!is.na(pp$wattGLB))) {
-        second <- pp[,TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60 ]
-        first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60 ]
-
-        ylim <- range(second,first,pp$wattDIR, na.rm = T)
-
-        plot(pp$Date, pp$wattGLB, "l", ylim = ylim)
-        lines(pp$Date, second, col = "pink" )
-        lines(pp$Date, first,  col = "red" )
-        title(as.Date(ad, origin = "1970-01-01"))
-
-        # points(pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , Date],
-        #        pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , wattGLB],
-        #        ylim = ylim, col = "blue")
-
-        points(pp[wattGLB > second | wattGLB > first , Date],
-               pp[wattGLB > second | wattGLB > first , wattGLB],
-               ylim = ylim, col = "red", pch = 1)
-
-    }
-}
 
 
 
@@ -261,10 +279,6 @@ wecare <- grep("QCF_DIR_|QCF_GLB_" , names(DATA), value = T )
 # }
 #
 #
-# # "Physical possible limit min (5)"
-# # "Physical possible limit max (6)"
-#
-#
 #
 # for (fg in wecare) {
 #     if (any(!is.na(DATA[[fg]]))) {
@@ -278,8 +292,6 @@ wecare <- grep("QCF_DIR_|QCF_GLB_" , names(DATA), value = T )
 #
 #
 # stop()
-#
-#
 #
 #
 #
@@ -516,118 +528,8 @@ wecare <- grep("QCF_DIR_|QCF_GLB_" , names(DATA), value = T )
 #         rm(hard, soft)
 #     }##END if DO_TEST_03
 #
-#
-#     if (DO_TEST_04 & !all(is.na(DATA_year$wattDIR))) {
-#         ## . . Plot climatological test 4. ---------------------------------####
-#         if (any(!is.na(DATA_year$wattDIR))) {
-#             ## For Direct
-#             ylim <- range(second_level_D,
-#                           first_level_D,
-#                           DATA_year$wattDIR,
-#                           na.rm = T)
-#             hard <- which(DATA_year$QCF_DIR %in% "Second climatological limit (16)")
-#             soft <- which(DATA_year$QCF_DIR %in% "First climatological limit (17)")
-#
-#             ####  plot direct by SZA  ####
-#             cat("\n\n")
-#             plot( DATA_year$SZA[Dgood], DATA_year$wattDIR[Dgood],
-#                   cex = .1,
-#                   xlim = xlim,  ylim = ylim,
-#                   xlab = "SZA", ylab = "Direct Irradiance")
-#             ## 4. Second climatological limit (16)
-#             points(DATA_year$SZA, second_level_D, cex = .2, col = alpha("red",  0.05))
-#             ## 4. First climatological limit (17)
-#             points(DATA_year$SZA, first_level_D,  cex = .2, col = alpha("blue", 0.05))
-#
-#             ## plot flagged
-#             points(DATA_year$SZA[soft], DATA_year$wattDIR[soft], cex = .7, col = "cyan")
-#             points(DATA_year$SZA[hard], DATA_year$wattDIR[hard], cex = .7, col = "magenta")
-#
-#             title(main = paste("Direct Beam climatological test 4.", YY))
-#             legend("topright",
-#                    legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements" ),
-#                    col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
-#                    pch = 19, bty = "n", cex = 0.8 )
-#
-#             ####  plot direct by Azimuth  ####
-#             cat("\n\n")
-#             plot( DATA_year$Azimuth[Dgood], DATA_year$wattDIR[Dgood],
-#                   cex = .1,
-#                   ylim = ylim,
-#                   xlab = "Azimuth", ylab = "Direct Irradiance" )
-#             ## 4. Second climatological limit (16)
-#             points(DATA_year$Azimuth, second_level_D, cex = .2,  col = alpha("red",  0.05))
-#             ## 4. First climatological limit (17)
-#             points(DATA_year$Azimuth, first_level_D,  cex = .2,  col = alpha("blue", 0.05))
-#
-#             ## plot flagged
-#             points(DATA_year$Azimuth[soft], DATA_year$wattDIR[soft], cex = .7, col = "cyan")
-#             points(DATA_year$Azimuth[hard], DATA_year$wattDIR[hard], cex = .7, col = "magenta")
-#
-#             title(main = paste("Direct Beam climatological test 4.", YY))
-#             legend("topright",
-#                    legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements" ),
-#                    col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
-#                    pch = 19, bty = "n", cex = 0.8 )
-#         }
-#
-#
-#         if (any(!is.na(DATA_year$wattGLB))) {
-#             ## For global
-#             ylim <- range(second_level_G,
-#                           first_level_G,
-#                           DATA_year$wattGLB,
-#                           na.rm = TRUE)
-#             hard <- which(DATA_year$QCF_GLB %in% "Second climatological limit (16)")
-#             soft <- which(DATA_year$QCF_GLB %in% "First climatological limit (17)")
-#
-#             ####  plot global by SZA  ####
-#             cat("\n\n")
-#             plot( DATA_year$SZA[Ggood], DATA_year$wattGLB[Ggood],
-#                   cex = .1,
-#                   xlim = xlim,  ylim = ylim,
-#                   xlab = "SZA", ylab = "Global Irradiance" )
-#             ## 4. Second climatological limit (16)
-#             points(DATA_year$SZA, second_level_G, cex = .2,  col = alpha("red", 0.05))
-#             ## 4. First climatological limit (17)
-#             points(DATA_year$SZA, first_level_G,  cex = .2,  col = alpha("blue",0.05))
-#
-#             ## plot flagged
-#             points(DATA_year$SZA[soft], DATA_year$wattGLB[soft], cex = .7, col = "cyan")
-#             points(DATA_year$SZA[hard], DATA_year$wattGLB[hard], cex = .7, col = "magenta")
-#
-#             title(main = paste("Global climatological test 4.",YY))
-#             legend("topright",
-#                    legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements"),
-#                    col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
-#                    pch = 19, bty = "n", cex = 0.8 )
-#
-#             ####  plot global by Azimuth  ####
-#             cat("\n\n")
-#             plot( DATA_year$Azimuth[Ggood], DATA_year$wattGLB[Ggood],
-#                   cex = .1,
-#                   ylim = ylim,
-#                   xlab = "Azimuth", ylab = "Global Irradiance" )
-#             ## 4. Second climatological limit (16)
-#             points(DATA_year$Azimuth, second_level_G, cex = .2,  col = alpha("red", 0.05))
-#             ## 4. First climatological limit (17)
-#             points(DATA_year$Azimuth, first_level_G,  cex = .2,  col = alpha("blue",0.05))
-#
-#             ## plot flagged
-#             points(DATA_year$Azimuth[soft], DATA_year$wattGLB[soft], cex = .7, col = "cyan")
-#             points(DATA_year$Azimuth[hard], DATA_year$wattGLB[hard], cex = .7, col = "magenta")
-#
-#             title(main = paste("Global climatological test 4.",YY))
-#             legend("topright",
-#                    legend = c("Global measurements", "Second limit", "First limit", "First measurements", "Second measurements"),
-#                    col    = c("black",               "red",          "blue",        "cyan",               "magenta"),
-#                    pch = 19, bty = "n", cex = 0.8 )
-#
-#             ## clean
-#             rm(second_level_G, first_level_G, second_level_D, first_level_D, hard, soft)
-#         }
-#     }##END if DO_TEST_04
-#
+
+
 #
 #     if (DO_TEST_05 & !all(is.na(DATA_year$wattDIR))) {
 #         ## . . Plot Tracker off test 5. ------------------------------------####
@@ -1090,19 +992,9 @@ wecare <- grep("QCF_DIR_|QCF_GLB_" , names(DATA), value = T )
 #     ))
 #
 #
-# #    ## Do some filtering (data drop) ##
-#
 
-# #
-# #    ## 8. Clearness index test
-# #    ## this values are mostly due to too low global values in retention with
-# #    ## cos(SZA) and TSI
-# #
-# #    sel_g <- DATA_year$QCF_GLB %in% c("Clearness index limit max (19)", "Clearness index limit min (20)")
-# #    DATA_year$wattGLB[sel_g] <- NA
-# #    cat(sprintf( " %6d  %s\n", sum(sel_g, na.rm = T), "Global Records removed due clearness index limits      (19) (20)'"))
-# #
-# #
+
+
 # #    ## Drop empty records
 # #    empty     <- is.na(DATA_year$wattDIR) & is.na(DATA_year$wattGLB)
 # #    DATA_year <- DATA_year[ !empty, ]
