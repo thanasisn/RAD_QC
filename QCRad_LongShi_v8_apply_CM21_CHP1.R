@@ -108,7 +108,27 @@ for (afl in fileslist) {
 }
 
 
-
+## Limits definition
+QS <- list(
+    sun_elev_min     = -2 * 0.103, # 0. Drop all data when sun is below this point
+    sun_elev_no_neg  =  0,         # 0. Don't allow negative values below this sun angle
+    glo_SWdn_min     = -4,         # 1. MIN Physically Possible Limits
+    dir_SWdn_min     = -4,         # 1. MIN Physically Possible Limits
+    glo_SWdn_min_ext = -2,         # 2. MIN Extremely Rare Minimum Limits
+    dir_SWdn_min_ext = -2,         # 2. MIN Extremely Rare Minimum Limits
+    dif_rati_min     =  0.001,     # 3. (12) extra comparison to check data
+    dif_rati_max     =  1.01,      # 3. (13) extra comparison to check data 1
+    clim_lim_C3      =  .81,       # 4. Direct Climatological (configurable) Limit first level
+    clim_lim_D3      =  .90,       # 4. Direct Climatological (configurable) Limit second level
+    clim_lim_C1      = 1.15,       # 4. Global Climatological (configurable) Limit first level
+    clim_lim_D1      = 1.35,       # 4. Global Climatological (configurable) Limit second level
+    ClrSW_a          = 1050.5,     # 5. Tracker off test Clear Sky factor a
+    ClrSW_b          = 1.095,      # 5. Tracker off test Clear Sky factor b
+    ClrSW_lim        = 0.85,       # 5. Tracker off test Threshold
+    CL_idx_max       = 1.3,        # 8. Clearness index test
+    CL_idx_min       = -0.001,     # 8. Clearness index test
+    NULL
+)
 
 
 ####  Check Quality factors  ####
@@ -149,6 +169,7 @@ keys  <- c("Second climatological limit (16)")
 #'
 #+ echo=F, include=T
 
+
 ## find
 sel_d <- DATA$QCF_DIR_04.1 %in% keys
 sel_g <- DATA$QCF_GLB_04.1 %in% keys
@@ -168,8 +189,38 @@ levels(DATA$QCF_DIR_04.2)
 
 
 
-DATA[ !is.na(QCF_DIR_04.1) ]
-DATA[ !is.na(QCF_DIR_04.2) ]
+temp1 <- DATA[ !is.na(QCF_DIR_04.1) ]
+temp2 <- DATA[ !is.na(QCF_DIR_04.2) ]
+
+
+for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
+    pp <- DATA[ as.Date(Date) == ad, ]
+    if (any(!is.na(pp$wattDIR))) {
+        second <- pp[,TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15 ]
+        first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10 ]
+        cat(any(pp$wattDIR > second),"\n")
+        cat(any(pp$wattDIR > first),"\n")
+
+        ylim <- range(second,first,pp$wattDIR, na.rm = T)
+
+        plot(pp$Date, pp$wattDIR, "l", ylim = ylim)
+        lines(pp$Date, second, col = "pink" )
+        lines(pp$Date, first,  col = "red" )
+        title(as.Date(ad, origin = "1970-01-01"))
+
+        points(pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , Date],
+               pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , wattDIR],
+               ylim = ylim, col = "blue")
+
+        pp[, wattDIR > TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15 ]
+        pp[, wattDIR > TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10 ]
+    }
+}
+
+
+
+
+
 
 
 

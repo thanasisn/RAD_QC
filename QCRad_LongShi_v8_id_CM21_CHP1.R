@@ -457,7 +457,7 @@ for (YY in yearSTA:yearEND) {
         cat(sprintf(" %6d    %s\n\n", sum(DFR_low,  na.rm = T), "Records below our extra diffuse ratio limit   (12)"))
         cat(sprintf(" %6d    %s\n\n", sum(DFR_hig,  na.rm = T), "Records above our extra diffuse ratio limit   (13)"))
 
-        rm(DFR_prop,DFR_low,DFR_hig,DFR_A,DFR_B)
+        rm(DFR_prop, DFR_low, DFR_hig, DFR_A, DFR_B)
     } ##END if DO_TEST_03
 
 
@@ -470,12 +470,16 @@ for (YY in yearSTA:yearEND) {
         first_level_D  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C3 * cosde( DATA_year$SZA )**0.2 + 10
         CL_first_D     <- DATA_year$wattDIR > first_level_D
         CL_secon_D     <- DATA_year$wattDIR > second_level_D
-stop()
+
         ## Apply second limit first as it is looser than first
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_secon_D ] <- "Second climatological limit (16)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_first_D ] <- "First climatological limit (17)"
-        DATA_year$QCF_DIR_04.2[ CL_secon_D ]                       <- "Second climatological limit (16)"
-        DATA_year$QCF_DIR_04.1[ CL_first_D ]                       <- "First climatological limit (17)"
+
+        DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10,
+                  QCF_DIR_04.1 := "First climatological limit (17)"]
+        DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15,
+                  QCF_DIR_04.2 := "Second climatological limit (16)"]
+
 
         ## . . Global ------------------------------------------------------####
         second_level_G <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D1 * cosde( DATA_year$SZA )**1.2 + 60
@@ -486,16 +490,15 @@ stop()
         ## Apply second limit first as it is looser than first
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & CL_secon_G ] <- "Second climatological limit (16)"
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & CL_first_G ] <- "First climatological limit (17)"
-        DATA_year$QCF_DIR_04.2[ CL_secon_G ]                       <- "Second climatological limit (16)"
-        DATA_year$QCF_DIR_04.1[ CL_first_G ]                       <- "First climatological limit (17)"
 
-        ## . . Info --------------------------------------------------------####
-        cat(sprintf( " %6d    %s\n\n", sum(CL_secon_D, na.rm = T), "Records above Second climatological limit     (16)"))
-        cat(sprintf( " %6d    %s\n\n", sum(CL_first_D, na.rm = T), "Records above First climatological limit      (17)"))
-        cat(sprintf( " %6d    %s\n\n", sum(CL_secon_G, na.rm = T), "Records above Second climatological limit     (16)"))
-        cat(sprintf( " %6d    %s\n\n", sum(CL_first_G, na.rm = T), "Records above First climatological limit      (17)"))
+        DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 55,
+                  QCF_GLB_04.1 := "First climatological limit (17)"]
+        DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60,
+                  QCF_GLB_04.2 := "Second climatological limit (16)"]
 
-        rm(CL_secon_D, CL_first_D, CL_secon_G, CL_first_G)
+
+        rm(CL_secon_D, CL_first_D, CL_secon_G, CL_first_G,
+           second_level_G, second_level_D)
     } ##END if DO_TEST_04
 
 
