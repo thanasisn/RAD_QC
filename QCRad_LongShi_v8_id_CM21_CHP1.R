@@ -466,14 +466,14 @@ for (YY in yearSTA:yearEND) {
         cat(paste("\n4. Climatological (configurable) Limits.\n\n"))
 
         ## . . Direct ------------------------------------------------------####
-        second_level_D <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D3 * cosde( DATA_year$SZA )**0.2 + 15
-        first_level_D  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C3 * cosde( DATA_year$SZA )**0.2 + 10
-        CL_first_D     <- DATA_year$wattDIR > first_level_D
-        CL_secon_D     <- DATA_year$wattDIR > second_level_D
-
-        ## Apply second limit first as it is looser than first
-        DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_secon_D ] <- "Second climatological limit (16)"
-        DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_first_D ] <- "First climatological limit (17)"
+        # second_level_D <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D3 * cosde( DATA_year$SZA )**0.2 + 15
+        # first_level_D  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C3 * cosde( DATA_year$SZA )**0.2 + 10
+        # CL_first_D     <- DATA_year$wattDIR > first_level_D
+        # CL_secon_D     <- DATA_year$wattDIR > second_level_D
+        #
+        # ## Apply second limit first as it is looser than first
+        # DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_secon_D ] <- "Second climatological limit (16)"
+        # DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & CL_first_D ] <- "First climatological limit (17)"
 
         DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10,
                   QCF_DIR_04.1 := "First climatological limit (17)"]
@@ -482,23 +482,16 @@ for (YY in yearSTA:yearEND) {
 
 
         ## . . Global ------------------------------------------------------####
-        second_level_G <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D1 * cosde( DATA_year$SZA )**1.2 + 60
-        first_level_G  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C1 * cosde( DATA_year$SZA )**1.2 + 55
-        CL_first_G     <- DATA_year$wattGLB > first_level_G
-        CL_secon_G     <- DATA_year$wattGLB > second_level_G
+        ## This have to allow for the enhancement cases of Global.
 
-        ## Apply second limit first as it is looser than first
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & CL_secon_G ] <- "Second climatological limit (16)"
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & CL_first_G ] <- "First climatological limit (17)"
 
-        DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 55,
+        DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60,
                   QCF_GLB_04.1 := "First climatological limit (17)"]
         DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60,
                   QCF_GLB_04.2 := "Second climatological limit (16)"]
 
 
-        rm(CL_secon_D, CL_first_D, CL_secon_G, CL_first_G,
-           second_level_G, second_level_D)
+        rm(CL_secon_D, CL_first_D, CL_secon_G, CL_first_G)
     } ##END if DO_TEST_04
 
 
@@ -889,6 +882,9 @@ for (YY in yearSTA:yearEND) {
     if (DO_TEST_04 & !all(is.na(DATA_year$wattDIR))) {
         ## . . Plot climatological test 4. ---------------------------------####
         if (any(!is.na(DATA_year$wattDIR))) {
+            ## check if is the same as above
+            second_level_D <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D3 * cosde( DATA_year$SZA )**0.2 + 15
+            first_level_D  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C3 * cosde( DATA_year$SZA )**0.2 + 10
             ## For Direct
             ylim <- range(second_level_D,
                           first_level_D,
@@ -942,6 +938,9 @@ for (YY in yearSTA:yearEND) {
 
 
         if (any(!is.na(DATA_year$wattGLB))) {
+            ## check if is the same as above
+            second_level_G <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D1 * cosde( DATA_year$SZA )**1.2 + 60
+            first_level_G  <- DATA_year$TSIextEARTH_comb * QS$clim_lim_C1 * cosde( DATA_year$SZA )**1.2 + 60
             ## For global
             ylim <- range(second_level_G,
                           first_level_G,

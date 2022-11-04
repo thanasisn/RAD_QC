@@ -120,7 +120,7 @@ QS <- list(
     dif_rati_max     =  1.01,      # 3. (13) extra comparison to check data 1
     clim_lim_C3      =  .81,       # 4. Direct Climatological (configurable) Limit first level
     clim_lim_D3      =  .90,       # 4. Direct Climatological (configurable) Limit second level
-    clim_lim_C1      = 1.15,       # 4. Global Climatological (configurable) Limit first level
+    clim_lim_C1      = 1.22,       # 4. Global Climatological (configurable) Limit first level
     clim_lim_D1      = 1.35,       # 4. Global Climatological (configurable) Limit second level
     ClrSW_a          = 1050.5,     # 5. Tracker off test Clear Sky factor a
     ClrSW_b          = 1.095,      # 5. Tracker off test Clear Sky factor b
@@ -132,6 +132,9 @@ QS <- list(
 
 
 ####  Check Quality factors  ####
+
+
+range(DATA$Date)
 
 
 
@@ -189,10 +192,9 @@ levels(DATA$QCF_DIR_04.2)
 
 
 
+## test direct
 temp1 <- DATA[ !is.na(QCF_DIR_04.1) ]
 temp2 <- DATA[ !is.na(QCF_DIR_04.2) ]
-
-
 for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
     pp <- DATA[ as.Date(Date) == ad, ]
     if (any(!is.na(pp$wattDIR))) {
@@ -217,6 +219,32 @@ for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
     }
 }
 
+## test global
+temp1 <- DATA[ !is.na(QCF_GLB_04.1) ]
+temp2 <- DATA[ !is.na(QCF_GLB_04.2) ]
+for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
+    pp <- DATA[ as.Date(Date) == ad, ]
+    if (any(!is.na(pp$wattGLB))) {
+        second <- pp[,TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60 ]
+        first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60 ]
+
+        ylim <- range(second,first,pp$wattDIR, na.rm = T)
+
+        plot(pp$Date, pp$wattGLB, "l", ylim = ylim)
+        lines(pp$Date, second, col = "pink" )
+        lines(pp$Date, first,  col = "red" )
+        title(as.Date(ad, origin = "1970-01-01"))
+
+        # points(pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , Date],
+        #        pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , wattGLB],
+        #        ylim = ylim, col = "blue")
+
+        points(pp[wattGLB > second | wattGLB > first , Date],
+               pp[wattGLB > second | wattGLB > first , wattGLB],
+               ylim = ylim, col = "red", pch = 1)
+
+    }
+}
 
 
 
