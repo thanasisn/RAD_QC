@@ -176,11 +176,13 @@ keys  <- c("Second climatological limit (16)", "First climatological limit (17)"
 #'
 #+ echo=F, include=T
 
+
+
 # levels(DATA$QCF_GLB_04.1)
 # levels(DATA$QCF_GLB_04.2)
 # levels(DATA$QCF_DIR_04.1)
 # levels(DATA$QCF_DIR_04.2)
-
+#
 # ## test direct
 # temp1 <- DATA[ !is.na(QCF_DIR_04.1) ]
 # temp2 <- DATA[ !is.na(QCF_DIR_04.2) ]
@@ -338,12 +340,12 @@ keys <- c("Direct > global hard (15)","Direct > global soft (14)")
 #'
 #+ echo=F, include=T
 
-## use the applied limits
+
 lim1 <- QS$dir_glo_invert
 off1 <- QS$dir_glo_glo_off
 
-hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat  > 3,    Elevat])
-hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat  > 3,    wattHOR - wattGLB])
+hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat > 3, Elevat])
+hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat > 3, wattHOR - wattGLB])
 hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Elevat])
 hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattHOR - wattGLB])
 
@@ -353,7 +355,7 @@ test <- DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1  ]
 
 for (ad in unique(as.Date(test$Date))) {
     pp   <- DATA[ as.Date(Date) == ad, ]
-    ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
+    ylim <- range(pp$wattGLB,pp$wattHOR, na.rm = T)
     plot( pp$Date, pp$wattHOR, "l", ylim = ylim, col = "blue")
     lines(pp$Date, pp$wattGLB, col = "green" )
     title(as.Date(ad, origin = "1970-01-01"))
@@ -364,23 +366,6 @@ for (ad in unique(as.Date(test$Date))) {
            pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattGLB],
            ylim = ylim, col = "green")
 }
-
-
-stop()
-
-
-## remove
-DATA[ QCF_BTH_08 %in% keys, wattGLB := NA ]
-DATA[ QCF_BTH_08 %in% keys, wattHOR := NA ]
-DATA[ QCF_BTH_08 %in% keys, wattDIR := NA ]
-## info
-cat(c(DATA[ QCF_BTH_08 %in% keys, .N ], " Global or Direct Records removed with:", keys), ".\n\n")
-## remove empty entries
-DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
-DATA$QCF_BTH_08 <- NULL
-
-
-
 
 
 
