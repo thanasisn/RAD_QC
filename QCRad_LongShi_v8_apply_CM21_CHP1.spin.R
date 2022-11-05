@@ -53,7 +53,7 @@
 knitr::opts_chunk$set(comment    = ""       )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
+knitr::opts_chunk$set(out.height = "30%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
 knitr::opts_chunk$set(cache      =  TRUE    )
 # knitr::opts_chunk$set(fig.pos    = '!h'    )
@@ -144,6 +144,7 @@ range(DATA$Date)
 #### ~ 1. PHYSICALLY POSSIBLE LIMITS PER BSRN ~ ####
 keys  <- c("Physical possible limit min (5)", "Physical possible limit max (6)")
 #'
+#' \newpage
 #' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
 #'
 #' Drop all data with flag: `r paste(keys)`.
@@ -168,21 +169,21 @@ if (sum(sel_d, sel_g) > 0) {
 
 
 #### ~ 4. Climatological (configurable) Limits ~ ####
-keys  <- c("Second climatological limit (16)", "First climatological limit (17)")
+keys  <- c("Second climatological limit (16)",
+           "First climatological limit (17)")
 #'
+#' \newpage
 #' ## 4. Climatological (configurable) Limits
 #'
 #' Drop all data with flag: `r paste(keys)`.
 #'
 #+ echo=F, include=T
 
-
-
 # levels(DATA$QCF_GLB_04.1)
 # levels(DATA$QCF_GLB_04.2)
 # levels(DATA$QCF_DIR_04.1)
 # levels(DATA$QCF_DIR_04.2)
-#
+
 # ## test direct
 # temp1 <- DATA[ !is.na(QCF_DIR_04.1) ]
 # temp2 <- DATA[ !is.na(QCF_DIR_04.2) ]
@@ -244,15 +245,21 @@ DATA$QCF_GLB_04.2   <- NULL
 ## remove empty entries
 DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
 ## info
-cat(c(sum(sel_d, na.rm = T), " Direct Records removed with:", keys), ".\n\n")
-cat(c(sum(sel_g, na.rm = T), " Global Records removed with:", keys), ".\n\n")
+cat(c(sum(sel_d, na.rm = T),
+      " Direct Records removed with:",
+      keys), ".\n\n")
+cat(c(sum(sel_g, na.rm = T),
+      " Global Records removed with:",
+      keys), ".\n\n")
 
 
 
 
 #### ~ 9. Clearness index test ~ ####
-keys  <- c("Clearness index limit max (19)", "Clearness index limit min (20)")
+keys  <- c("Clearness index limit max (19)",
+           "Clearness index limit min (20)")
 #'
+#' \newpage
 #' ## 9. Clearness index test
 #'
 #' Drop all data with flag: `r paste(keys)`.
@@ -264,57 +271,58 @@ keys  <- c("Clearness index limit max (19)", "Clearness index limit min (20)")
 #+ echo=F, include=T
 
 # levels(DATA$QCF_GLB_09)
-# hist(DATA[ QCF_GLB_09 %in% keys, wattGLB], breaks = 100 )
-# hist(DATA[ QCF_GLB_09 %in% keys, Elevat ], breaks = 100 )
-# hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, wattGLB], breaks = 100 )
-# hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, Elevat ], breaks = 100 )
-#
+hist(DATA[ QCF_GLB_09 %in% keys,              wattGLB], breaks = 100 )
+hist(DATA[ QCF_GLB_09 %in% keys,              Elevat ], breaks = 100 )
+hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, wattGLB], breaks = 100 )
+hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, Elevat ], breaks = 100 )
+
 # test <- DATA[ , .(Min_kt =  min(Clearness_Kt, na.rm = T),
 #                   Max_kt =  max(Clearness_Kt, na.rm = T)),
 #               by = .(Elevat = (Elevat %/% 0.01) * 0.01 ) ]
-#
 # plot(test$Elevat, test$Max_kt)
 # plot(test$Elevat, test$Min_kt)
-#
+
 # DATA[ Clearness_Kt >  10 , Clearness_Kt := NA]
 # DATA[ Clearness_Kt < -20 , Clearness_Kt := NA]
 # min(DATA$SZA)
 # max(DATA$SZA)
 # cosde(90.00000001)
 # cosde(89.99999999)
-#
-# tmp <- DATA[ Elevat < 120 ]
-# for (ay in unique(year(tmp$Date))) {
-#     pp <- tmp[year(tmp$Date) == ay]
-#     # plot(pp$Azimuth, pp$wattGLB, main = ay, pch = 19, cex = 0.1)
-#     # points(pp[QCF_GLB_09 %in% keys,Azimuth],
-#     #      pp[QCF_GLB_09 %in% keys,wattGLB],
-#     #      pch = 19, cex = 0.2, col = "red")
-#     ylim = c(-20, 20)
-#     # plot(pp$Azimuth, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
-#     # points(pp[QCF_GLB_09 %in% keys,Azimuth],
-#     #        pp[QCF_GLB_09 %in% keys,Clearness_Kt],
-#     #        pch = 19, cex = 0.2, col = "red")
-#     #
-#     # abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
-#     # abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
-#     ylim = c(-0.5, 2)
-#     plot(pp$Elevat, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
-#     points(pp[Clearness_Kt > QS$CL_idx_max, Elevat],
-#            pp[Clearness_Kt > QS$CL_idx_max, Clearness_Kt],
-#            pch = 19, cex = 0.3, col = "red")
-#     points(pp[Clearness_Kt < QS$CL_idx_min, Elevat],
-#            pp[Clearness_Kt < QS$CL_idx_min, Clearness_Kt],
-#            pch = 19, cex = 0.3, col = "blue")
-#     abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
-#     abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
-# }
+
+tmp <- DATA[ Elevat < 120 ]
+for (ay in unique(year(tmp$Date))) {
+    pp <- tmp[year(tmp$Date) == ay]
+    # plot(pp$Azimuth, pp$wattGLB, main = ay, pch = 19, cex = 0.1)
+    # points(pp[QCF_GLB_09 %in% keys,Azimuth],
+    #      pp[QCF_GLB_09 %in% keys,wattGLB],
+    #      pch = 19, cex = 0.2, col = "red")
+    ylim = c(-20, 20)
+    # plot(pp$Azimuth, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
+    # points(pp[QCF_GLB_09 %in% keys,Azimuth],
+    #        pp[QCF_GLB_09 %in% keys,Clearness_Kt],
+    #        pch = 19, cex = 0.2, col = "red")
+    #
+    # abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
+    # abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+    ylim = c(-0.5, 2)
+    plot(pp$Elevat, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
+    points(pp[Clearness_Kt > QS$CL_idx_max, Elevat],
+           pp[Clearness_Kt > QS$CL_idx_max, Clearness_Kt],
+           pch = 19, cex = 0.3, col = "red")
+    points(pp[Clearness_Kt < QS$CL_idx_min, Elevat],
+           pp[Clearness_Kt < QS$CL_idx_min, Clearness_Kt],
+           pch = 19, cex = 0.3, col = "blue")
+    abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
+    abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+}
 
 
 ## remove
-DATA[ QCF_GLB_09 %in% keys, wattGLB := NA ]
+DATA[QCF_GLB_09 %in% keys, wattGLB := NA]
 ## info
-cat(c(DATA[ QCF_GLB_09 %in% keys, .N ], " Global Records removed with:", keys), ".\n\n")
+cat(c(DATA[QCF_GLB_09 %in% keys, .N],
+      " Global Records removed with:",
+      keys), ".\n\n")
 ## remove empty entries
 DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
 DATA$QCF_GLB_09 <- NULL
@@ -327,6 +335,7 @@ DATA$QCF_GLB_09 <- NULL
 #### ~  8. Test for inverted values ~ ####
 keys <- c("Direct > global hard (15)","Direct > global soft (14)")
 #'
+#' \newpage
 #' ## 8. Test for inverted values
 #'
 #' Drop all data with flag: `r paste(keys)`.
@@ -340,12 +349,12 @@ keys <- c("Direct > global hard (15)","Direct > global soft (14)")
 #'
 #+ echo=F, include=T
 
-
+## use the applied limits
 lim1 <- QS$dir_glo_invert
 off1 <- QS$dir_glo_glo_off
 
-hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat > 3, Elevat])
-hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat > 3, wattHOR - wattGLB])
+hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat  > 3,    Elevat])
+hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat  > 3,    wattHOR - wattGLB])
 hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Elevat])
 hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattHOR - wattGLB])
 
@@ -355,8 +364,9 @@ test <- DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1  ]
 
 for (ad in unique(as.Date(test$Date))) {
     pp   <- DATA[ as.Date(Date) == ad, ]
-    ylim <- range(pp$wattGLB,pp$wattHOR, na.rm = T)
-    plot( pp$Date, pp$wattHOR, "l", ylim = ylim, col = "blue")
+    ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
+    plot( pp$Date, pp$wattHOR, "l",
+          ylim = ylim, col = "blue", ylab = "", xlab = "")
     lines(pp$Date, pp$wattGLB, col = "green" )
     title(as.Date(ad, origin = "1970-01-01"))
     points(pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Date],
@@ -366,6 +376,23 @@ for (ad in unique(as.Date(test$Date))) {
            pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattGLB],
            ylim = ylim, col = "green")
 }
+
+
+
+
+
+## remove
+DATA[ QCF_BTH_08 %in% keys, wattGLB := NA ]
+DATA[ QCF_BTH_08 %in% keys, wattHOR := NA ]
+DATA[ QCF_BTH_08 %in% keys, wattDIR := NA ]
+## info
+cat(c(DATA[ QCF_BTH_08 %in% keys, .N ], " Global or Direct Records removed with:", keys), ".\n\n")
+## remove empty entries
+DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
+DATA$QCF_BTH_08 <- NULL
+
+
+
 
 
 
