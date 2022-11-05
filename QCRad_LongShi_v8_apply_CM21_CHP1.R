@@ -320,13 +320,39 @@ DATA$QCF_GLB_09 <- NULL
 
 
 
+#### ~ 9. Clearness index test ~ ####
+
+
+
+hist(DATA[ wattHOR - wattGLB > 0 , Elevat])
+
+
+
 
 all(DATA$QCF_DIR_08 == DATA$QCF_GLB_08, na.rm = T)
 
 
 test <- DATA[ !is.na(QCF_DIR_08), ]
 
-unique(as.Date(test$Date))
+
+
+for (ad in unique(as.Date(test$Date))) {
+
+    pp <- DATA[ as.Date(Date) == ad, ]
+    #         second <- pp[,TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15 ]
+    #         first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10 ]
+    ylim <- range(pp$wattGLB,pp$wattDIR, na.rm = T)
+    plot( pp$Date, pp$wattDIR, "l", ylim = ylim, col = "blue")
+    lines(pp$Date, pp$wattGLB, col = "green" )
+    title(as.Date(ad, origin = "1970-01-01"))
+    points(pp[!is.na(QCF_DIR_08)|!is.na(QCF_GLB_08), Date],
+           pp[!is.na(QCF_DIR_08)|!is.na(QCF_GLB_08), wattDIR],
+           ylim = ylim, col = "blue")
+    points(pp[!is.na(QCF_DIR_08)|!is.na(QCF_GLB_08), Date],
+           pp[!is.na(QCF_DIR_08)|!is.na(QCF_GLB_08), wattGLB],
+           ylim = ylim, col = "green")
+
+}
 
 
 
