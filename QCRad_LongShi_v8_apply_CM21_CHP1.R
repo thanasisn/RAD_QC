@@ -412,18 +412,6 @@ DATA$QCF_GLB_09 <- NULL
 
 
 
-
-
-#### ~ 6. Rayleigh Limit Diffuse Comparison ~ ####
-keys  <- c("Rayleigh diffuse limit (18)")
-#'
-#' \newpage
-#' ## 6. Rayleigh Limit Diffuse Comparison
-#'
-#' Compare measured diffuse radiation with a modeled value of diffuse.
-#'
-#'
-
 Rayleigh_diff <- function(SZA, Pressure) {
 
     a    <-   209.3
@@ -435,12 +423,26 @@ Rayleigh_diff <- function(SZA, Pressure) {
     mu_0 <- cosde(SZA)
 
     return( a * mu_0     +
-            b * mu_0 ^ 2 +
-            c * mu_0 ^ 3 +
-            d * mu_0 ^ 4 +
-            e * mu_0 ^ 5 +
-            f * mu_0 * Pressure )
+                b * mu_0 ^ 2 +
+                c * mu_0 ^ 3 +
+                d * mu_0 ^ 4 +
+                e * mu_0 ^ 5 +
+                f * mu_0 * Pressure )
 }
+
+
+#### ~ 6. Rayleigh Limit Diffuse Comparison ~ ####
+keys  <- c("Rayleigh diffuse limit (18)")
+#'
+#' \newpage
+#' ## 6. Rayleigh Limit Diffuse Comparison
+#'
+#' Compare inferred diffuse radiation with a modeled value of diffuse,
+#' based on SZA and atmospheric pressure.
+#'
+#' `r Rayleigh_diff`
+#'
+
 
 
 DATA[ , RaylDIFF := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
@@ -458,7 +460,7 @@ for (ad in unique(as.Date(test$Date))) {
 
     ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
     plot( pp$Date, pp$wattDIF, "l",
-          ylim = ylim, col = "cyan", ylab = "", xlab = "")
+          ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
     lines(pp$Date, pp$RaylDIFF, col = "red" )
     title(as.Date(ad, origin = "1970-01-01"))
     # par(new = T)
