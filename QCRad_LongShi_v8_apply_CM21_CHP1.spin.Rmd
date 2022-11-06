@@ -1,55 +1,54 @@
-# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
-#' ---
-#' title:       "QCRad methodology application."
-#' author:      "Natsis Athanasios"
-#' institute:   "AUTH"
-#' affiliation: "Laboratory of Atmospheric Physics"
-#' abstract:    "Data quality for radiation measurements as described by
-#'               CN Long and Y Shi, September 2006, DOE/SC-ARM/TR-074.
-#'               - The QCRad Value Added Product Surface
-#'               Radiation Measurement Quality Control Testing Including
-#'               Climatology_Long2006.pdf"
-#'
-#' documentclass: article
-#' classoption:   a4paper,oneside
-#' fontsize:      10pt
-#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#'
-#' link-citations:  yes
-#' colorlinks:      yes
-#'
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections:  no
-#'     fig_caption:      no
-#'     keep_tex:         no
-#'     latex_engine:     xelatex
-#'     toc:              yes
-#'     fig_width:        8
-#'     fig_height:       5
-#'   html_document:
-#'     toc: true
-#'     fig_width:  9
-#'     fig_height: 4
-#'   pdf_document:
-#' date: "`r format(Sys.time(), '%F')`"
-#' ---
+---
+title:       "QCRad methodology application."
+author:      "Natsis Athanasios"
+institute:   "AUTH"
+affiliation: "Laboratory of Atmospheric Physics"
+abstract:    "Data quality for radiation measurements as described by
+              CN Long and Y Shi, September 2006, DOE/SC-ARM/TR-074.
+              - The QCRad Value Added Product Surface
+              Radiation Measurement Quality Control Testing Including
+              Climatology_Long2006.pdf"
+
+documentclass: article
+classoption:   a4paper,oneside
+fontsize:      10pt
+geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+
+link-citations:  yes
+colorlinks:      yes
+
+header-includes:
+- \usepackage{caption}
+- \usepackage{placeins}
+- \captionsetup{font=small}
+
+output:
+  bookdown::pdf_document2:
+    number_sections:  no
+    fig_caption:      no
+    keep_tex:         no
+    latex_engine:     xelatex
+    toc:              yes
+    fig_width:        8
+    fig_height:       5
+  html_document:
+    toc: true
+    fig_width:  9
+    fig_height: 4
+  pdf_document:
+date: "`r format(Sys.time(), '%F')`"
+---
+
+**Source code: [github.com/thanasisn/RAD_QC](https://github.com/thanasisn/RAD_QC)**
 
 
-#'
-#' **Source code: [github.com/thanasisn/RAD_QC](https://github.com/thanasisn/RAD_QC)**
-#'
-#'
-#+ echo=F, include=T
+
+```{r echo=F, include=T}
 
 ####_  Document options _####
 
-#+ echo=F, include=F
+```
+```{r echo=F, include=F}
 knitr::opts_chunk$set(comment    = ""       )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"    )
@@ -70,7 +69,8 @@ knitr::opts_chunk$set(cache      =  TRUE    )
 ## The chosen levels have to be evaluated with the available data
 ##
 
-#+ include=F, echo=F
+```
+```{r include=F, echo=F}
 ####  Set environment  ####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
@@ -82,7 +82,8 @@ if (!interactive()) {
 }
 
 
-#+ echo=F, include=T
+```
+```{r echo=F, include=T}
 ####  External code  ####
 library(scales,     warn.conflicts = F, quietly = T)
 library(data.table, warn.conflicts = F, quietly = T)
@@ -144,13 +145,16 @@ range(DATA$Date)
 
 #### ~ 1. PHYSICALLY POSSIBLE LIMITS PER BSRN ~ ####
 keys  <- c("Physical possible limit min (5)", "Physical possible limit max (6)")
-#'
-#' \newpage
-#' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
-#'
-#' Drop all data with flag: `r paste(keys)`.
-#'
-#+ echo=F, include=T
+```
+
+
+\newpage
+## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
+
+Drop all data with flag: `r paste(keys)`.
+
+
+```{r echo=F, include=T}
 
 ## find
 sel_d <- DATA$QCF_DIR_01 %in% keys
@@ -172,13 +176,16 @@ if (sum(sel_d, sel_g) > 0) {
 #### ~ 4. Climatological (configurable) Limits ~ ####
 keys  <- c("Second climatological limit (16)",
            "First climatological limit (17)")
-#'
-#' \newpage
-#' ## 4. Climatological (configurable) Limits
-#'
-#' Drop all data with flag: `r paste(keys)`.
-#'
-#+ echo=F, include=T
+```
+
+
+\newpage
+## 4. Climatological (configurable) Limits
+
+Drop all data with flag: `r paste(keys)`.
+
+
+```{r echo=F, include=T}
 
 # levels(DATA$QCF_GLB_04.1)
 # levels(DATA$QCF_GLB_04.2)
@@ -261,17 +268,20 @@ cat(c(sum(sel_g, na.rm = T),
 #### ~ 9. Clearness index test ~ ####
 keys  <- c("Clearness index limit max (19)",
            "Clearness index limit min (20)")
-#'
-#' \newpage
-#' ## 9. Clearness index test
-#'
-#' Drop all data with flag: `r paste(keys)`.
-#'
-#' These data are near Elevation 0 and caused by the cos(SZA)
-#' kt = GLB / (cos(sza) * TSI)
-#' low GLB value end extreme cos(sza) values
-#'
-#+ echo=F, include=T
+```
+
+
+\newpage
+## 9. Clearness index test
+
+Drop all data with flag: `r paste(keys)`.
+
+These data are near Elevation 0 and caused by the cos(SZA)
+kt = GLB / (cos(sza) * TSI)
+low GLB value end extreme cos(sza) values
+
+
+```{r echo=F, include=T}
 
 if (DO_PLOTS) {
     # levels(DATA$QCF_GLB_09)
@@ -340,20 +350,23 @@ DATA$QCF_GLB_09 <- NULL
 
 #### ~  8. Test for inverted values ~ ####
 keys <- c("Direct > global hard (15)","Direct > global soft (14)")
-#'
-#' \newpage
-#' ## 8. Test for inverted values
-#'
-#' Drop all data with flag: `r paste(keys)`.
-#'
-#' When the Direct on horizontal level is greater than a %
-#' from the Global.
-#'
-#' This denotes obstacles on the morning mostly, or very low
-#' signals when Sun is near the horizon. And possible
-#' cases of Instrument windows cleaning.
-#'
-#+ echo=F, include=T
+```
+
+
+\newpage
+## 8. Test for inverted values
+
+Drop all data with flag: `r paste(keys)`.
+
+When the Direct on horizontal level is greater than a %
+from the Global.
+
+This denotes obstacles on the morning mostly, or very low
+signals when Sun is near the horizon. And possible
+cases of Instrument windows cleaning.
+
+
+```{r echo=F, include=T}
 
 if (DO_PLOTS) {
     ## use the applied limits
@@ -1183,9 +1196,12 @@ for (fg in wecare) {
 # # if (!TESTING) myRtools::write_RDS( SUS_DATA_gather, SUSPECTS_EXP )
 # # ##----------------------------------------------------------------------------##
 #
+```
 
+**END**
 
-#' **END**
-#+ include=T, echo=F
+```{r include=T, echo=F}
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+```
+
