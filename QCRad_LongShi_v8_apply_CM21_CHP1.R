@@ -96,6 +96,9 @@ DATA_BASE     <- "~/DATA/Broad_Band/QCRad_LongShi/"
 IN_PREFIX     <- "LAP_QCRad_LongShi_v8_id_CM21_CHP1_"
 
 DO_PLOTS      <- TRUE
+if (interactive()) {
+    DO_PLOTS      <- FALSE
+}
 
 
 ####  Load all data  ####
@@ -406,7 +409,6 @@ DATA$QCF_GLB_09 <- NULL
 
 
 
-####    ############################
 
 
 
@@ -422,14 +424,58 @@ keys  <- c("Rayleigh diffuse limit (18)")
 #'
 #'
 
+Rayleigh_diff <- function(SZA, Pressure) {
+
+    a    <-   209.3
+    b    <-  -708.3
+    c    <-  1128.7
+    d    <-  -911.2
+    e    <-   287.85
+    f    <-     0.046725
+    mu_0 <- cosde(SZA)
+
+    return( a * mu_0     +
+            b * mu_0 ^ 2 +
+            c * mu_0 ^ 3 +
+            d * mu_0 ^ 4 +
+            e * mu_0 ^ 5 +
+            f * mu_0 * Pressure )
+}
 
 
+DATA[ , RaylDIFF := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
 
 
+test <- unique(DATA[ wattGLB > 50 &
+                     (wattDIF / wattGLB) < 0.8 &
+                      wattDIF < (RaylDIFF - 1),  ])
 
 
+for (ad in unique(as.Date(test$Date))) {
+    pp   <- DATA[ as.Date(Date) == ad, ]
 
+    layout(matrix(c(1,2), 2, 1, byrow = TRUE))
 
+    ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
+    plot( pp$Date, pp$wattDIF, "l",
+          ylim = ylim, col = "cyan", ylab = "", xlab = "")
+    lines(pp$Date, pp$RaylDIFF, col = "red" )
+    title(as.Date(ad, origin = "1970-01-01"))
+    # par(new = T)
+
+    ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
+    plot( pp$Date, pp$wattGLB, "l",
+          ylim = ylim, col = "green", ylab = "", xlab = "")
+    lines(pp$Date, pp$wattDIR, col = "blue" )
+
+    points(pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), Date],
+           pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), wattDIR],
+           ylim = ylim, col = "red")
+    points(pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), Date],
+           pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), wattGLB],
+           ylim = ylim, col = "red")
+
+}
 
 
 
@@ -447,7 +493,7 @@ for (fg in wecare) {
 }
 
 
-wecare <- grep("QCF_DIR_|QCF_GLB_" , names(DATA), value = T )
+wecare <- grep("QCF_DIR_|QCF_GLB_|QCF_BTH_" , names(DATA), value = T )
 
 for (fg in wecare) {
     cat(paste(fg),"\n")
@@ -462,14 +508,6 @@ for (fg in wecare) {
 #         try(plot(DATA$Date, factor(DATA[[fg]]), main = fg))
 #     }
 # }
-#
-#
-#
-#
-#
-# stop()
-#
-#
 #
 #
 # #+ echo=F, include=T, results="asis"
