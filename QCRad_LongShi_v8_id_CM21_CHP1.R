@@ -548,9 +548,8 @@ for (YY in yearSTA:yearEND) {
 
         ## . . Both --------------------------------------------------------####
         DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & Rayleigh_lim ] <- "Rayleigh diffuse limit (18)"
-        DATA_year$QCF_GLB_06[ Rayleigh_lim ]                         <- "Rayleigh diffuse limit (18)"
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & Rayleigh_lim ] <- "Rayleigh diffuse limit (18)"
-        DATA_year$QCF_DIR_06[ Rayleigh_lim ]                         <- "Rayleigh diffuse limit (18)"
+        DATA_year$QCF_BTH_06[ Rayleigh_lim ]                         <- "Rayleigh diffuse limit (18)"
 
         ## . .  Info -------------------------------------------------------####
         cat(sprintf( " %6d    %s\n\n", sum(Rayleigh_lim, na.rm = T), "Rayleigh diffuse limit                               (18)"))
@@ -862,7 +861,7 @@ for (YY in yearSTA:yearEND) {
 
 
     if (DO_TEST_04 & !all(is.na(DATA_year$wattDIR))) {
-        ## . . Plot climatological test 4. ---------------------------------####
+        ## . . 4. Plot climatological test ---------------------------------####
         if (any(!is.na(DATA_year$wattDIR))) {
             ## check if is the same as above
             second_level_D <- DATA_year$TSIextEARTH_comb * QS$clim_lim_D3 * cosde( DATA_year$SZA )**0.2 + 15
@@ -872,8 +871,8 @@ for (YY in yearSTA:yearEND) {
                           first_level_D,
                           DATA_year$wattDIR,
                           na.rm = T)
-            hard <- which(DATA_year$QCF_DIR %in% "Second climatological limit (16)")
-            soft <- which(DATA_year$QCF_DIR %in% "First climatological limit (17)")
+            hard <- which(DATA_year$QCF_DIR_04.2 %in% "Second climatological limit (16)")
+            soft <- which(DATA_year$QCF_DIR_04.1 %in% "First climatological limit (17)")
 
             ####  plot direct by SZA  ####
             cat("\n\n")
@@ -928,8 +927,8 @@ for (YY in yearSTA:yearEND) {
                           first_level_G,
                           DATA_year$wattGLB,
                           na.rm = TRUE)
-            hard <- which(DATA_year$QCF_GLB %in% "Second climatological limit (16)")
-            soft <- which(DATA_year$QCF_GLB %in% "First climatological limit (17)")
+            hard <- which(DATA_year$QCF_GLB_04.2 %in% "Second climatological limit (16)")
+            soft <- which(DATA_year$QCF_GLB_04.1 %in% "First climatological limit (17)")
 
             ####  plot global by SZA  ####
             cat("\n\n")
@@ -1071,9 +1070,9 @@ for (YY in yearSTA:yearEND) {
 
 
     if (DO_TEST_08 & !all(is.na(DATA_year$wattDIF))) {
-        ## . . Plot Diffuse inversion test 8. ------------------------------####
+        ## . . 8. Plot Diffuse inversion test ------------------------------####
 
-        ####  plot direct by SZA  ####
+        ##  plot direct by SZA
         cat("\n\n")
         plot( DATA_year$SZA[Dgood | Ggood], DATA_year$wattDIF[Dgood | Ggood],
               cex = .1,
@@ -1082,8 +1081,8 @@ for (YY in yearSTA:yearEND) {
         title(main = paste("Diffuse inversion test 8.",YY))
 
         ## plot flagged
-        ss <- which(DATA_year$QCF_DIR == "Direct > global soft (14)")
-        tt <- which(DATA_year$QCF_DIR == "Direct > global hard (15)")
+        ss <- which(DATA_year$QCF_BTH_08 == "Direct > global soft (14)")
+        tt <- which(DATA_year$QCF_BTH_08 == "Direct > global hard (15)")
 
         points( DATA_year$SZA[ss], DATA_year$wattDIF[ss],
                 cex = .7, col = "magenta" )
@@ -1097,7 +1096,7 @@ for (YY in yearSTA:yearEND) {
                pch = 19, bty = "n", cex = 0.8 )
 
 
-        ####  plot direct by Azimuth  ####
+        ## plot direct by Azimuth
         cat("\n\n")
         plot( DATA_year$Azimuth[Dgood | Ggood], DATA_year$wattDIF[Dgood | Ggood],
               cex = .1,
@@ -1105,8 +1104,8 @@ for (YY in yearSTA:yearEND) {
         title(main = paste("Diffuse inversion test 8.",YY))
 
         ## plot flagged
-        ss <- which(DATA_year$QCF_DIR == "Direct > global soft (14)")
-        tt <- which(DATA_year$QCF_DIR == "Direct > global hard (15)")
+        ss <- which(DATA_year$QCF_BTH_08 == "Direct > global soft (14)")
+        tt <- which(DATA_year$QCF_BTH_08 == "Direct > global hard (15)")
 
         points( DATA_year$Azimuth[ss], DATA_year$wattDIF[ss],
                 cex = .7, col = "magenta" )
@@ -1122,7 +1121,7 @@ for (YY in yearSTA:yearEND) {
 
 
     if (DO_TEST_09 & !all(is.na(DATA_year$Clearness_Kt)) ) {
-        ## . . Clearness index test 9. -------------------------------------####
+        ## . . 9. Clearness index test -------------------------------------####
         ylim <- range(DATA_year$Clearness_Kt, na.rm = T)
         if (ylim[1] < -1 ) ylim[1] = -1
         if (ylim[2] >  3 ) ylim[2] =  3
@@ -1447,8 +1446,7 @@ for (YY in yearSTA:yearEND) {
     ## . . Prepare main data for export ------------------------------------####
 
     ## Drop some columns ##
-    DATA_year <- subset( DATA_year, select = c(-pressure,
-                                               -Pressure_Source,
+    DATA_year <- subset( DATA_year, select = c(-Pressure_Source,
                                                -Times,
                                                -ClrSW
     ))

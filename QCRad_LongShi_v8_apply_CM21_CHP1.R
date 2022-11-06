@@ -196,7 +196,8 @@ if (DO_PLOTS) {
             second <- pp[,TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15 ]
             first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10 ]
             ylim <- range(second,first,pp$wattDIR, na.rm = T)
-            plot(pp$Date, pp$wattDIR, "l", ylim = ylim)
+            plot(pp$Date, pp$wattDIR, "l",
+                 ylim = ylim, ylab = "", xlab = "wattDIR")
             lines(pp$Date, second, col = "pink" )
             lines(pp$Date, first,  col = "red" )
             title(as.Date(ad, origin = "1970-01-01"))
@@ -218,7 +219,8 @@ if (DO_PLOTS) {
             second <- pp[,TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60 ]
             first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60 ]
             ylim <- range(second,first,pp$wattDIR, na.rm = T)
-            plot(pp$Date, pp$wattGLB, "l", ylim = ylim)
+            plot(pp$Date, pp$wattGLB, "l",
+                 ylim = ylim, xlab = "", ylab = "wattGLB")
             lines(pp$Date, second, col = "pink" )
             lines(pp$Date, first,  col = "red" )
             title(as.Date(ad, origin = "1970-01-01"))
@@ -254,6 +256,71 @@ cat(c(sum(sel_d, na.rm = T),
 cat(c(sum(sel_g, na.rm = T),
       " Global Records removed with:",
       keys), ".\n\n")
+
+
+
+
+
+#### ~  8. Test for inverted values ~ ####
+keys <- c("Direct > global hard (15)","Direct > global soft (14)")
+#'
+#' \newpage
+#' ## 8. Test for inverted values
+#'
+#' Drop all data with flag: `r paste(keys)`.
+#'
+#' When the Direct on horizontal level is greater than a %
+#' from the Global.
+#'
+#' This denotes obstacles on the morning mostly, or very low
+#' signals when Sun is near the horizon. And possible
+#' cases of Instrument windows cleaning.
+#'
+#+ echo=F, include=T
+
+if (DO_PLOTS) {
+    ## use the applied limits
+    lim1 <- QS$dir_glo_invert
+    off1 <- QS$dir_glo_glo_off
+
+    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat  > 3,    Elevat])
+    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat  > 3,    wattHOR - wattGLB])
+    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Elevat])
+    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattHOR - wattGLB])
+
+    # test <- DATA[ !is.na(QCF_BTH_08), ]
+    # test <- DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1 & Elevat > 15 ]
+    test <- DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1  ]
+
+    for (ad in unique(as.Date(test$Date))) {
+        pp   <- DATA[ as.Date(Date) == ad, ]
+        ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
+        plot( pp$Date, pp$wattHOR, "l",
+              ylim = ylim, col = "blue", ylab = "", xlab = "")
+        lines(pp$Date, pp$wattGLB, col = "green" )
+        title(as.Date(ad, origin = "1970-01-01"))
+        points(pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Date],
+               pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattHOR],
+               ylim = ylim, col = "blue")
+        points(pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Date],
+               pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattGLB],
+               ylim = ylim, col = "green")
+    }
+
+}
+
+## remove
+DATA[ QCF_BTH_08 %in% keys, wattGLB := NA ]
+DATA[ QCF_BTH_08 %in% keys, wattHOR := NA ]
+DATA[ QCF_BTH_08 %in% keys, wattDIR := NA ]
+## info
+cat(c(DATA[ QCF_BTH_08 %in% keys, .N ], " Global or Direct Records removed with:", keys), ".\n\n")
+## remove empty entries
+DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
+DATA$QCF_BTH_08 <- NULL
+
+
+
 
 
 
@@ -338,63 +405,27 @@ DATA$QCF_GLB_09 <- NULL
 
 
 
-#### ~  8. Test for inverted values ~ ####
-keys <- c("Direct > global hard (15)","Direct > global soft (14)")
+
+####    ############################
+
+
+
+
+
+#### ~ 6. Rayleigh Limit Diffuse Comparison ~ ####
+keys  <- c("Rayleigh diffuse limit (18)")
 #'
 #' \newpage
-#' ## 8. Test for inverted values
+#' ## 6. Rayleigh Limit Diffuse Comparison
 #'
-#' Drop all data with flag: `r paste(keys)`.
+#' Compare measured diffuse radiation with a modeled value of diffuse.
 #'
-#' When the Direct on horizontal level is greater than a %
-#' from the Global.
 #'
-#' This denotes obstacles on the morning mostly, or very low
-#' signals when Sun is near the horizon. And possible
-#' cases of Instrument windows cleaning.
-#'
-#+ echo=F, include=T
 
-if (DO_PLOTS) {
-    ## use the applied limits
-    lim1 <- QS$dir_glo_invert
-    off1 <- QS$dir_glo_glo_off
 
-    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat  > 3,    Elevat])
-    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat  > 3,    wattHOR - wattGLB])
-    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Elevat])
-    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattHOR - wattGLB])
 
-    # test <- DATA[ !is.na(QCF_BTH_08), ]
-    # test <- DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1 & Elevat > 15 ]
-    test <- DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1  ]
 
-    for (ad in unique(as.Date(test$Date))) {
-        pp   <- DATA[ as.Date(Date) == ad, ]
-        ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
-        plot( pp$Date, pp$wattHOR, "l",
-              ylim = ylim, col = "blue", ylab = "", xlab = "")
-        lines(pp$Date, pp$wattGLB, col = "green" )
-        title(as.Date(ad, origin = "1970-01-01"))
-        points(pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Date],
-               pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattHOR],
-               ylim = ylim, col = "blue")
-        points(pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Date],
-               pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattGLB],
-               ylim = ylim, col = "green")
-    }
 
-}
-
-## remove
-DATA[ QCF_BTH_08 %in% keys, wattGLB := NA ]
-DATA[ QCF_BTH_08 %in% keys, wattHOR := NA ]
-DATA[ QCF_BTH_08 %in% keys, wattDIR := NA ]
-## info
-cat(c(DATA[ QCF_BTH_08 %in% keys, .N ], " Global or Direct Records removed with:", keys), ".\n\n")
-## remove empty entries
-DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
-DATA$QCF_BTH_08 <- NULL
 
 
 
