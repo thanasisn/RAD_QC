@@ -386,8 +386,6 @@ if (DO_PLOTS) {
 
 }
 
-
-
 ## remove
 DATA[ QCF_BTH_08 %in% keys, wattGLB := NA ]
 DATA[ QCF_BTH_08 %in% keys, wattHOR := NA ]
