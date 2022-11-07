@@ -456,7 +456,7 @@ test <- unique(DATA[ wattGLB > 50 &
 for (ad in unique(as.Date(test$Date))) {
     pp   <- DATA[ as.Date(Date) == ad, ]
 
-    layout(matrix(c(1,2), 2, 1, byrow = TRUE))
+    # layout(matrix(c(1,2), 2, 1, byrow = TRUE))
 
     ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
     plot( pp$Date, pp$wattDIF, "l",
