@@ -490,7 +490,6 @@ for (ad in unique(as.Date(test$Date))) {
     cat("\n")
 
 }
-#+ echo=F, include=T
 
 
 
