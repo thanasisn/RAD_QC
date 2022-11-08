@@ -440,7 +440,7 @@ Rayleigh_diff <- function(SZA, Pressure) {
 #' - Difference on Sun observation angle due to different instruments location.
 #' - Cases of instrument windows cleaning
 #'
-# #' `r print(Rayleigh_diff)`
+#' `r print(Rayleigh_diff)`
 #'
 #+ echo=F, include=T
 
