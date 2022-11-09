@@ -116,7 +116,7 @@ QS <- list(
     dif_rati_max     =   1.01,      # 3. (13) extra comparison to check data 1
     clim_lim_C3      =   0.81,      # 4. Direct Climatological (configurable) Limit first level
     clim_lim_D3      =   0.90,      # 4. Direct Climatological (configurable) Limit second level
-    clim_lim_C1      =   1.22,      # 4. Global Climatological (configurable) Limit first level
+    clim_lim_C1      =   1.15,      # 4. Global Climatological (configurable) Limit first level
     clim_lim_D1      =   1.35,      # 4. Global Climatological (configurable) Limit second level
     ClrSW_a          = 1050.5,      # 5. Tracker off test Clear Sky factor a
     ClrSW_b          =   1.095,     # 5. Tracker off test Clear Sky factor b
