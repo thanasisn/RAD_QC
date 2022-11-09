@@ -1,6 +1,6 @@
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title:       "QCRad methodology application."
+#' title:       "QCRad methodology identification."
 #' author:      "Natsis Athanasios"
 #' institute:   "AUTH"
 #' affiliation: "Laboratory of Atmospheric Physics"
@@ -39,17 +39,29 @@
 #'   pdf_document:
 #' date: "`r format(Sys.time(), '%F')`"
 #' ---
-
-
 #'
 #' **Source code: [github.com/thanasisn/RAD_QC](https://github.com/thanasisn/RAD_QC)**
+#'
+#' ### Notes ###
+#'
+#' Run for each year and apply Quality control on radiation data.
+#'
+#' reads:
+#'   - level 1 data
+#'   - pressure reconstruction
+#'   - TSI reconstruction
+#'
+#' exports:
+#'   - characterized data with QCRad algorithm
+#'   - strict QCRad dat
+#'   - all bad data points
+#'
+#' The chosen levels have to be evaluated with the available data
 #'
 #'
 #+ echo=F, include=T
 
 ####_  Document options _####
-
-#+ echo=F, include=F
 knitr::opts_chunk$set(comment    = ""       )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"    )
@@ -57,22 +69,8 @@ knitr::opts_chunk$set(out.width  = "100%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
 # knitr::opts_chunk$set(fig.pos    = '!h'    )
 
-####_ Notes _####
 
-##
-## Run for each year and apply Quality control on radiation data.
-## reads:   from level 1 data
-##          pressure
-##          TSI
-## exports: characterized data with QCRad algorithm
-##          strict QCRad dat
-##          all bad data points
-##
-## The chosen levels have to be evaluated with the available data
-##
-
-#+ include=F, echo=F
-####  Set environment  ####
+####_  Set environment  _####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "./QCRad_LongShi_v8_id_CM21_CHP1.R"
@@ -82,16 +80,13 @@ if (!interactive()) {
     filelock::lock(paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".loc", Script.Name))), timeout = 0)
 }
 
-
-#+ echo=F, include=T
-####  External code  ####
-library(scales,     warn.conflicts = F, quietly = T)
-library(data.table, warn.conflicts = F, quietly = T)
+library(scales)
+library(data.table)
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/RAD_QC/Functions_write_data.R")
 
 
-### Variables init ###
+####  Variables init  ####
 
 ## data files pattern
 CHP1_BASE_IN   <- "~/DATA/Broad_Band/LAP_CHP1"
@@ -114,7 +109,7 @@ LAST_DAY_EXPR  <- as.POSIXct("2022-03-31")  ## day of last manual data clean
 
 
 
-## Limits definition
+## . . Limits definitions  ####
 QS <- list(
     sun_elev_min     =  -2 * 0.103, # 0. Drop all data when sun is below this point
     sun_elev_no_neg  =   0,         # 0. Don't allow negative values below this sun angle
@@ -243,12 +238,13 @@ for (YY in yearSTA:yearEND) {
     cat("\\newpage\n\n")
     cat("\n## Year:", YY, "\n\n")
 
-    ## start graphical device to output not in the pdf report
-    if (!interactive()) {
-        png(paste0("~/RAD_QC/REPORTS/", basename(sub("\\.R$","_", Script.Name)), YY, "_%04d.png"),
-            pointsize = 18, width = 960, height = 720)
+    if (!isTRUE(getOption('knitr.in.progress'))) {
+        ## start graphical device to output not in the pdf report
+        if (!interactive()) {
+            png(paste0("~/RAD_QC/REPORTS/", basename(sub("\\.R$","_", Script.Name)), YY, "_%04d.png"),
+                pointsize = 18, width = 960, height = 720)
+        }
     }
-
 
     ####  Get Direct if available  #####
     year_file1 <- paste0(CHP1_BASE_IN, "_L1_", YY, ".Rds")
@@ -1063,7 +1059,7 @@ for (YY in yearSTA:yearEND) {
 
             legend("topright",
                    legend = c("Direct measurements","Biology Build", "Possible pole obstruction"),
-                   col    = c("black",              "magenta",       "Cyan"      ),
+                   col    = c("black",              "magenta",       "Cyan"                     ),
                    pch = 19, bty = "n", cex = 0.8 )
         }
     }##END if DO_TEST_07
@@ -1254,7 +1250,7 @@ for (YY in yearSTA:yearEND) {
                legend = cnames,
                col = palete_rand[cnames],
                pch = 19, bty = "n", cex = 0.7 ) }
-    title(paste("All suspects on Global (excl. Diffuse ratio comp min (12)) for",YY))
+    title(paste("All suspects on Global (excl. Diffuse ratio comp min (12)) for", YY))
 
     ## by Azimuth
     cat("\n\n")
@@ -1454,7 +1450,6 @@ for (YY in yearSTA:yearEND) {
 
 #    ## Do some filtering (data drop) ##
 #
-#
 #    ## Drop empty records
 #    empty     <- is.na(DATA_year$wattDIR) & is.na(DATA_year$wattGLB)
 #    DATA_year <- DATA_year[ !empty, ]
@@ -1468,9 +1463,10 @@ for (YY in yearSTA:yearEND) {
    ## . . Export main data -------------------------------------------------####
    if ( !TESTING & dim(DATA_year)[1] > 0 ) {
        write_RDS(object = DATA_year,
-                 file   = paste0(OUTPUT_BASE, basename(sub("\\.R$","_", Script.Name)),YY))
+                 file   = paste0(OUTPUT_BASE,
+                                 basename(sub("\\.R$","_", Script.Name)), YY))
    }
-    ##-------------------------------------------------------------------------##
+   ##-------------------------------------------------------------------------##
 
 
 #    ##-- Strict output for clear sky use ---------------------------------------

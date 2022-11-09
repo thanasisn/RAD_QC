@@ -1,6 +1,6 @@
 # /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
 #' ---
-#' title:       "QCRad methodology application."
+#' title:       "QCRad methodology apply."
 #' author:      "Natsis Athanasios"
 #' institute:   "AUTH"
 #' affiliation: "Laboratory of Atmospheric Physics"
