@@ -13,10 +13,12 @@ exec  > >(tee -i "${LOG_FILE}")
 exec 2> >(tee -i "${ERR_FILE}" >&2)
 info "START :: $0 :: $* ::"
 
-exit
-info "Read raw files to SIG"
-Rscript "$(dirname "$0")/CHP1_R10_Read_raw_LAP.R"
+info "LongShi Idendification"
+Rscript "$(dirname "$0")/QCRad_LongShi_v8_id_CM21_CHP1.R
 
+
+info "LongShi Application"
+Rscript "$(dirname "$0")/QCRad_LongShi_v8_apply_CM21_CHP1.R
 
 
 
