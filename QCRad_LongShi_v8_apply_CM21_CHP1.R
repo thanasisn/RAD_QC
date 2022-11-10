@@ -89,9 +89,12 @@ IN_PREFIX     <- "LAP_QCRad_LongShi_v8_id_CM21_CHP1_"
 cachedata     <- "~/RAD_QC/temp_data.Rds"
 
 ####  Execution control  ####
-TEST_04      <- FALSE
 
-TEST_04      <- TRUE
+TEST_04      <- FALSE
+TEST_08      <- FALSE
+
+# TEST_04      <- TRUE
+TEST_08      <- TRUE
 
 
 DO_PLOTS      <- TRUE
@@ -204,22 +207,26 @@ keys  <- c("Second climatological limit (16)",
 #' \newpage
 #' ## 4. Climatological (configurable) Limits
 #'
-cat(paste("\n## 4. Climatological (configurable) Limits.\n\n"))
 #'
 #' Limits the maximum expected irradiance based on climatological
 #' observations levels and the value of TSI.
 #'
 #' Some hits on first limits are expected and need manual evaluation.
+#'
 #' Hits on second limit should be problematic data.
 #'
 #' For GHI this may limit the radiation enhancement cases.
 #'
+#' Exclusions should be done case by case
+#'
 
 if (TEST_04) {
+    cat(paste("\n## 4. Climatological (configurable) Limits.\n\n"))
+
     QS$clim_lim_C3 <- 0.77
     QS$clim_lim_D3 <- 0.81
     QS$clim_lim_C1 <- 1.14
-    QS$clim_lim_D1 <- 1.30
+    QS$clim_lim_D1 <- 1.32
 
     ## Criteria
     ## . . Direct ----------------------------------------------------------####
@@ -239,10 +246,6 @@ if (TEST_04) {
     DATA[wattGLB > Glo_Secon_Clim_lim,
          QCF_GLB_04.2 := "Second climatological limit (16)"]
 
-    #+ echo=F, include=T
-
-
-
     hist(DATA[, wattDIR - Dir_First_Clim_lim] , breaks = 100,
          main = "Departure Direct from first climatological limti")
 
@@ -255,10 +258,10 @@ if (TEST_04) {
     hist(DATA[, wattGLB - Glo_Secon_Clim_lim] , breaks = 100,
          main = "Departure Direct from second climatological limit")
 
-    table(DATA$QCF_GLB_04.1)
-    table(DATA$QCF_GLB_04.2)
-    table(DATA$QCF_DIR_04.1)
-    table(DATA$QCF_DIR_04.2)
+    pander(table(DATA$QCF_GLB_04.1))
+    pander(table(DATA$QCF_GLB_04.2))
+    pander(table(DATA$QCF_DIR_04.1))
+    pander(table(DATA$QCF_DIR_04.2))
 
     if (DO_PLOTS) {
 
@@ -269,15 +272,15 @@ if (TEST_04) {
             if (any(!is.na(pp$wattDIR))) {
                 ylim <- range(pp$Dir_First_Clim_lim, pp$wattDIR, na.rm = T)
                 plot(pp$Date, pp$wattDIR, "l", col = "blue",
-                     ylim = ylim, ylab = "", xlab = "wattDIR")
+                     ylim = ylim, xlab = "", ylab = "wattDIR")
                 title(paste("4.1", as.Date(ad, origin = "1970-01-01")))
                 ## plot limits
-                lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink"  )
+                lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink")
                 lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
                 ## mark offending data
                 points(pp[wattDIR > Dir_First_Clim_lim, Date],
                        pp[wattDIR > Dir_First_Clim_lim, wattDIR],
-                       ylim = ylim, col = "pink", pch = 1)
+                       col = "pink", pch = 1)
             }
         }
 
@@ -289,18 +292,17 @@ if (TEST_04) {
             if (any(!is.na(pp$wattDIR))) {
                 ylim <- range(pp$Dir_Secon_Clim_lim, pp$wattDIR, na.rm = T)
                 plot(pp$Date, pp$wattDIR, "l", col = "blue",
-                     ylim = ylim, ylab = "", xlab = "wattDIR")
+                     ylim = ylim, xlab = "", ylab = "wattDIR")
                 title(paste("4.2", as.Date(ad, origin = "1970-01-01")))
                 ## plot limits
-                lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink"  )
+                lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink")
                 lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
                 ## mark offending data
                 points(pp[wattDIR > Dir_First_Clim_lim, Date],
                        pp[wattDIR > Dir_First_Clim_lim, wattDIR],
-                       ylim = ylim, col = "red", pch = 1)
+                       col = "red", pch = 1)
             }
         }
-
 
         ## test global first limit
         temp1 <- DATA[ !is.na(QCF_GLB_04.1) ]
@@ -309,15 +311,15 @@ if (TEST_04) {
             if (any(!is.na(pp$wattGLB))) {
                 ylim <- range(pp$Glo_First_Clim_lim, pp$wattGLB, na.rm = T)
                 plot(pp$Date, pp$wattGLB, "l", col = "green",
-                     ylim = ylim, ylab = "", xlab = "wattGLB")
+                     ylim = ylim, xlab = "", ylab = "wattGLB")
                 title(paste("4.1", as.Date(ad, origin = "1970-01-01")))
                 ## plot limits
-                lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink"  )
+                lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink")
                 lines(pp$Date, pp$Glo_Secon_Clim_lim, col = "red" )
                 ## mark offending data
                 points(pp[wattGLB > Glo_First_Clim_lim, Date],
                        pp[wattGLB > Glo_First_Clim_lim, wattGLB],
-                       ylim = ylim, col = "pink", pch = 1)
+                       col = "pink", pch = 1)
             }
         }
 
@@ -328,15 +330,15 @@ if (TEST_04) {
             if (any(!is.na(pp$wattGLB))) {
                 ylim <- range(pp$Glo_Secon_Clim_lim, pp$wattGLB, na.rm = T)
                 plot(pp$Date, pp$wattGLB, "l", col = "green",
-                     ylim = ylim, ylab = "", xlab = "wattGLB")
+                     ylim = ylim, xlab = "", ylab = "wattGLB")
                 title(paste("4.2", as.Date(ad, origin = "1970-01-01")))
                 ## plot limits
-                lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink"  )
+                lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink")
                 lines(pp$Date, pp$Glo_Secon_Clim_lim, col = "red" )
                 ## mark offending data
-                points(pp[wattGLB > Dir_Secon_Clim_lim, Date],
-                       pp[wattGLB > Dir_Secon_Clim_lim, wattGLB],
-                       ylim = ylim, col = "red", pch = 1)
+                points(pp[wattGLB > Glo_Secon_Clim_lim, Date],
+                       pp[wattGLB > Glo_Secon_Clim_lim, wattGLB],
+                       col = "red", pch = 1)
             }
         }
 
@@ -389,46 +391,67 @@ keys <- c("Direct > global hard (15)","Direct > global soft (14)")
 #'
 #+ echo=F, include=T
 
-if (DO_PLOTS) {
-    ## use the applied limits
-    lim1 <- QS$dir_glo_invert
-    off1 <- QS$dir_glo_glo_off
+QS$dir_glo_invert
+QS$dir_glo_glo_off
 
-    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat  > 3,    Elevat])
-    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & Elevat  > 3,    wattHOR - wattGLB])
-    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Elevat])
-    hist(DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattHOR - wattGLB])
+if (TEST_08) {
 
-    # test <- DATA[ !is.na(QCF_BTH_08), ]
-    # test <- DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1 & Elevat > 15 ]
-    test <- DATA[ 100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1  ]
+    cat(paste("\n8. Inversion test.\n\n"))
 
-    for (ad in unique(as.Date(test$Date))) {
-        pp   <- DATA[ as.Date(Date) == ad, ]
-        ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
-        plot( pp$Date, pp$wattHOR, "l",
-              ylim = ylim, col = "blue", ylab = "", xlab = "")
-        lines(pp$Date, pp$wattGLB, col = "green" )
-        title(as.Date(ad, origin = "1970-01-01"))
-        points(pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Date],
-               pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattHOR],
-               ylim = ylim, col = "blue")
-        points(pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, Date],
-               pp[100*(wattHOR - wattGLB)/wattGLB > lim1 & wattGLB > off1, wattGLB],
-               ylim = ylim, col = "green")
+    ## Criteria
+    ## . . Both ------------------------------------------------------------####
+
+    DATA[, Relative_diffuse := 100 * (wattHOR - wattGLB) / wattGLB ]
+
+    DATA[Relative_diffuse > QS$dir_glo_invert  &
+                  wattGLB > QS$dir_glo_glo_off ,
+         QCF_BTH_08.1 := "Direct > global soft (14)" ]
+
+    DATA[Relative_diffuse > QS$dir_glo_invert ,
+         QCF_BTH_08.2 := "Direct > global hard (15)" ]
+
+    hist(DATA[, Relative_diffuse], breaks = 100)
+
+    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  Elevat])
+    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  wattHOR - wattGLB])
+    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & wattGLB > QS$dir_glo_glo_off, Elevat])
+    hist(DATA[ Relative_diffuse > QS$dir_glo_invert & wattGLB > QS$dir_glo_glo_off, wattHOR - wattGLB])
+
+
+    if (DO_PLOTS) {
+
+
+
+        test <- DATA[ !is.na(QCF_BTH_08.1) ]
+
+        for (ad in unique(as.Date(test$Date))) {
+            pp   <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
+            plot( pp$Date, pp$wattHOR, "l",
+                  ylim = ylim, col = "blue", ylab = "", xlab = "")
+            lines(pp$Date, pp$wattGLB, col = "green" )
+            title(as.Date(ad, origin = "1970-01-01"))
+            points(pp[!is.na(QCF_BTH_08.1), Date],
+                   pp[!is.na(QCF_BTH_08.1), wattHOR],
+                   ylim = ylim, col = "blue")
+            points(pp[!is.na(QCF_BTH_08.1), Date],
+                   pp[!is.na(QCF_BTH_08.1), wattGLB],
+                   ylim = ylim, col = "green")
+        }
+
     }
 
+    # ## remove
+    # DATA[ QCF_BTH_08 %in% keys, wattGLB := NA ]
+    # DATA[ QCF_BTH_08 %in% keys, wattHOR := NA ]
+    # DATA[ QCF_BTH_08 %in% keys, wattDIR := NA ]
+    # ## info
+    # cat(c(DATA[ QCF_BTH_08 %in% keys, .N ], " Global or Direct Records removed with:", keys), ".\n\n")
+    # ## remove empty entries
+    # DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
+    # DATA$QCF_BTH_08 <- NULL
+    DATA$Relative_diffuse <- NULL
 }
-
-## remove
-DATA[ QCF_BTH_08 %in% keys, wattGLB := NA ]
-DATA[ QCF_BTH_08 %in% keys, wattHOR := NA ]
-DATA[ QCF_BTH_08 %in% keys, wattDIR := NA ]
-## info
-cat(c(DATA[ QCF_BTH_08 %in% keys, .N ], " Global or Direct Records removed with:", keys), ".\n\n")
-## remove empty entries
-DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
-DATA$QCF_BTH_08 <- NULL
 #' -----------------------------------------------------------------------------
 #+ echo=F, include=T
 
