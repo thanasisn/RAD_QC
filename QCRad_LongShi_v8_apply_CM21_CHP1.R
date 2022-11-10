@@ -246,6 +246,8 @@ if (TEST_04) {
     DATA[wattGLB > Glo_Secon_Clim_lim,
          QCF_GLB_04.2 := "Second climatological limit (16)"]
 
+    ## Plots
+
     hist(DATA[, wattDIR - Dir_First_Clim_lim] , breaks = 100,
          main = "Departure Direct from first climatological limti")
 
@@ -380,8 +382,6 @@ keys <- c("Direct > global hard (15)","Direct > global soft (14)")
 #' \newpage
 #' ## 8. Test for inverted values
 #'
-#' Drop all data with flag: `r paste(keys)`.
-#'
 #' When the Direct on horizontal level is greater than a %
 #' from the Global.
 #'
@@ -389,10 +389,15 @@ keys <- c("Direct > global hard (15)","Direct > global soft (14)")
 #' signals when Sun is near the horizon. And possible
 #' cases of Instrument windows cleaning.
 #'
+#' Probably these value should be removed for CS when occurring on low
+#' elevation angles.
+#'
+#' Additional criteria is needed for the data drop
+#'
 #+ echo=F, include=T
 
-QS$dir_glo_invert
-QS$dir_glo_glo_off
+QS$dir_glo_invert  <- 5  ## per cent
+QS$dir_glo_glo_off <- 5  ## global minimum
 
 if (TEST_08) {
 
@@ -402,6 +407,7 @@ if (TEST_08) {
     ## . . Both ------------------------------------------------------------####
 
     DATA[, Relative_diffuse := 100 * (wattHOR - wattGLB) / wattGLB ]
+    DATA[ is.infinite(Relative_diffuse), Relative_diffuse := NA]
 
     DATA[Relative_diffuse > QS$dir_glo_invert  &
                   wattGLB > QS$dir_glo_glo_off ,
@@ -410,7 +416,10 @@ if (TEST_08) {
     DATA[Relative_diffuse > QS$dir_glo_invert ,
          QCF_BTH_08.2 := "Direct > global hard (15)" ]
 
-    hist(DATA[, Relative_diffuse], breaks = 100)
+    ## Plots
+
+    hist(DATA[ !is.na(QCF_BTH_08.1), Relative_diffuse], breaks = 100)
+    hist(DATA[ !is.na(QCF_BTH_08.2), Relative_diffuse], breaks = 100)
 
     hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  Elevat])
     hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  wattHOR - wattGLB])
@@ -418,26 +427,66 @@ if (TEST_08) {
     hist(DATA[ Relative_diffuse > QS$dir_glo_invert & wattGLB > QS$dir_glo_glo_off, wattHOR - wattGLB])
 
 
+    pander(table(DATA$QCF_BTH_08.1))
+    pander(table(DATA$QCF_BTH_08.2))
+
     if (DO_PLOTS) {
 
 
-
         test <- DATA[ !is.na(QCF_BTH_08.1) ]
+        xlim <- range( DATA[ Elevat > 0, Azimuth ] )
+
 
         for (ad in unique(as.Date(test$Date))) {
             pp   <- DATA[ as.Date(Date) == ad, ]
             ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
-            plot( pp$Date, pp$wattHOR, "l",
-                  ylim = ylim, col = "blue", ylab = "", xlab = "")
-            lines(pp$Date, pp$wattGLB, col = "green" )
-            title(as.Date(ad, origin = "1970-01-01"))
-            points(pp[!is.na(QCF_BTH_08.1), Date],
+            plot( pp$Azimuth, pp$wattHOR, "l",
+                  xlim = xlim, ylim = ylim, col = "blue", ylab = "", xlab = "")
+            lines(pp$Azimuth, pp$wattGLB, col = "green" )
+            title(paste("8.1", as.Date(ad, origin = "1970-01-01")))
+            points(pp[!is.na(QCF_BTH_08.1), Azimuth],
                    pp[!is.na(QCF_BTH_08.1), wattHOR],
                    ylim = ylim, col = "blue")
-            points(pp[!is.na(QCF_BTH_08.1), Date],
+            points(pp[!is.na(QCF_BTH_08.1), Azimuth],
                    pp[!is.na(QCF_BTH_08.1), wattGLB],
                    ylim = ylim, col = "green")
         }
+
+        test <- DATA[ !is.na(QCF_BTH_08.2) ]
+        xlim <- range( DATA[ Elevat > 0, Azimuth ] )
+
+        for (ad in unique(as.Date(test$Date))) {
+            pp   <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
+            plot( pp$Azimuth, pp$wattHOR, "l",
+                  ylim = ylim, col = "blue", ylab = "", xlab = "")
+            lines(pp$Azimuth, pp$wattGLB, col = "green" )
+            title(paste("8.2", as.Date(ad, origin = "1970-01-01")))
+            points(pp[!is.na(QCF_BTH_08.2), Azimuth],
+                   pp[!is.na(QCF_BTH_08.2), wattHOR],
+                   ylim = ylim, col = "blue")
+            points(pp[!is.na(QCF_BTH_08.2), Azimuth],
+                   pp[!is.na(QCF_BTH_08.2), wattGLB],
+                   ylim = ylim, col = "green")
+        }
+
+
+        # test <- DATA[ , Relative_diffuse < -200 ]
+        # for (ad in unique(as.Date(DATA[test,Date]))) {
+        #     pp   <- DATA[ as.Date(Date) == ad, ]
+        #     tt   <- pp[, Relative_diffuse < -200 ]
+        #     ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
+        #     plot( pp$Date, pp$wattHOR, "l",
+        #           ylim = ylim, col = "blue", ylab = "", xlab = "")
+        #     lines(pp$Date, pp$wattGLB, col = "green" )
+        #     title(as.Date(ad, origin = "1970-01-01"))
+        #     points(pp[tt, Date],
+        #            pp[tt, wattHOR],
+        #            ylim = ylim, col = "blue")
+        #     points(pp[tt, Date],
+        #            pp[tt, wattGLB],
+        #            ylim = ylim, col = "green")
+        # }
 
     }
 
