@@ -462,29 +462,29 @@ for (YY in yearSTA:yearEND) {
     } ##END if DO_TEST_03
 
 
-    if (DO_TEST_04) {
-        ####  4. Climatological (configurable) Limits  #########################
-        cat(paste("\n4. Climatological (configurable) Limits.\n\n"))
-        ##
-        ## Limits the maximum expected irradiance based on climatological
-        ## observations and the value of TSI.
-        ##
-        ## . . Direct ------------------------------------------------------####
-        DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10,
-                  QCF_DIR_04.1 := "First climatological limit (17)"]
-        DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15,
-                  QCF_DIR_04.2 := "Second climatological limit (16)"]
-
-        ## . . Global ------------------------------------------------------####
-        ##
-        ## This have to allow for the enhancement cases of Global.
-        ##
-        DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60,
-                  QCF_GLB_04.1 := "First climatological limit (17)"]
-        DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60,
-                  QCF_GLB_04.2 := "Second climatological limit (16)"]
-
-    } ##END if DO_TEST_04
+#    if (DO_TEST_04) {
+#        ####  4. Climatological (configurable) Limits  #########################
+#        cat(paste("\n4. Climatological (configurable) Limits.\n\n"))
+#        ##
+#        ## Limits the maximum expected irradiance based on climatological
+#        ## observations and the value of TSI.
+#        ##
+#        ## . . Direct ------------------------------------------------------####
+#        DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10,
+#                  QCF_DIR_04.1 := "First climatological limit (17)"]
+#        DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15,
+#                  QCF_DIR_04.2 := "Second climatological limit (16)"]
+#
+#        ## . . Global ------------------------------------------------------####
+#        ##
+#        ## This have to allow for the enhancement cases of Global.
+#        ##
+#        DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60,
+#                  QCF_GLB_04.1 := "First climatological limit (17)"]
+#        DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60,
+#                  QCF_GLB_04.2 := "Second climatological limit (16)"]
+#
+#    } ##END if DO_TEST_04
 
 
     if (DO_TEST_05) {

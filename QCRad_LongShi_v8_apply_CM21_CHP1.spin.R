@@ -88,6 +88,8 @@ DATA_BASE     <- "~/DATA/Broad_Band/QCRad_LongShi/"
 IN_PREFIX     <- "LAP_QCRad_LongShi_v8_id_CM21_CHP1_"
 cachedata     <- "~/RAD_QC/temp_data.Rds"
 
+####  Execution control  ####
+TEST_04      <- FALSE
 
 TEST_04      <- TRUE
 
@@ -99,11 +101,12 @@ if (interactive()) {
 
 
 ####  Load all data  ####
+fileslist <- list.files(path    = DATA_BASE,
+                        pattern = paste0(IN_PREFIX, ".*.Rds"),
+                        full.names = TRUE)
+fileslist <- sort(fileslist)
+## read data or load cached
 if (!file.exists(cachedata)) {
-    fileslist <- list.files(path    = DATA_BASE,
-                            pattern = paste0(IN_PREFIX, ".*.Rds"),
-                            full.names = TRUE)
-    fileslist <- sort(fileslist)
     DATA <- data.table()
     for (afl in fileslist) {
         tmp  <- readRDS(afl)
@@ -136,28 +139,26 @@ pander(pp, caption = "Input files")
 #' ### Some filters definitions
 #'
 #+ echo=T, include=T
-QS <- list(
-    sun_elev_min     =  -2 * 0.103, # 0. Drop all data when sun is below this point
-    sun_elev_no_neg  =   0,         # 0. Don't allow negative values below this sun angle
-    glo_SWdn_min     =  -4,         # 1. MIN Physically Possible Limits
-    dir_SWdn_min     =  -4,         # 1. MIN Physically Possible Limits
-    glo_SWdn_min_ext =  -2,         # 2. MIN Extremely Rare Minimum Limits
-    dir_SWdn_min_ext =  -2,         # 2. MIN Extremely Rare Minimum Limits
-    dif_rati_min     =   0.001,     # 3. (12) extra comparison to check data
-    dif_rati_max     =   1.01,      # 3. (13) extra comparison to check data 1
-    clim_lim_C3      =   0.81,      # 4. Direct Climatological (configurable) Limit first level
-    clim_lim_D3      =   0.90,      # 4. Direct Climatological (configurable) Limit second level
-    clim_lim_C1      =   1.15,      # 4. Global Climatological (configurable) Limit first level
-    clim_lim_D1      =   1.35,      # 4. Global Climatological (configurable) Limit second level
-    ClrSW_a          = 1050.5,      # 5. Tracker off test Clear Sky factor a
-    ClrSW_b          =   1.095,     # 5. Tracker off test Clear Sky factor b
-    ClrSW_lim        =   0.85,      # 5. Tracker off test Threshold
-    dir_glo_invert   =   3,         # 8. Test for inverted values: DIRhor - GLBhor > lim[%]
-    dir_glo_glo_off  =   5,         # 8. Test for inverted values apply for GLBhor > offset
-    CL_idx_max       =   1.3,       # 9. Clearness index test
-    CL_idx_min       =  -0.001,     # 9. Clearness index test
-    NULL
-)
+QS <- list()
+QS$sun_elev_min     <-   -2 * 0.103 # 0. Drop all data when sun is below this point
+QS$sun_elev_no_neg  <-    0         # 0. Don't allow negative values below this sun angle
+QS$glo_SWdn_min     <-   -4         # 1. MIN Physically Possible Limits
+QS$dir_SWdn_min     <-   -4         # 1. MIN Physically Possible Limits
+QS$glo_SWdn_min_ext <-   -2         # 2. MIN Extremely Rare Minimum Limits
+QS$dir_SWdn_min_ext <-   -2         # 2. MIN Extremely Rare Minimum Limits
+QS$dif_rati_min     <-    0.001     # 3. (12) extra comparison to check data
+QS$dif_rati_max     <-    1.01      # 3. (13) extra comparison to check data 1
+QS$clim_lim_C3      <-    0.81      # 4. Direct Climatological (configurable) Limit first level
+QS$clim_lim_D3      <-    0.90      # 4. Direct Climatological (configurable) Limit second level
+QS$clim_lim_C1      <-    1.15      # 4. Global Climatological (configurable) Limit first level
+QS$clim_lim_D1      <-    1.35      # 4. Global Climatological (configurable) Limit second level
+QS$ClrSW_a          <- 1050.5       # 5. Tracker off test Clear Sky factor a
+QS$ClrSW_b          <-    1.095     # 5. Tracker off test Clear Sky factor b
+QS$ClrSW_lim        <-    0.85      # 5. Tracker off test Threshold
+QS$dir_glo_invert   <-    3         # 8. Test for inverted values: DIRhor - GLBhor > lim[%]
+QS$dir_glo_glo_off  <-    5         # 8. Test for inverted values apply for GLBhor > offset
+QS$CL_idx_max       <-    1.3       # 9. Clearness index test
+QS$CL_idx_min       <-   -0.001     # 9. Clearness index test
 #+ echo=F, include=T
 
 
@@ -187,7 +188,7 @@ cat(c(sum(sel_d, na.rm = T), " Direct Records removed with:", keys), ".\n\n")
 cat(c(sum(sel_g, na.rm = T), " Global Records removed with:", keys), ".\n\n")
 if (sum(sel_d, sel_g) > 0) {
     ## more code to add
-    cat("\n\n**CHECK OMITED DATA**\n\n")
+    cat("\n\n**CHECK OMITTED DATA**\n\n")
 }
 #' -----------------------------------------------------------------------------
 #+ echo=F, include=T
@@ -203,6 +204,8 @@ if (TEST_04) {
     #' \newpage
     #' ## 4. Climatological (configurable) Limits
     #'
+    cat(paste("\n## 4. Climatological (configurable) Limits.\n\n"))
+    #'
     #' Limits the maximum expected irradiance based on climatological
     #' observations levels and the value of TSI.
     #'
@@ -210,25 +213,24 @@ if (TEST_04) {
     #'
 
     ## Criteria
-    cat(paste("\n4. Climatological (configurable) Limits.\n\n"))
-    ## . . Direct ------------------------------------------------------####
-    DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10,
-              QCF_DIR_04.1 := "First climatological limit (17)"]
-    DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15,
-              QCF_DIR_04.2 := "Second climatological limit (16)"]
+    ## . . Direct ----------------------------------------------------------####
+    DATA[wattDIR > TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10,
+         QCF_DIR_04.1 := "First climatological limit (17)"]
+    DATA[wattDIR > TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15,
+         QCF_DIR_04.2 := "Second climatological limit (16)"]
 
-    ## . . Global ------------------------------------------------------####
-    DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60,
-              QCF_GLB_04.1 := "First climatological limit (17)"]
-    DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60,
-              QCF_GLB_04.2 := "Second climatological limit (16)"]
+    ## . . Global ----------------------------------------------------------####
+    DATA[wattGLB > TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60,
+         QCF_GLB_04.1 := "First climatological limit (17)"]
+    DATA[wattGLB > TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60,
+         QCF_GLB_04.2 := "Second climatological limit (16)"]
 
     #+ echo=F, include=T
 
-    # levels(DATA$QCF_GLB_04.1)
-    # levels(DATA$QCF_GLB_04.2)
-    # levels(DATA$QCF_DIR_04.1)
-    # levels(DATA$QCF_DIR_04.2)
+    table(DATA$QCF_GLB_04.1)
+    table(DATA$QCF_GLB_04.2)
+    table(DATA$QCF_DIR_04.1)
+    table(DATA$QCF_DIR_04.2)
 
     if (DO_PLOTS) {
         ## test direct
@@ -303,6 +305,7 @@ if (TEST_04) {
 }
 #' -----------------------------------------------------------------------------
 #+ echo=F, include=T
+
 
 
 
