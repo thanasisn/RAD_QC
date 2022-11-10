@@ -86,24 +86,37 @@ source("~/RAD_QC/Functions_write_data.R")
 ####  Variables init  ####
 DATA_BASE     <- "~/DATA/Broad_Band/QCRad_LongShi/"
 IN_PREFIX     <- "LAP_QCRad_LongShi_v8_id_CM21_CHP1_"
+cachedata     <- "~/RAD_QC/temp_data.Rds"
+
+
+TEST_04      <- TRUE
+
 
 DO_PLOTS      <- TRUE
 if (interactive()) {
-    DO_PLOTS      <- FALSE
+    DO_PLOTS  <- FALSE
 }
 
 
 ####  Load all data  ####
-fileslist <- list.files( path    = DATA_BASE,
-                         pattern = paste0(IN_PREFIX, ".*.Rds"),
-                         full.names = TRUE)
-fileslist <- sort(fileslist)
-DATA <- data.table()
-for (afl in fileslist) {
-    tmp  <- readRDS(afl)
-    DATA <- rbind(DATA, tmp, fill = TRUE)
-    rm(tmp)
+if (!file.exists(cachedata)) {
+    fileslist <- list.files(path    = DATA_BASE,
+                            pattern = paste0(IN_PREFIX, ".*.Rds"),
+                            full.names = TRUE)
+    fileslist <- sort(fileslist)
+    DATA <- data.table()
+    for (afl in fileslist) {
+        tmp  <- readRDS(afl)
+        DATA <- rbind(DATA, tmp, fill = TRUE)
+        rm(tmp)
+    }
+    write_RDS(DATA, cachedata, clean = TRUE)
+} else {
+    DATA <- readRDS(cachedata)
+    cat("\n\n**USING CACHED DATA!!**\n\n")
 }
+
+
 
 #'
 #' ### INPUT DATA
@@ -122,6 +135,7 @@ pander(pp, caption = "Input files")
 #'
 #' ### Some filters definitions
 #'
+#+ echo=T, include=T
 QS <- list(
     sun_elev_min     =  -2 * 0.103, # 0. Drop all data when sun is below this point
     sun_elev_no_neg  =   0,         # 0. Don't allow negative values below this sun angle
@@ -181,95 +195,114 @@ if (sum(sel_d, sel_g) > 0) {
 
 
 
-####  4. Climatological (configurable) Limits  ####
-keys  <- c("Second climatological limit (16)",
-           "First climatological limit (17)")
-#'
-#' \newpage
-#' ## 4. Climatological (configurable) Limits
-#'
-#' Drop all data with flag: `r paste(keys)`.
-#'
-#+ echo=F, include=T
+if (TEST_04) {
+    ####  4. Climatological (configurable) Limits  ####
+    keys  <- c("Second climatological limit (16)",
+               "First climatological limit (17)")
+    #'
+    #' \newpage
+    #' ## 4. Climatological (configurable) Limits
+    #'
+    #' Limits the maximum expected irradiance based on climatological
+    #' observations levels and the value of TSI.
+    #'
+    #' For GHI this may limit the radiation enhancement cases.
+    #'
 
-# levels(DATA$QCF_GLB_04.1)
-# levels(DATA$QCF_GLB_04.2)
-# levels(DATA$QCF_DIR_04.1)
-# levels(DATA$QCF_DIR_04.2)
+    ## Criteria
+    cat(paste("\n4. Climatological (configurable) Limits.\n\n"))
+    ## . . Direct ------------------------------------------------------####
+    DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10,
+              QCF_DIR_04.1 := "First climatological limit (17)"]
+    DATA_year[wattDIR > TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15,
+              QCF_DIR_04.2 := "Second climatological limit (16)"]
 
-if (DO_PLOTS) {
-    ## test direct
-    temp1 <- DATA[ !is.na(QCF_DIR_04.1) ]
-    temp2 <- DATA[ !is.na(QCF_DIR_04.2) ]
-    for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
-        pp <- DATA[ as.Date(Date) == ad, ]
-        if (any(!is.na(pp$wattDIR))) {
-            second <- pp[,TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15 ]
-            first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10 ]
-            ylim <- range(second,first,pp$wattDIR, na.rm = T)
-            plot(pp$Date, pp$wattDIR, "l",
-                 ylim = ylim, ylab = "", xlab = "wattDIR")
-            lines(pp$Date, second, col = "pink" )
-            lines(pp$Date, first,  col = "red" )
-            title(as.Date(ad, origin = "1970-01-01"))
-            # points(pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , Date],
-            #        pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , wattDIR],
-            #        ylim = ylim, col = "blue")
-            points(pp[wattDIR > second | wattDIR > first , Date],
-                   pp[wattDIR > second | wattDIR > first , wattGLB],
-                   ylim = ylim, col = "red", pch = 1)
+    ## . . Global ------------------------------------------------------####
+    DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60,
+              QCF_GLB_04.1 := "First climatological limit (17)"]
+    DATA_year[wattGLB > TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60,
+              QCF_GLB_04.2 := "Second climatological limit (16)"]
+
+    #+ echo=F, include=T
+
+    # levels(DATA$QCF_GLB_04.1)
+    # levels(DATA$QCF_GLB_04.2)
+    # levels(DATA$QCF_DIR_04.1)
+    # levels(DATA$QCF_DIR_04.2)
+
+    if (DO_PLOTS) {
+        ## test direct
+        temp1 <- DATA[ !is.na(QCF_DIR_04.1) ]
+        temp2 <- DATA[ !is.na(QCF_DIR_04.2) ]
+        for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            if (any(!is.na(pp$wattDIR))) {
+                second <- pp[,TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15 ]
+                first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10 ]
+                ylim <- range(second,first,pp$wattDIR, na.rm = T)
+                plot(pp$Date, pp$wattDIR, "l",
+                     ylim = ylim, ylab = "", xlab = "wattDIR")
+                lines(pp$Date, second, col = "pink" )
+                lines(pp$Date, first,  col = "red" )
+                title(as.Date(ad, origin = "1970-01-01"))
+                # points(pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , Date],
+                #        pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , wattDIR],
+                #        ylim = ylim, col = "blue")
+                points(pp[wattDIR > second | wattDIR > first , Date],
+                       pp[wattDIR > second | wattDIR > first , wattGLB],
+                       ylim = ylim, col = "red", pch = 1)
+            }
+        }
+
+        ## test global
+        temp1 <- DATA[ !is.na(QCF_GLB_04.1) ]
+        temp2 <- DATA[ !is.na(QCF_GLB_04.2) ]
+        for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            if (any(!is.na(pp$wattGLB))) {
+                second <- pp[,TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60 ]
+                first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60 ]
+                ylim <- range(second,first,pp$wattDIR, na.rm = T)
+                plot(pp$Date, pp$wattGLB, "l",
+                     ylim = ylim, xlab = "", ylab = "wattGLB")
+                lines(pp$Date, second, col = "pink" )
+                lines(pp$Date, first,  col = "red" )
+                title(as.Date(ad, origin = "1970-01-01"))
+                # points(pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , Date],
+                #        pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , wattGLB],
+                #        ylim = ylim, col = "blue")
+                points(pp[wattGLB > first, Date],
+                       pp[wattGLB > first, wattGLB],
+                       ylim = ylim, col = "red", pch = 1)
+                points(pp[wattGLB > second, Date],
+                       pp[wattGLB > second, wattGLB],
+                       ylim = ylim, col = "blue", pch = 1)
+            }
         }
     }
 
-    ## test global
-    temp1 <- DATA[ !is.na(QCF_GLB_04.1) ]
-    temp2 <- DATA[ !is.na(QCF_GLB_04.2) ]
-    for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
-        pp <- DATA[ as.Date(Date) == ad, ]
-        if (any(!is.na(pp$wattGLB))) {
-            second <- pp[,TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60 ]
-            first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60 ]
-            ylim <- range(second,first,pp$wattDIR, na.rm = T)
-            plot(pp$Date, pp$wattGLB, "l",
-                 ylim = ylim, xlab = "", ylab = "wattGLB")
-            lines(pp$Date, second, col = "pink" )
-            lines(pp$Date, first,  col = "red" )
-            title(as.Date(ad, origin = "1970-01-01"))
-            # points(pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , Date],
-            #        pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , wattGLB],
-            #        ylim = ylim, col = "blue")
-            points(pp[wattGLB > first, Date],
-                   pp[wattGLB > first, wattGLB],
-                   ylim = ylim, col = "red", pch = 1)
-            points(pp[wattGLB > second, Date],
-                   pp[wattGLB > second, wattGLB],
-                   ylim = ylim, col = "blue", pch = 1)
-        }
-    }
+    # ## find
+    # sel_d <- DATA$QCF_DIR_04.1 %in% keys | DATA$QCF_DIR_04.2 %in% keys
+    # sel_g <- DATA$QCF_GLB_04.1 %in% keys | DATA$QCF_GLB_04.2 %in% keys
+    # ## remove
+    # DATA$wattDIR[sel_d] <- NA
+    # DATA$wattGLB[sel_g] <- NA
+    # DATA$QCF_DIR_04.1   <- NULL
+    # DATA$QCF_DIR_04.2   <- NULL
+    # DATA$QCF_GLB_04.1   <- NULL
+    # DATA$QCF_GLB_04.2   <- NULL
+    # ## remove empty entries
+    # DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
+    # ## info
+    # cat(c(sum(sel_d, na.rm = T),
+    #       " Direct Records removed with:",
+    #       keys), ".\n\n")
+    # cat(c(sum(sel_g, na.rm = T),
+    #       " Global Records removed with:",
+    #       keys), ".\n\n")
 }
-
-## find
-sel_d <- DATA$QCF_DIR_04.1 %in% keys | DATA$QCF_DIR_04.2 %in% keys
-sel_g <- DATA$QCF_GLB_04.1 %in% keys | DATA$QCF_GLB_04.2 %in% keys
-## remove
-DATA$wattDIR[sel_d] <- NA
-DATA$wattGLB[sel_g] <- NA
-DATA$QCF_DIR_04.1   <- NULL
-DATA$QCF_DIR_04.2   <- NULL
-DATA$QCF_GLB_04.1   <- NULL
-DATA$QCF_GLB_04.2   <- NULL
-## remove empty entries
-DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
-## info
-cat(c(sum(sel_d, na.rm = T),
-      " Direct Records removed with:",
-      keys), ".\n\n")
-cat(c(sum(sel_g, na.rm = T),
-      " Global Records removed with:",
-      keys), ".\n\n")
 #' -----------------------------------------------------------------------------
 #+ echo=F, include=T
-
 
 
 
