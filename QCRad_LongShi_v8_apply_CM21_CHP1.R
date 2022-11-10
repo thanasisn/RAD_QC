@@ -61,7 +61,7 @@ knitr::opts_chunk$set(comment    = ""       )
 knitr::opts_chunk$set(dev        = "png"    )
 knitr::opts_chunk$set(out.height = "30%"   )
 knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(cache      =  TRUE    )
+knitr::opts_chunk$set(cache      =  FALSE    )
 # knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
@@ -102,7 +102,12 @@ for (afl in fileslist) {
     DATA <- rbind(DATA, tmp, fill = TRUE)
     rm(tmp)
 }
-
+#'
+#' \newpage
+#' ## INPUT DATA
+#'
+#+ echo=F, include=T
+stop()
 
 ## . . Limits definitions  ####
 QS <- list(
