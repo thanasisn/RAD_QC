@@ -1,58 +1,58 @@
-# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
-#' ---
-#' title:       "QCRad methodology apply."
-#' author:      "Natsis Athanasios"
-#' institute:   "AUTH"
-#' affiliation: "Laboratory of Atmospheric Physics"
-#' abstract:    "Data quality for radiation measurements as described by
-#'               CN Long and Y Shi, September 2006, DOE/SC-ARM/TR-074.
-#'               - The QCRad Value Added Product Surface
-#'               Radiation Measurement Quality Control Testing Including
-#'               Climatology_Long2006.pdf"
-#'
-#' documentclass: article
-#' classoption:   a4paper,oneside
-#' fontsize:      10pt
-#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#'
-#' link-citations:  yes
-#' colorlinks:      yes
-#'
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections:  no
-#'     fig_caption:      no
-#'     keep_tex:         no
-#'     latex_engine:     xelatex
-#'     toc:              yes
-#'     fig_width:        8
-#'     fig_height:       5
-#'   html_document:
-#'     toc: true
-#'     fig_width:  9
-#'     fig_height: 4
-#'   pdf_document:
-#' date: "`r format(Sys.time(), '%F')`"
-#' ---
-#'
-#' **Source code: [github.com/thanasisn/RAD_QC](https://github.com/thanasisn/RAD_QC)**
-#'
-#' ### Notes ###
-#'
-#' Run for each year and apply Quality control on radiation data based on ID.
-#'
-#' The chosen levels and filters have to be evaluated with the available data.
-#'
-#' reads: QCRad_LongShi_v8_id_*
-#'
-#' exports:
-#'
-#+ echo=F, include=T
+---
+title:       "QCRad methodology apply."
+author:      "Natsis Athanasios"
+institute:   "AUTH"
+affiliation: "Laboratory of Atmospheric Physics"
+abstract:    "Data quality for radiation measurements as described by
+              CN Long and Y Shi, September 2006, DOE/SC-ARM/TR-074.
+              - The QCRad Value Added Product Surface
+              Radiation Measurement Quality Control Testing Including
+              Climatology_Long2006.pdf"
+
+documentclass: article
+classoption:   a4paper,oneside
+fontsize:      10pt
+geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+
+link-citations:  yes
+colorlinks:      yes
+
+header-includes:
+- \usepackage{caption}
+- \usepackage{placeins}
+- \captionsetup{font=small}
+
+output:
+  bookdown::pdf_document2:
+    number_sections:  no
+    fig_caption:      no
+    keep_tex:         no
+    latex_engine:     xelatex
+    toc:              yes
+    fig_width:        8
+    fig_height:       5
+  html_document:
+    toc: true
+    fig_width:  9
+    fig_height: 4
+  pdf_document:
+date: "`r format(Sys.time(), '%F')`"
+---
+
+**Source code: [github.com/thanasisn/RAD_QC](https://github.com/thanasisn/RAD_QC)**
+
+### Notes ###
+
+Run for each year and apply Quality control on radiation data based on ID.
+
+The chosen levels and filters have to be evaluated with the available data.
+
+reads: QCRad_LongShi_v8_id_*
+
+exports:
+
+
+```{r echo=F, include=T}
 
 
 ####_  Document options _####
@@ -104,24 +104,35 @@ for (afl in fileslist) {
     DATA <- rbind(DATA, tmp, fill = TRUE)
     rm(tmp)
 }
+```
 
-#'
-#' ### INPUT DATA
-#'
-#' **Data range: `r paste(range(DATA$Date), collapse = " to ")`**
-#'
-#+ echo=F, include=T
-#'
+
+### INPUT DATA
+
+**Data range: `r paste(range(DATA$Date), collapse = " to ")`**
+
+
+```{r echo=F, include=T}
+```
+
+
+
+```{r }
 pp <- data.frame(basename(fileslist), file.mtime(fileslist))
 names(pp) <- c("Filename", "File mtime")
 pander(pp, caption = "Input files")
-#+ echo=F, include=T
+```
+```{r echo=F, include=T}
 
 
 ## . . Limits definitions  ####
-#'
-#' ### Some filters definitions
-#'
+```
+
+
+### Some filters definitions
+
+
+```{r }
 QS <- list(
     sun_elev_min     =  -2 * 0.103, # 0. Drop all data when sun is below this point
     sun_elev_no_neg  =   0,         # 0. Don't allow negative values below this sun angle
@@ -144,7 +155,8 @@ QS <- list(
     CL_idx_min       =  -0.001,     # 9. Clearness index test
     NULL
 )
-#+ echo=F, include=T
+```
+```{r echo=F, include=T}
 
 
 
@@ -152,13 +164,16 @@ QS <- list(
 
 ####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ####
 keys  <- c("Physical possible limit min (5)", "Physical possible limit max (6)")
-#'
-#' \newpage
-#' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
-#'
-#' Drop all data with flag: `r paste(keys)`.
-#'
-#+ echo=F, include=T
+```
+
+
+\newpage
+## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
+
+Drop all data with flag: `r paste(keys)`.
+
+
+```{r echo=F, include=T}
 
 ## find
 sel_d <- DATA$QCF_DIR_01 %in% keys
@@ -175,8 +190,11 @@ if (sum(sel_d, sel_g) > 0) {
     ## more code to add
     cat("\n\n**CHECK OMITED DATA**\n\n")
 }
-#' -----------------------------------------------------------------------------
-#+ echo=F, include=T
+```
+
+-----------------------------------------------------------------------------
+
+```{r echo=F, include=T}
 
 
 
@@ -184,13 +202,16 @@ if (sum(sel_d, sel_g) > 0) {
 ####  4. Climatological (configurable) Limits  ####
 keys  <- c("Second climatological limit (16)",
            "First climatological limit (17)")
-#'
-#' \newpage
-#' ## 4. Climatological (configurable) Limits
-#'
-#' Drop all data with flag: `r paste(keys)`.
-#'
-#+ echo=F, include=T
+```
+
+
+\newpage
+## 4. Climatological (configurable) Limits
+
+Drop all data with flag: `r paste(keys)`.
+
+
+```{r echo=F, include=T}
 
 # levels(DATA$QCF_GLB_04.1)
 # levels(DATA$QCF_GLB_04.2)
@@ -267,28 +288,34 @@ cat(c(sum(sel_d, na.rm = T),
 cat(c(sum(sel_g, na.rm = T),
       " Global Records removed with:",
       keys), ".\n\n")
-#' -----------------------------------------------------------------------------
-#+ echo=F, include=T
+```
+
+-----------------------------------------------------------------------------
+
+```{r echo=F, include=T}
 
 
 
 
 ####  8. Test for inverted values  ####
 keys <- c("Direct > global hard (15)","Direct > global soft (14)")
-#'
-#' \newpage
-#' ## 8. Test for inverted values
-#'
-#' Drop all data with flag: `r paste(keys)`.
-#'
-#' When the Direct on horizontal level is greater than a %
-#' from the Global.
-#'
-#' This denotes obstacles on the morning mostly, or very low
-#' signals when Sun is near the horizon. And possible
-#' cases of Instrument windows cleaning.
-#'
-#+ echo=F, include=T
+```
+
+
+\newpage
+## 8. Test for inverted values
+
+Drop all data with flag: `r paste(keys)`.
+
+When the Direct on horizontal level is greater than a %
+from the Global.
+
+This denotes obstacles on the morning mostly, or very low
+signals when Sun is near the horizon. And possible
+cases of Instrument windows cleaning.
+
+
+```{r echo=F, include=T}
 
 if (DO_PLOTS) {
     ## use the applied limits
@@ -330,8 +357,11 @@ cat(c(DATA[ QCF_BTH_08 %in% keys, .N ], " Global or Direct Records removed with:
 ## remove empty entries
 DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
 DATA$QCF_BTH_08 <- NULL
-#' -----------------------------------------------------------------------------
-#+ echo=F, include=T
+```
+
+-----------------------------------------------------------------------------
+
+```{r echo=F, include=T}
 
 
 
@@ -339,17 +369,20 @@ DATA$QCF_BTH_08 <- NULL
 ####  9. Clearness index test  ####
 keys  <- c("Clearness index limit max (19)",
            "Clearness index limit min (20)")
-#'
-#' \newpage
-#' ## 9. Clearness index test
-#'
-#' Drop all data with flag: `r paste(keys)`.
-#'
-#' These data are near Elevation 0 and caused by the cos(SZA)
-#' kt = GLB / (cos(sza) * TSI)
-#' low GLB value end extreme cos(sza) values
-#'
-#+ echo=F, include=T
+```
+
+
+\newpage
+## 9. Clearness index test
+
+Drop all data with flag: `r paste(keys)`.
+
+These data are near Elevation 0 and caused by the cos(SZA)
+kt = GLB / (cos(sza) * TSI)
+low GLB value end extreme cos(sza) values
+
+
+```{r echo=F, include=T}
 
 if (DO_PLOTS) {
     # levels(DATA$QCF_GLB_09)
@@ -410,8 +443,11 @@ cat(c(DATA[QCF_GLB_09 %in% keys, .N],
 ## remove empty entries
 DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
 DATA$QCF_GLB_09 <- NULL
-#' -----------------------------------------------------------------------------
-#+ echo=F, include=T
+```
+
+-----------------------------------------------------------------------------
+
+```{r echo=F, include=T}
 
 
 
@@ -444,21 +480,23 @@ Rayleigh_diff <- function(SZA, Pressure) {
                 e * mu_0 ^ 5 +
                 f * mu_0 * Pressure )
 }
+```
 
-#'
-#' \newpage
-#' ## 6. Rayleigh Limit Diffuse Comparison
-#'
-#' Compare inferred diffuse radiation with a modeled value of diffuse,
-#' based on SZA and atmospheric pressure.
-#'
-#' Reasons:
-#' - Difference on Sun observation angle due to different instruments location.
-#' - Cases of instrument windows cleaning
-#'
-#' `r print(Rayleigh_diff)`
-#'
-#+ echo=F, include=T
+
+\newpage
+## 6. Rayleigh Limit Diffuse Comparison
+
+Compare inferred diffuse radiation with a modeled value of diffuse,
+based on SZA and atmospheric pressure.
+
+Reasons:
+- Difference on Sun observation angle due to different instruments location.
+- Cases of instrument windows cleaning
+
+`r print(Rayleigh_diff)`
+
+
+```{r echo=F, include=T}
 
 
 
@@ -603,9 +641,13 @@ for (fg in wecare) {
 # # if (!TESTING) myRtools::write_RDS( SUS_DATA_gather, SUSPECTS_EXP )
 # # ##----------------------------------------------------------------------------##
 #
+```
 
-#'
-#' **END**
-#+ include=T, echo=F
+
+**END**
+
+```{r include=T, echo=F}
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+```
+
