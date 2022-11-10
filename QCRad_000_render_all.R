@@ -20,12 +20,12 @@ setwd("~/RAD_QC/")
 OUTPUT_FORMAT <- NULL
 
 
-####  render scritps  ####
+####  render scripts  ####
 
 
-# render("./QCRad_LongShi_v8_id_CM21_CHP1.R",
-#        clean                = TRUE,
-#        output_dir           = "./REPORTS/")
+render("./QCRad_LongShi_v8_id_CM21_CHP1.R",
+       clean                = TRUE,
+       output_dir           = "./REPORTS/")
 
 
 render("./QCRad_LongShi_v8_apply_CM21_CHP1.R",

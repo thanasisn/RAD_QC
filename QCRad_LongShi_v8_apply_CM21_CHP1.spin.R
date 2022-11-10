@@ -196,36 +196,64 @@ if (sum(sel_d, sel_g) > 0) {
 
 
 
+
+####  4. Climatological (configurable) Limits  ####
+keys  <- c("Second climatological limit (16)",
+           "First climatological limit (17)")
+#'
+#' \newpage
+#' ## 4. Climatological (configurable) Limits
+#'
+cat(paste("\n## 4. Climatological (configurable) Limits.\n\n"))
+#'
+#' Limits the maximum expected irradiance based on climatological
+#' observations levels and the value of TSI.
+#'
+#' Some hits on first limits are expected and need manual evaluation.
+#' Hits on second limit should be problematic data.
+#'
+#' For GHI this may limit the radiation enhancement cases.
+#'
+
 if (TEST_04) {
-    ####  4. Climatological (configurable) Limits  ####
-    keys  <- c("Second climatological limit (16)",
-               "First climatological limit (17)")
-    #'
-    #' \newpage
-    #' ## 4. Climatological (configurable) Limits
-    #'
-    cat(paste("\n## 4. Climatological (configurable) Limits.\n\n"))
-    #'
-    #' Limits the maximum expected irradiance based on climatological
-    #' observations levels and the value of TSI.
-    #'
-    #' For GHI this may limit the radiation enhancement cases.
-    #'
+    QS$clim_lim_C3 <- 0.77
+    QS$clim_lim_D3 <- 0.81
+    QS$clim_lim_C1
+    QS$clim_lim_D1
 
     ## Criteria
     ## . . Direct ----------------------------------------------------------####
-    DATA[wattDIR > TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10,
+    DATA[, Dir_First_Clim_lim := TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10]
+    DATA[wattDIR > Dir_First_Clim_lim,
          QCF_DIR_04.1 := "First climatological limit (17)"]
-    DATA[wattDIR > TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15,
+
+    DATA[, Dir_Secon_Clim_lim := TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15]
+    DATA[wattDIR > Dir_Secon_Clim_lim,
          QCF_DIR_04.2 := "Second climatological limit (16)"]
 
     ## . . Global ----------------------------------------------------------####
-    DATA[wattGLB > TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60,
+    DATA[, Glo_First_Clim_lim := TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60]
+    DATA[wattGLB > Glo_First_Clim_lim,
          QCF_GLB_04.1 := "First climatological limit (17)"]
-    DATA[wattGLB > TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60,
+    DATA[, Glo_Secon_Clim_lim := TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60]
+    DATA[wattGLB > Glo_Secon_Clim_lim,
          QCF_GLB_04.2 := "Second climatological limit (16)"]
 
     #+ echo=F, include=T
+
+
+
+    hist(DATA[, wattDIR - Dir_First_Clim_lim] , breaks = 100,
+         main = "Departure Direct from first climatological limti")
+
+    hist(DATA[, wattDIR - Dir_Secon_Clim_lim] , breaks = 100,
+         main = "Departure Direct from second climatological limit")
+
+    hist(DATA[, wattGLB - Glo_First_Clim_lim] , breaks = 100,
+         main = "Departure Direct from first climatological limti")
+
+    hist(DATA[, wattGLB - Glo_Secon_Clim_lim] , breaks = 100,
+         main = "Departure Direct from second climatological limit")
 
     table(DATA$QCF_GLB_04.1)
     table(DATA$QCF_GLB_04.2)
@@ -233,54 +261,85 @@ if (TEST_04) {
     table(DATA$QCF_DIR_04.2)
 
     if (DO_PLOTS) {
-        ## test direct
+
+        ## test direct first limit
         temp1 <- DATA[ !is.na(QCF_DIR_04.1) ]
-        temp2 <- DATA[ !is.na(QCF_DIR_04.2) ]
-        for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
+        for (ad in sort(unique(as.Date(temp1$Date)))) {
             pp <- DATA[ as.Date(Date) == ad, ]
             if (any(!is.na(pp$wattDIR))) {
-                second <- pp[,TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15 ]
-                first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10 ]
-                ylim <- range(second,first,pp$wattDIR, na.rm = T)
-                plot(pp$Date, pp$wattDIR, "l",
+                ylim <- range(pp$Dir_First_Clim_lim, pp$wattDIR, na.rm = T)
+                plot(pp$Date, pp$wattDIR, "l", col = "blue",
                      ylim = ylim, ylab = "", xlab = "wattDIR")
-                lines(pp$Date, second, col = "pink" )
-                lines(pp$Date, first,  col = "red" )
-                title(as.Date(ad, origin = "1970-01-01"))
-                # points(pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , Date],
-                #        pp[!is.na(QCF_DIR_04.1)|!is.na(QCF_DIR_04.2) , wattDIR],
-                #        ylim = ylim, col = "blue")
-                points(pp[wattDIR > second | wattDIR > first , Date],
-                       pp[wattDIR > second | wattDIR > first , wattGLB],
+                title(paste("4.1", as.Date(ad, origin = "1970-01-01")))
+                ## plot limits
+                lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink"  )
+                lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
+                ## mark offending data
+                points(pp[wattDIR > Dir_First_Clim_lim, Date],
+                       pp[wattDIR > Dir_First_Clim_lim, wattDIR],
+                       ylim = ylim, col = "pink", pch = 1)
+            }
+        }
+
+        ## test direct second limit
+        temp2 <- DATA[ !is.na(QCF_DIR_04.2) ]
+        # extra <- sample(unique(as.Date(DATA[!is.na(wattDIR), Date])),5)
+        for (ad in sort(unique(c(as.Date(temp2$Date))))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            if (any(!is.na(pp$wattDIR))) {
+                ylim <- range(pp$Dir_Secon_Clim_lim, pp$wattDIR, na.rm = T)
+                plot(pp$Date, pp$wattDIR, "l", col = "blue",
+                     ylim = ylim, ylab = "", xlab = "wattDIR")
+                title(paste("4.2", as.Date(ad, origin = "1970-01-01")))
+                ## plot limits
+                lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink"  )
+                lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
+                ## mark offending data
+                points(pp[wattDIR > Dir_First_Clim_lim, Date],
+                       pp[wattDIR > Dir_First_Clim_lim, wattDIR],
                        ylim = ylim, col = "red", pch = 1)
             }
         }
 
-        ## test global
+
+        ## test global first limit
         temp1 <- DATA[ !is.na(QCF_GLB_04.1) ]
-        temp2 <- DATA[ !is.na(QCF_GLB_04.2) ]
-        for (ad in unique(c(as.Date(temp2$Date),as.Date(temp1$Date)))) {
+        for (ad in sort(unique(as.Date(temp1$Date)))) {
             pp <- DATA[ as.Date(Date) == ad, ]
             if (any(!is.na(pp$wattGLB))) {
-                second <- pp[,TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60 ]
-                first  <- pp[,TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60 ]
-                ylim <- range(second,first,pp$wattDIR, na.rm = T)
-                plot(pp$Date, pp$wattGLB, "l",
-                     ylim = ylim, xlab = "", ylab = "wattGLB")
-                lines(pp$Date, second, col = "pink" )
-                lines(pp$Date, first,  col = "red" )
-                title(as.Date(ad, origin = "1970-01-01"))
-                # points(pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , Date],
-                #        pp[!is.na(QCF_GLB_04.1)|!is.na(QCF_GLB_04.2) , wattGLB],
-                #        ylim = ylim, col = "blue")
-                points(pp[wattGLB > first, Date],
-                       pp[wattGLB > first, wattGLB],
-                       ylim = ylim, col = "red", pch = 1)
-                points(pp[wattGLB > second, Date],
-                       pp[wattGLB > second, wattGLB],
-                       ylim = ylim, col = "blue", pch = 1)
+                ylim <- range(pp$Glo_First_Clim_lim, pp$wattGLB, na.rm = T)
+                plot(pp$Date, pp$wattGLB, "l", col = "green",
+                     ylim = ylim, ylab = "", xlab = "wattGLB")
+                title(paste("4.1", as.Date(ad, origin = "1970-01-01")))
+                ## plot limits
+                lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink"  )
+                lines(pp$Date, pp$Glo_Secon_Clim_lim, col = "red" )
+                ## mark offending data
+                points(pp[wattGLB > Glo_First_Clim_lim, Date],
+                       pp[wattGLB > Glo_First_Clim_lim, wattGLB],
+                       ylim = ylim, col = "pink", pch = 1)
             }
         }
+
+        ## test global second limit
+        temp2 <- DATA[ !is.na(QCF_GLB_04.2) ]
+        for (ad in sort(unique(c(as.Date(temp2$Date))))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            if (any(!is.na(pp$wattGLB))) {
+                ylim <- range(pp$Glo_Secon_Clim_lim, pp$wattGLB, na.rm = T)
+                plot(pp$Date, pp$wattGLB, "l", col = "green",
+                     ylim = ylim, ylab = "", xlab = "wattGLB")
+                title(paste("4.2", as.Date(ad, origin = "1970-01-01")))
+                ## plot limits
+                lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink"  )
+                lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
+                ## mark offending data
+                points(pp[wattDIR > Dir_First_Clim_lim, Date],
+                       pp[wattDIR > Dir_First_Clim_lim, wattGLB],
+                       ylim = ylim, col = "red", pch = 1)
+            }
+        }
+
     }
 
     # ## find
@@ -302,6 +361,10 @@ if (TEST_04) {
     # cat(c(sum(sel_g, na.rm = T),
     #       " Global Records removed with:",
     #       keys), ".\n\n")
+    DATA$Dir_First_Clim_lim <- NULL
+    DATA$Glo_First_Clim_lim <- NULL
+    DATA$Dir_Secon_Clim_lim <- NULL
+    DATA$Glo_Secon_Clim_lim <- NULL
 }
 #' -----------------------------------------------------------------------------
 #+ echo=F, include=T
