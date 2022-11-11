@@ -2,7 +2,7 @@
 ## created on 2022-03-29
 
 #### This is for daily usage.
-## For building reports there is an R scirpt
+## For building reports there is an R script
 
 
 info() { echo ; echo "$(date +%F_%T) :: $* " >&1; }
@@ -13,12 +13,14 @@ exec  > >(tee -i "${LOG_FILE}")
 exec 2> >(tee -i "${ERR_FILE}" >&2)
 info "START :: $0 :: $* ::"
 
-info "LongShi Idendification"
-Rscript "$(dirname "$0")/QCRad_LongShi_v8_id_CM21_CHP1.R
+
+
+info "LongShi Identification"
+Rscript "$(dirname "$0")/QCRad_LongShi_v8_id_CM21_CHP1.R"
 
 
 info "LongShi Application"
-Rscript "$(dirname "$0")/QCRad_LongShi_v8_apply_CM21_CHP1.R
+Rscript "$(dirname "$0")/QCRad_LongShi_v8_apply_CM21_CHP1.R"
 
 
 

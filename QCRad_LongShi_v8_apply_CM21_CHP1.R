@@ -93,9 +93,12 @@ cachedata    <- "~/RAD_QC/temp_data.Rds"
 
 TEST_04      <- FALSE
 TEST_08      <- FALSE
+TEST_09      <- FALSE
 
 # TEST_04      <- TRUE
-TEST_08      <- TRUE
+# TEST_08      <- TRUE
+TEST_09      <- TRUE
+
 
 
 DO_PLOTS     <- TRUE
@@ -103,7 +106,7 @@ if (interactive()) {
     DO_PLOTS <- FALSE
 }
 
-
+#+ echo=F, include=T
 ####  Load all data  ####
 fileslist <- list.files(path    = DATA_BASE,
                         pattern = paste0(IN_PREFIX, ".*.Rds"),
@@ -159,7 +162,7 @@ QS$ClrSW_a          <- 1050.5       # 5. Tracker off test Clear Sky factor a
 QS$ClrSW_b          <-    1.095     # 5. Tracker off test Clear Sky factor b
 QS$ClrSW_lim        <-    0.85      # 5. Tracker off test Threshold
 QS$dir_glo_invert   <-    3         # 8. Test for inverted values: DIRhor - GLBhor > lim[%]
-QS$dir_glo_glo_off  <-    5         # 8. Test for inverted values apply for GLBhor > offset
+QS$dir_glo_glo_off  <-    5         # 8. Test for inverted values: apply for GLBhor > offset
 QS$CL_idx_max       <-    1.3       # 9. Clearness index test
 QS$CL_idx_min       <-   -0.001     # 9. Clearness index test
 
@@ -195,15 +198,10 @@ if (sum(sel_d, sel_g) > 0) {
 
 
 
-
 ####  4. Climatological (configurable) Limits  ####
-keys  <- c("Second climatological limit (16)",
-           "First climatological limit (17)")
 #'
 #' \newpage
 #' ## 4. Climatological (configurable) Limits
-#'
-cat("\n## 4. Climatological (configurable) Limits.\n\n")
 #'
 #' Limits the maximum expected irradiance based on climatological
 #' observations levels and the value of TSI.
@@ -216,9 +214,11 @@ cat("\n## 4. Climatological (configurable) Limits.\n\n")
 #'
 #' Exclusions should be done case by case.
 #'
-
-#+ echo=TEST_04, inclute=T
+#'
+#+ echo=TEST_04, include=T
 if (TEST_04) {
+    cat("\n## 4. Climatological (configurable) Limits.\n\n")
+
     QS$clim_lim_C3 <- 0.77
     QS$clim_lim_D3 <- 0.81
     QS$clim_lim_C1 <- 1.14
@@ -227,28 +227,24 @@ if (TEST_04) {
     ## . . Direct ----------------------------------------------------------####
     DATA[, Dir_First_Clim_lim := TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10]
     DATA[wattDIR > Dir_First_Clim_lim,
-         QCF_DIR_04.1 := "First climatological limit (17)"]
+         QCF_DIR_04_1 := "First climatological limit (17)"]
 
     DATA[, Dir_Secon_Clim_lim := TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15]
     DATA[wattDIR > Dir_Secon_Clim_lim,
-         QCF_DIR_04.2 := "Second climatological limit (16)"]
+         QCF_DIR_04_2 := "Second climatological limit (16)"]
 
     ## . . Global ----------------------------------------------------------####
     DATA[, Glo_First_Clim_lim := TSIextEARTH_comb * QS$clim_lim_C1 * cosde(SZA)^1.2 + 60]
     DATA[wattGLB > Glo_First_Clim_lim,
-         QCF_GLB_04.1 := "First climatological limit (17)"]
+         QCF_GLB_04_1 := "First climatological limit (17)"]
     DATA[, Glo_Secon_Clim_lim := TSIextEARTH_comb * QS$clim_lim_D1 * cosde(SZA)^1.2 + 60]
     DATA[wattGLB > Glo_Secon_Clim_lim,
-         QCF_GLB_04.2 := "Second climatological limit (16)"]
+         QCF_GLB_04_2 := "Second climatological limit (16)"]
 
-    pander(table(DATA$QCF_GLB_04.1, exclude = NULL))
-    cat("\n\n")
-    pander(table(DATA$QCF_GLB_04.2, exclude = NULL))
-    cat("\n\n")
-    pander(table(DATA$QCF_DIR_04.1, exclude = NULL))
-    cat("\n\n")
-    pander(table(DATA$QCF_DIR_04.2, exclude = NULL))
-    cat("\n\n")
+    cat(pander(table(DATA$QCF_GLB_04_1, exclude = NULL)))
+    cat(pander(table(DATA$QCF_GLB_04_2, exclude = NULL)))
+    cat(pander(table(DATA$QCF_DIR_04_1, exclude = NULL)))
+    cat(pander(table(DATA$QCF_DIR_04_2, exclude = NULL)))
 }
 
 
@@ -270,7 +266,7 @@ if (TEST_04) {
     if (DO_PLOTS) {
 
         ## test direct first limit
-        temp1 <- DATA[ !is.na(QCF_DIR_04.1) ]
+        temp1 <- DATA[ !is.na(QCF_DIR_04_1) ]
         for (ad in sort(unique(as.Date(temp1$Date)))) {
             pp <- DATA[ as.Date(Date) == ad, ]
             if (any(!is.na(pp$wattDIR))) {
@@ -289,7 +285,7 @@ if (TEST_04) {
         }
 
         ## test direct second limit
-        temp2 <- DATA[ !is.na(QCF_DIR_04.2) ]
+        temp2 <- DATA[ !is.na(QCF_DIR_04_2) ]
         # extra <- sample(unique(as.Date(DATA[!is.na(wattDIR), Date])),5)
         for (ad in sort(unique(c(as.Date(temp2$Date))))) {
             pp <- DATA[ as.Date(Date) == ad, ]
@@ -309,7 +305,7 @@ if (TEST_04) {
         }
 
         ## test global first limit
-        temp1 <- DATA[ !is.na(QCF_GLB_04.1) ]
+        temp1 <- DATA[ !is.na(QCF_GLB_04_1) ]
         for (ad in sort(unique(as.Date(temp1$Date)))) {
             pp <- DATA[ as.Date(Date) == ad, ]
             if (any(!is.na(pp$wattGLB))) {
@@ -328,7 +324,7 @@ if (TEST_04) {
         }
 
         ## test global second limit
-        temp2 <- DATA[ !is.na(QCF_GLB_04.2) ]
+        temp2 <- DATA[ !is.na(QCF_GLB_04_2) ]
         for (ad in sort(unique(c(as.Date(temp2$Date))))) {
             pp <- DATA[ as.Date(Date) == ad, ]
             if (any(!is.na(pp$wattGLB))) {
@@ -349,15 +345,15 @@ if (TEST_04) {
     }
 
     # ## find
-    # sel_d <- DATA$QCF_DIR_04.1 %in% keys | DATA$QCF_DIR_04.2 %in% keys
-    # sel_g <- DATA$QCF_GLB_04.1 %in% keys | DATA$QCF_GLB_04.2 %in% keys
+    # sel_d <- DATA$QCF_DIR_04_1 %in% keys | DATA$QCF_DIR_04_2 %in% keys
+    # sel_g <- DATA$QCF_GLB_04_1 %in% keys | DATA$QCF_GLB_04_2 %in% keys
     # ## remove
     # DATA$wattDIR[sel_d] <- NA
     # DATA$wattGLB[sel_g] <- NA
-    # DATA$QCF_DIR_04.1   <- NULL
-    # DATA$QCF_DIR_04.2   <- NULL
-    # DATA$QCF_GLB_04.1   <- NULL
-    # DATA$QCF_GLB_04.2   <- NULL
+    # DATA$QCF_DIR_04_1   <- NULL
+    # DATA$QCF_DIR_04_2   <- NULL
+    # DATA$QCF_GLB_04_1   <- NULL
+    # DATA$QCF_GLB_04_2   <- NULL
     # ## remove empty entries
     # DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
     # ## info
@@ -378,65 +374,64 @@ if (TEST_04) {
 
 
 ####  8. Test for inverted values  ####
-keys <- c("Direct > global hard (15)","Direct > global soft (14)")
 #'
 #' \newpage
 #' ## 8. Test for inverted values
 #'
-#' When the Direct on horizontal level is greater than a %
-#' from the Global.
+#' Test the ratio of Diffuse / Global radiation.
+#' When the Diffuse is too lower than Global, (less than a % limit).
 #'
-#' This denotes obstacles on the morning mostly, or very low
-#' signals when Sun is near the horizon. And possible
-#' cases of Instrument windows cleaning.
+#' This denotes obstacles on the mornings mostly, or very low
+#' signals when Sun is near the horizon.
+#' Due to the time difference of sun shine, due to geometry, location and
+#' obstacles.
+#'
+#' And possible cases of Instrument windows cleaning shadowing.
 #'
 #' Probably these value should be removed for CS when occurring on low
-#' elevation angles.
+#' elevation angles, as the measurements can not be considered to reflect
+#' the same condition of Sun visibility.
 #'
 #' Additional criteria is needed for any data drop.
 #'
-#+ echo=F, include=T
-
-QS$dir_glo_invert  <- 5  ## per cent
-QS$dir_glo_glo_off <- 5  ## global minimum
-
+#+ echo=TEST_08, include=T
 if (TEST_08) {
-
     cat(paste("\n8. Inversion test.\n\n"))
 
-    ## Criteria
-    ## . . Both ------------------------------------------------------------####
+    QS$dir_glo_invert  <- 5  # Diffuse Inversion test: DIRhor - GLBhor > lim[%]
+    QS$dir_glo_glo_off <- 5  # Diffuse Inversion test: apply for GLBhor > offset
 
+    ## . . Both ------------------------------------------------------------####
     DATA[, Relative_diffuse := 100 * (wattHOR - wattGLB) / wattGLB ]
     DATA[ is.infinite(Relative_diffuse), Relative_diffuse := NA]
 
     DATA[Relative_diffuse > QS$dir_glo_invert  &
                   wattGLB > QS$dir_glo_glo_off ,
-         QCF_BTH_08.1 := "Direct > global soft (14)" ]
+         QCF_BTH_08_1 := "Direct > global soft (14)" ]
 
     DATA[Relative_diffuse > QS$dir_glo_invert ,
-         QCF_BTH_08.2 := "Direct > global hard (15)" ]
+         QCF_BTH_08_2 := "Direct > global hard (15)" ]
 
-    ## Plots
+    cat(pander(table(DATA$QCF_BTH_08_1, exclude = TRUE)))
+    cat(pander(table(DATA$QCF_BTH_08_2, exclude = TRUE)))
+}
 
-    hist(DATA[ !is.na(QCF_BTH_08.1), Relative_diffuse], breaks = 100)
-    hist(DATA[ !is.na(QCF_BTH_08.2), Relative_diffuse], breaks = 100)
+#+ echo=F
+if (TEST_08) {
+
+    hist(DATA[ !is.na(QCF_BTH_08_1), Relative_diffuse], breaks = 100)
+    hist(DATA[ !is.na(QCF_BTH_08_2), Relative_diffuse], breaks = 100)
 
     hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  Elevat])
     hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  wattHOR - wattGLB])
     hist(DATA[ Relative_diffuse > QS$dir_glo_invert & wattGLB > QS$dir_glo_glo_off, Elevat])
     hist(DATA[ Relative_diffuse > QS$dir_glo_invert & wattGLB > QS$dir_glo_glo_off, wattHOR - wattGLB])
 
-
-    pander(table(DATA$QCF_BTH_08.1))
-    pander(table(DATA$QCF_BTH_08.2))
-
     if (DO_PLOTS) {
 
-
-        test <- DATA[ !is.na(QCF_BTH_08.1) ]
+        ## plot softer limit
+        test <- DATA[ !is.na(QCF_BTH_08_1) ]
         xlim <- range( DATA[ Elevat > 0, Azimuth ] )
-
 
         for (ad in unique(as.Date(test$Date))) {
             pp   <- DATA[ as.Date(Date) == ad, ]
@@ -445,15 +440,16 @@ if (TEST_08) {
                   xlim = xlim, ylim = ylim, col = "blue", ylab = "", xlab = "")
             lines(pp$Azimuth, pp$wattGLB, col = "green" )
             title(paste("8.1", as.Date(ad, origin = "1970-01-01")))
-            points(pp[!is.na(QCF_BTH_08.1), Azimuth],
-                   pp[!is.na(QCF_BTH_08.1), wattHOR],
+            points(pp[!is.na(QCF_BTH_08_1), Azimuth],
+                   pp[!is.na(QCF_BTH_08_1), wattHOR],
                    ylim = ylim, col = "blue")
-            points(pp[!is.na(QCF_BTH_08.1), Azimuth],
-                   pp[!is.na(QCF_BTH_08.1), wattGLB],
+            points(pp[!is.na(QCF_BTH_08_1), Azimuth],
+                   pp[!is.na(QCF_BTH_08_1), wattGLB],
                    ylim = ylim, col = "green")
         }
 
-        test <- DATA[ !is.na(QCF_BTH_08.2) ]
+        ## plot harder limit
+        test <- DATA[ !is.na(QCF_BTH_08_2) ]
         xlim <- range( DATA[ Elevat > 0, Azimuth ] )
 
         for (ad in unique(as.Date(test$Date))) {
@@ -463,14 +459,13 @@ if (TEST_08) {
                   ylim = ylim, col = "blue", ylab = "", xlab = "")
             lines(pp$Azimuth, pp$wattGLB, col = "green" )
             title(paste("8.2", as.Date(ad, origin = "1970-01-01")))
-            points(pp[!is.na(QCF_BTH_08.2), Azimuth],
-                   pp[!is.na(QCF_BTH_08.2), wattHOR],
+            points(pp[!is.na(QCF_BTH_08_2), Azimuth],
+                   pp[!is.na(QCF_BTH_08_2), wattHOR],
                    ylim = ylim, col = "blue")
-            points(pp[!is.na(QCF_BTH_08.2), Azimuth],
-                   pp[!is.na(QCF_BTH_08.2), wattGLB],
+            points(pp[!is.na(QCF_BTH_08_2), Azimuth],
+                   pp[!is.na(QCF_BTH_08_2), wattGLB],
                    ylim = ylim, col = "green")
         }
-
 
         # test <- DATA[ , Relative_diffuse < -200 ]
         # for (ad in unique(as.Date(DATA[test,Date]))) {
@@ -490,7 +485,6 @@ if (TEST_08) {
         # }
 
     }
-
     # ## remove
     # DATA[ QCF_BTH_08 %in% keys, wattGLB := NA ]
     # DATA[ QCF_BTH_08 %in% keys, wattHOR := NA ]
@@ -507,85 +501,88 @@ if (TEST_08) {
 
 
 
-# ####  9. Clearness index test  ####
-# keys  <- c("Clearness index limit max (19)",
-#            "Clearness index limit min (20)")
-# #'
-# #' \newpage
-# #' ## 9. Clearness index test
-# #'
-# #' Drop all data with flag: `r paste(keys)`.
-# #'
-# #' These data are near Elevation 0 and caused by the cos(SZA)
-# #' kt = GLB / (cos(sza) * TSI)
-# #' low GLB value end extreme cos(sza) values
-# #'
-# #+ echo=F, include=T
-#
-# if (DO_PLOTS) {
-#     # levels(DATA$QCF_GLB_09)
-#     hist(DATA[ QCF_GLB_09 %in% keys,              wattGLB], breaks = 100 )
-#     hist(DATA[ QCF_GLB_09 %in% keys,              Elevat ], breaks = 100 )
-#     hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, wattGLB], breaks = 100 )
-#     hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, Elevat ], breaks = 100 )
-#
-#     # test <- DATA[ , .(Min_kt =  min(Clearness_Kt, na.rm = T),
-#     #                   Max_kt =  max(Clearness_Kt, na.rm = T)),
-#     #               by = .(Elevat = (Elevat %/% 0.01) * 0.01 ) ]
-#     # plot(test$Elevat, test$Max_kt)
-#     # plot(test$Elevat, test$Min_kt)
-#
-#     # DATA[ Clearness_Kt >  10 , Clearness_Kt := NA]
-#     # DATA[ Clearness_Kt < -20 , Clearness_Kt := NA]
-#     # min(DATA$SZA)
-#     # max(DATA$SZA)
-#     # cosde(90.00000001)
-#     # cosde(89.99999999)
-#
-#     tmp <- DATA[ Elevat < 120 ]
-#     for (ay in unique(year(tmp$Date))) {
-#         pp <- tmp[year(tmp$Date) == ay]
-#         # plot(pp$Azimuth, pp$wattGLB, main = ay, pch = 19, cex = 0.1)
-#         # points(pp[QCF_GLB_09 %in% keys,Azimuth],
-#         #      pp[QCF_GLB_09 %in% keys,wattGLB],
-#         #      pch = 19, cex = 0.2, col = "red")
-#         ylim = c(-20, 20)
-#         # plot(pp$Azimuth, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
-#         # points(pp[QCF_GLB_09 %in% keys,Azimuth],
-#         #        pp[QCF_GLB_09 %in% keys,Clearness_Kt],
-#         #        pch = 19, cex = 0.2, col = "red")
-#         #
-#         # abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
-#         # abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
-#         ylim = c(-0.5, 2)
-#         plot(pp$Elevat, pp$Clearness_Kt,
-#              main = ay, pch = 19, cex = 0.1,
-#              ylim = ylim, xlab = "Elevation", ylab = "Clearness index Kt" )
-#         points(pp[Clearness_Kt > QS$CL_idx_max, Elevat],
-#                pp[Clearness_Kt > QS$CL_idx_max, Clearness_Kt],
-#                pch = 19, cex = 0.3, col = "red")
-#         points(pp[Clearness_Kt < QS$CL_idx_min, Elevat],
-#                pp[Clearness_Kt < QS$CL_idx_min, Clearness_Kt],
-#                pch = 19, cex = 0.3, col = "blue")
-#         abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
-#         abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
-#     }
-# }
-#
-# ## remove
-# DATA[QCF_GLB_09 %in% keys, wattGLB := NA]
-# ## info
-# cat(c(DATA[QCF_GLB_09 %in% keys, .N],
-#       " Global Records removed with:",
-#       keys), ".\n\n")
-# ## remove empty entries
-# DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
-# DATA$QCF_GLB_09 <- NULL
-# #' -----------------------------------------------------------------------------
-#
-#
-#
-#
+####  9. Clearness index test  ####
+#'
+#' \newpage
+#' ## 9. Clearness index test
+#'
+#'
+#' These data are near Elevation 0 and caused by the cos(SZA)
+#' kt = GLB / (cos(sza) * TSI)
+#' low GLB value end extreme cos(sza) values
+#'
+#+ echo=F, include=T
+
+#+ echo=TEST_09, include=T
+if (TEST_09) {
+
+    if (DO_PLOTS) {
+        # levels(DATA$QCF_GLB_09)
+        hist(DATA[ QCF_GLB_09 %in% keys,              wattGLB], breaks = 100 )
+        hist(DATA[ QCF_GLB_09 %in% keys,              Elevat ], breaks = 100 )
+        hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, wattGLB], breaks = 100 )
+        hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, Elevat ], breaks = 100 )
+
+        # test <- DATA[ , .(Min_kt =  min(Clearness_Kt, na.rm = T),
+        #                   Max_kt =  max(Clearness_Kt, na.rm = T)),
+        #               by = .(Elevat = (Elevat %/% 0.01) * 0.01 ) ]
+        # plot(test$Elevat, test$Max_kt)
+        # plot(test$Elevat, test$Min_kt)
+
+        # DATA[ Clearness_Kt >  10 , Clearness_Kt := NA]
+        # DATA[ Clearness_Kt < -20 , Clearness_Kt := NA]
+        # min(DATA$SZA)
+        # max(DATA$SZA)
+        # cosde(90.00000001)
+        # cosde(89.99999999)
+
+        tmp <- DATA[ Elevat < 120 ]
+        for (ay in unique(year(tmp$Date))) {
+            pp <- tmp[year(tmp$Date) == ay]
+            # plot(pp$Azimuth, pp$wattGLB, main = ay, pch = 19, cex = 0.1)
+            # points(pp[QCF_GLB_09 %in% keys,Azimuth],
+            #      pp[QCF_GLB_09 %in% keys,wattGLB],
+            #      pch = 19, cex = 0.2, col = "red")
+            ylim = c(-20, 20)
+            # plot(pp$Azimuth, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
+            # points(pp[QCF_GLB_09 %in% keys,Azimuth],
+            #        pp[QCF_GLB_09 %in% keys,Clearness_Kt],
+            #        pch = 19, cex = 0.2, col = "red")
+            #
+            # abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
+            # abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+            ylim = c(-0.5, 2)
+            plot(pp$Elevat, pp$Clearness_Kt,
+                 main = ay, pch = 19, cex = 0.1,
+                 ylim = ylim, xlab = "Elevation", ylab = "Clearness index Kt" )
+            points(pp[Clearness_Kt > QS$CL_idx_max, Elevat],
+                   pp[Clearness_Kt > QS$CL_idx_max, Clearness_Kt],
+                   pch = 19, cex = 0.3, col = "red")
+            points(pp[Clearness_Kt < QS$CL_idx_min, Elevat],
+                   pp[Clearness_Kt < QS$CL_idx_min, Clearness_Kt],
+                   pch = 19, cex = 0.3, col = "blue")
+            abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
+            abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+        }
+    }
+
+    # ## remove
+    # DATA[QCF_GLB_09 %in% keys, wattGLB := NA]
+    # ## info
+    # cat(c(DATA[QCF_GLB_09 %in% keys, .N],
+    #       " Global Records removed with:",
+    #       keys), ".\n\n")
+    # ## remove empty entries
+    # DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
+    # DATA$QCF_GLB_09 <- NULL
+}
+#' -----------------------------------------------------------------------------
+
+
+
+
+
+
 #
 #
 #
