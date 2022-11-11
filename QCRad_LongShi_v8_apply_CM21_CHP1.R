@@ -273,7 +273,7 @@ if (TEST_04) {
                 ylim <- range(pp$Dir_First_Clim_lim, pp$wattDIR, na.rm = T)
                 plot(pp$Date, pp$wattDIR, "l", col = "blue",
                      ylim = ylim, xlab = "", ylab = "wattDIR")
-                title(paste("4.1", as.Date(ad, origin = "1970-01-01")))
+                title(paste("4_1", as.Date(ad, origin = "1970-01-01")))
                 ## plot limits
                 lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink")
                 lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
@@ -293,7 +293,7 @@ if (TEST_04) {
                 ylim <- range(pp$Dir_Secon_Clim_lim, pp$wattDIR, na.rm = T)
                 plot(pp$Date, pp$wattDIR, "l", col = "blue",
                      ylim = ylim, xlab = "", ylab = "wattDIR")
-                title(paste("4.2", as.Date(ad, origin = "1970-01-01")))
+                title(paste("4_2", as.Date(ad, origin = "1970-01-01")))
                 ## plot limits
                 lines(pp$Date, pp$Dir_First_Clim_lim, col = "pink")
                 lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
@@ -312,7 +312,7 @@ if (TEST_04) {
                 ylim <- range(pp$Glo_First_Clim_lim, pp$wattGLB, na.rm = T)
                 plot(pp$Date, pp$wattGLB, "l", col = "green",
                      ylim = ylim, xlab = "", ylab = "wattGLB")
-                title(paste("4.1", as.Date(ad, origin = "1970-01-01")))
+                title(paste("4_1", as.Date(ad, origin = "1970-01-01")))
                 ## plot limits
                 lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink")
                 lines(pp$Date, pp$Glo_Secon_Clim_lim, col = "red" )
@@ -331,7 +331,7 @@ if (TEST_04) {
                 ylim <- range(pp$Glo_Secon_Clim_lim, pp$wattGLB, na.rm = T)
                 plot(pp$Date, pp$wattGLB, "l", col = "green",
                      ylim = ylim, xlab = "", ylab = "wattGLB")
-                title(paste("4.2", as.Date(ad, origin = "1970-01-01")))
+                title(paste("4_2", as.Date(ad, origin = "1970-01-01")))
                 ## plot limits
                 lines(pp$Date, pp$Glo_First_Clim_lim, col = "pink")
                 lines(pp$Date, pp$Glo_Secon_Clim_lim, col = "red" )
@@ -439,7 +439,7 @@ if (TEST_08) {
             plot( pp$Azimuth, pp$wattHOR, "l",
                   xlim = xlim, ylim = ylim, col = "blue", ylab = "", xlab = "")
             lines(pp$Azimuth, pp$wattGLB, col = "green" )
-            title(paste("8.1", as.Date(ad, origin = "1970-01-01")))
+            title(paste("8_1", as.Date(ad, origin = "1970-01-01")))
             points(pp[!is.na(QCF_BTH_08_1), Azimuth],
                    pp[!is.na(QCF_BTH_08_1), wattHOR],
                    ylim = ylim, col = "blue")
@@ -458,7 +458,7 @@ if (TEST_08) {
             plot( pp$Azimuth, pp$wattHOR, "l",
                   ylim = ylim, col = "blue", ylab = "", xlab = "")
             lines(pp$Azimuth, pp$wattGLB, col = "green" )
-            title(paste("8.2", as.Date(ad, origin = "1970-01-01")))
+            title(paste("8_2", as.Date(ad, origin = "1970-01-01")))
             points(pp[!is.na(QCF_BTH_08_2), Azimuth],
                    pp[!is.na(QCF_BTH_08_2), wattHOR],
                    ylim = ylim, col = "blue")
@@ -506,64 +506,89 @@ if (TEST_08) {
 #' \newpage
 #' ## 9. Clearness index test
 #'
+#' This filter is mine.
 #'
 #' These data are near Elevation 0 and caused by the cos(SZA)
 #' kt = GLB / (cos(sza) * TSI)
 #' low GLB value end extreme cos(sza) values
+#' No actual reason to remove, as those angles are discarded most of the times.
 #'
-#+ echo=F, include=T
-
+#' For larger elevation angles......
+#'
 #+ echo=TEST_09, include=T
 if (TEST_09) {
+    cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
 
+    QS$CL_idx_max <-  1.18   # Upper Clearness index accepted level
+    QS$CL_idx_min <- -0.001 # Lower Clearness index accepted level
+    QS$CL_idx_ele <-  2.5   # Apply for elevations above this angle
+
+    ## . . Global ------------------------------------------------------####
+    DATA[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele,
+         QCF_GLB_09 := "Clearness index limit max (19)" ]
+    DATA[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele,
+         QCF_GLB_09 := "Clearness index limit min (20)" ]
+
+    cat(pander(table(DATA$QCF_GLB_09, exclude = TRUE)))
+}
+
+
+if (TEST_09) {
     if (DO_PLOTS) {
-        # levels(DATA$QCF_GLB_09)
-        hist(DATA[ QCF_GLB_09 %in% keys,              wattGLB], breaks = 100 )
-        hist(DATA[ QCF_GLB_09 %in% keys,              Elevat ], breaks = 100 )
-        hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, wattGLB], breaks = 100 )
-        hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, Elevat ], breaks = 100 )
 
-        # test <- DATA[ , .(Min_kt =  min(Clearness_Kt, na.rm = T),
-        #                   Max_kt =  max(Clearness_Kt, na.rm = T)),
-        #               by = .(Elevat = (Elevat %/% 0.01) * 0.01 ) ]
-        # plot(test$Elevat, test$Max_kt)
-        # plot(test$Elevat, test$Min_kt)
+        range(DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], na.rm = T)
+        hist(DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], breaks = 100 )
 
-        # DATA[ Clearness_Kt >  10 , Clearness_Kt := NA]
-        # DATA[ Clearness_Kt < -20 , Clearness_Kt := NA]
-        # min(DATA$SZA)
-        # max(DATA$SZA)
+        if (any(!is.na(QCF_GLB_09))) {
+            hist(DATA[!is.na(QCF_GLB_09), wattGLB],      breaks = 100 )
+            hist(DATA[!is.na(QCF_GLB_09), Elevat ],      breaks = 100 )
+            hist(DATA[!is.na(QCF_GLB_09), Clearness_Kt], breaks = 100 )
+        }
+
         # cosde(90.00000001)
         # cosde(89.99999999)
 
-        tmp <- DATA[ Elevat < 120 ]
+        tmp <- DATA[ !is.na(QCF_GLB_09) ]
+        ## plot offending years
         for (ay in unique(year(tmp$Date))) {
-            pp <- tmp[year(tmp$Date) == ay]
-            # plot(pp$Azimuth, pp$wattGLB, main = ay, pch = 19, cex = 0.1)
-            # points(pp[QCF_GLB_09 %in% keys,Azimuth],
-            #      pp[QCF_GLB_09 %in% keys,wattGLB],
-            #      pch = 19, cex = 0.2, col = "red")
-            ylim = c(-20, 20)
-            # plot(pp$Azimuth, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
-            # points(pp[QCF_GLB_09 %in% keys,Azimuth],
-            #        pp[QCF_GLB_09 %in% keys,Clearness_Kt],
-            #        pch = 19, cex = 0.2, col = "red")
-            #
-            # abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
-            # abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+            pp <- DATA[year(Date) == ay]
+
             ylim = c(-0.5, 2)
             plot(pp$Elevat, pp$Clearness_Kt,
                  main = ay, pch = 19, cex = 0.1,
                  ylim = ylim, xlab = "Elevation", ylab = "Clearness index Kt" )
-            points(pp[Clearness_Kt > QS$CL_idx_max, Elevat],
-                   pp[Clearness_Kt > QS$CL_idx_max, Clearness_Kt],
+
+            abline(v = QS$CL_idx_ele, col = "yellow")
+
+            points(pp[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Elevat],
+                   pp[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele, Clearness_Kt],
                    pch = 19, cex = 0.3, col = "red")
-            points(pp[Clearness_Kt < QS$CL_idx_min, Elevat],
-                   pp[Clearness_Kt < QS$CL_idx_min, Clearness_Kt],
+            abline(h = QS$CL_idx_max, col = "magenta", lwd = 0.5)
+
+            points(pp[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Elevat],
+                   pp[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele, Clearness_Kt],
                    pch = 19, cex = 0.3, col = "blue")
-            abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
             abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
         }
+
+        ## plot offending days
+        for (ad in sort(unique(c(as.Date(tmp$Date))))) {
+            pp   <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$wattDIR, pp$wattGLB, na.rm = T)
+            plot(pp$Date, pp$wattGLB, "l", col = "green",
+                 ylim = ylim, xlab = "", ylab = "wattGLB")
+            lines(pp$Date, pp$wattDIR, col = "blue")
+            title(paste("9.", as.Date(ad, origin = "1970-01-01")))
+            ## mark offending data
+            points(pp[!is.na(QCF_GLB_09), Date],
+                   pp[!is.na(QCF_GLB_09), wattGLB],
+                   col = "red", pch = 1)
+            ## no applicable to direct
+            # points(pp[!is.na(QCF_GLB_09), Date],
+            #        pp[!is.na(QCF_GLB_09), wattDIR],
+            #        col = "red", pch = 1)
+        }
+
     }
 
     # ## remove
@@ -583,12 +608,7 @@ if (TEST_09) {
 
 
 
-#
-#
-#
-#
-#
-#
+
 # #### ~ 6. Rayleigh Limit Diffuse Comparison ~ ####
 # keys  <- c("Rayleigh diffuse limit (18)")
 #
