@@ -28,7 +28,7 @@
 #'     number_sections:  no
 #'     fig_caption:      no
 #'     keep_tex:         no
-#'     keep_md:          yes
+#'     keep_md:          no
 #'     latex_engine:     xelatex
 #'     toc:              yes
 #'     fig_width:        8
@@ -85,22 +85,22 @@ source("~/RAD_QC/Functions_write_data.R")
 
 
 ####  Variables init  ####
-DATA_BASE     <- "~/DATA/Broad_Band/QCRad_LongShi/"
-IN_PREFIX     <- "LAP_QCRad_LongShi_v8_id_CM21_CHP1_"
-cachedata     <- "~/RAD_QC/temp_data.Rds"
+DATA_BASE    <- "~/DATA/Broad_Band/QCRad_LongShi/"
+IN_PREFIX    <- "LAP_QCRad_LongShi_v8_id_CM21_CHP1_"
+cachedata    <- "~/RAD_QC/temp_data.Rds"
 
 ####  Execution control  ####
 
 TEST_04      <- FALSE
 TEST_08      <- FALSE
 
-# TEST_04      <- TRUE
+TEST_04      <- TRUE
 TEST_08      <- TRUE
 
 
-DO_PLOTS      <- TRUE
+DO_PLOTS     <- TRUE
 if (interactive()) {
-    DO_PLOTS  <- FALSE
+    DO_PLOTS <- FALSE
 }
 
 
@@ -203,6 +203,7 @@ keys  <- c("Second climatological limit (16)",
 #' \newpage
 #' ## 4. Climatological (configurable) Limits
 #'
+cat("\n## 4. Climatological (configurable) Limits.\n\n")
 #'
 #' Limits the maximum expected irradiance based on climatological
 #' observations levels and the value of TSI.
@@ -213,18 +214,16 @@ keys  <- c("Second climatological limit (16)",
 #'
 #' For GHI this may limit the radiation enhancement cases.
 #'
-#' Exclusions should be done case by case
+#' Exclusions should be done case by case.
 #'
 
+#+ echo=TEST_04
 if (TEST_04) {
-    cat(paste("\n## 4. Climatological (configurable) Limits.\n\n"))
-
     QS$clim_lim_C3 <- 0.77
     QS$clim_lim_D3 <- 0.81
     QS$clim_lim_C1 <- 1.14
     QS$clim_lim_D1 <- 1.32
 
-    ## Criteria
     ## . . Direct ----------------------------------------------------------####
     DATA[, Dir_First_Clim_lim := TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10]
     DATA[wattDIR > Dir_First_Clim_lim,
@@ -242,24 +241,31 @@ if (TEST_04) {
     DATA[wattGLB > Glo_Secon_Clim_lim,
          QCF_GLB_04.2 := "Second climatological limit (16)"]
 
-    ## Plots
+    pander(table(DATA$QCF_GLB_04.1, exclude = NULL))
+    cat("\n\n")
+    pander(table(DATA$QCF_GLB_04.2, exclude = NULL))
+    cat("\n\n")
+    pander(table(DATA$QCF_DIR_04.1, exclude = NULL))
+    cat("\n\n")
+    pander(table(DATA$QCF_DIR_04.2, exclude = NULL))
+    cat("\n\n")
+}
 
-    hist(DATA[, wattDIR - Dir_First_Clim_lim] , breaks = 100,
+
+#+ echo=F, include=T
+if (TEST_04) {
+
+    hist(DATA[, wattDIR - Dir_First_Clim_lim], breaks = 100,
          main = "Departure Direct from first climatological limti")
 
-    hist(DATA[, wattDIR - Dir_Secon_Clim_lim] , breaks = 100,
+    hist(DATA[, wattDIR - Dir_Secon_Clim_lim], breaks = 100,
          main = "Departure Direct from second climatological limit")
 
-    hist(DATA[, wattGLB - Glo_First_Clim_lim] , breaks = 100,
+    hist(DATA[, wattGLB - Glo_First_Clim_lim], breaks = 100,
          main = "Departure Direct from first climatological limti")
 
-    hist(DATA[, wattGLB - Glo_Secon_Clim_lim] , breaks = 100,
+    hist(DATA[, wattGLB - Glo_Secon_Clim_lim], breaks = 100,
          main = "Departure Direct from second climatological limit")
-
-    pander(table(DATA$QCF_GLB_04.1))
-    pander(table(DATA$QCF_GLB_04.2))
-    pander(table(DATA$QCF_DIR_04.1))
-    pander(table(DATA$QCF_DIR_04.2))
 
     if (DO_PLOTS) {
 
@@ -387,7 +393,7 @@ keys <- c("Direct > global hard (15)","Direct > global soft (14)")
 #' Probably these value should be removed for CS when occurring on low
 #' elevation angles.
 #'
-#' Additional criteria is needed for the data drop
+#' Additional criteria is needed for any data drop.
 #'
 #+ echo=F, include=T
 
@@ -501,275 +507,275 @@ if (TEST_08) {
 
 
 
-####  9. Clearness index test  ####
-keys  <- c("Clearness index limit max (19)",
-           "Clearness index limit min (20)")
-#'
-#' \newpage
-#' ## 9. Clearness index test
-#'
-#' Drop all data with flag: `r paste(keys)`.
-#'
-#' These data are near Elevation 0 and caused by the cos(SZA)
-#' kt = GLB / (cos(sza) * TSI)
-#' low GLB value end extreme cos(sza) values
-#'
-#+ echo=F, include=T
-
-if (DO_PLOTS) {
-    # levels(DATA$QCF_GLB_09)
-    hist(DATA[ QCF_GLB_09 %in% keys,              wattGLB], breaks = 100 )
-    hist(DATA[ QCF_GLB_09 %in% keys,              Elevat ], breaks = 100 )
-    hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, wattGLB], breaks = 100 )
-    hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, Elevat ], breaks = 100 )
-
-    # test <- DATA[ , .(Min_kt =  min(Clearness_Kt, na.rm = T),
-    #                   Max_kt =  max(Clearness_Kt, na.rm = T)),
-    #               by = .(Elevat = (Elevat %/% 0.01) * 0.01 ) ]
-    # plot(test$Elevat, test$Max_kt)
-    # plot(test$Elevat, test$Min_kt)
-
-    # DATA[ Clearness_Kt >  10 , Clearness_Kt := NA]
-    # DATA[ Clearness_Kt < -20 , Clearness_Kt := NA]
-    # min(DATA$SZA)
-    # max(DATA$SZA)
-    # cosde(90.00000001)
-    # cosde(89.99999999)
-
-    tmp <- DATA[ Elevat < 120 ]
-    for (ay in unique(year(tmp$Date))) {
-        pp <- tmp[year(tmp$Date) == ay]
-        # plot(pp$Azimuth, pp$wattGLB, main = ay, pch = 19, cex = 0.1)
-        # points(pp[QCF_GLB_09 %in% keys,Azimuth],
-        #      pp[QCF_GLB_09 %in% keys,wattGLB],
-        #      pch = 19, cex = 0.2, col = "red")
-        ylim = c(-20, 20)
-        # plot(pp$Azimuth, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
-        # points(pp[QCF_GLB_09 %in% keys,Azimuth],
-        #        pp[QCF_GLB_09 %in% keys,Clearness_Kt],
-        #        pch = 19, cex = 0.2, col = "red")
-        #
-        # abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
-        # abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
-        ylim = c(-0.5, 2)
-        plot(pp$Elevat, pp$Clearness_Kt,
-             main = ay, pch = 19, cex = 0.1,
-             ylim = ylim, xlab = "Elevation", ylab = "Clearness index Kt" )
-        points(pp[Clearness_Kt > QS$CL_idx_max, Elevat],
-               pp[Clearness_Kt > QS$CL_idx_max, Clearness_Kt],
-               pch = 19, cex = 0.3, col = "red")
-        points(pp[Clearness_Kt < QS$CL_idx_min, Elevat],
-               pp[Clearness_Kt < QS$CL_idx_min, Clearness_Kt],
-               pch = 19, cex = 0.3, col = "blue")
-        abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
-        abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
-    }
-}
-
-## remove
-DATA[QCF_GLB_09 %in% keys, wattGLB := NA]
-## info
-cat(c(DATA[QCF_GLB_09 %in% keys, .N],
-      " Global Records removed with:",
-      keys), ".\n\n")
-## remove empty entries
-DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
-DATA$QCF_GLB_09 <- NULL
-#' -----------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-#### ~ 6. Rayleigh Limit Diffuse Comparison ~ ####
-keys  <- c("Rayleigh diffuse limit (18)")
-
-Rayleigh_diff <- function(SZA, Pressure) {
-
-    source("~/CODE/FUNCTIONS/R/trig_deg.R")
-
-    a    <-   209.3
-    b    <-  -708.3
-    c    <-  1128.7
-    d    <-  -911.2
-    e    <-   287.85
-    f    <-     0.046725
-    mu_0 <- cosde(SZA)
-
-    return( a * mu_0     +
-                b * mu_0 ^ 2 +
-                c * mu_0 ^ 3 +
-                d * mu_0 ^ 4 +
-                e * mu_0 ^ 5 +
-                f * mu_0 * Pressure )
-}
-
-#'
-#' \newpage
-#' ## 6. Rayleigh Limit Diffuse Comparison
-#'
-#' Compare inferred diffuse radiation with a modeled value of diffuse,
-#' based on SZA and atmospheric pressure.
-#'
-#' Reasons:
-#' - Difference on Sun observation angle due to different instruments location.
-#' - Cases of instrument windows cleaning
-#'
-#' `r print(Rayleigh_diff)`
-#'
-#+ echo=F, include=T
-
-
-
-DATA[ , RaylDIFF := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
-
-
-test <- unique(DATA[ wattGLB > 50 &
-                    (wattDIF / wattGLB) < 0.8 &
-                     wattDIF < (RaylDIFF - 1),  ])
-
-hist(test$Azimuth, breaks = 100)
-hist(test$SZA, breaks = 100)
-
+# ####  9. Clearness index test  ####
+# keys  <- c("Clearness index limit max (19)",
+#            "Clearness index limit min (20)")
+# #'
+# #' \newpage
+# #' ## 9. Clearness index test
+# #'
+# #' Drop all data with flag: `r paste(keys)`.
+# #'
+# #' These data are near Elevation 0 and caused by the cos(SZA)
+# #' kt = GLB / (cos(sza) * TSI)
+# #' low GLB value end extreme cos(sza) values
+# #'
+# #+ echo=F, include=T
+#
+# if (DO_PLOTS) {
+#     # levels(DATA$QCF_GLB_09)
+#     hist(DATA[ QCF_GLB_09 %in% keys,              wattGLB], breaks = 100 )
+#     hist(DATA[ QCF_GLB_09 %in% keys,              Elevat ], breaks = 100 )
+#     hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, wattGLB], breaks = 100 )
+#     hist(DATA[ QCF_GLB_09 %in% keys & Elevat > 2, Elevat ], breaks = 100 )
+#
+#     # test <- DATA[ , .(Min_kt =  min(Clearness_Kt, na.rm = T),
+#     #                   Max_kt =  max(Clearness_Kt, na.rm = T)),
+#     #               by = .(Elevat = (Elevat %/% 0.01) * 0.01 ) ]
+#     # plot(test$Elevat, test$Max_kt)
+#     # plot(test$Elevat, test$Min_kt)
+#
+#     # DATA[ Clearness_Kt >  10 , Clearness_Kt := NA]
+#     # DATA[ Clearness_Kt < -20 , Clearness_Kt := NA]
+#     # min(DATA$SZA)
+#     # max(DATA$SZA)
+#     # cosde(90.00000001)
+#     # cosde(89.99999999)
+#
+#     tmp <- DATA[ Elevat < 120 ]
+#     for (ay in unique(year(tmp$Date))) {
+#         pp <- tmp[year(tmp$Date) == ay]
+#         # plot(pp$Azimuth, pp$wattGLB, main = ay, pch = 19, cex = 0.1)
+#         # points(pp[QCF_GLB_09 %in% keys,Azimuth],
+#         #      pp[QCF_GLB_09 %in% keys,wattGLB],
+#         #      pch = 19, cex = 0.2, col = "red")
+#         ylim = c(-20, 20)
+#         # plot(pp$Azimuth, pp$Clearness_Kt, main = ay, pch = 19, cex = 0.1, ylim = ylim)
+#         # points(pp[QCF_GLB_09 %in% keys,Azimuth],
+#         #        pp[QCF_GLB_09 %in% keys,Clearness_Kt],
+#         #        pch = 19, cex = 0.2, col = "red")
+#         #
+#         # abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
+#         # abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+#         ylim = c(-0.5, 2)
+#         plot(pp$Elevat, pp$Clearness_Kt,
+#              main = ay, pch = 19, cex = 0.1,
+#              ylim = ylim, xlab = "Elevation", ylab = "Clearness index Kt" )
+#         points(pp[Clearness_Kt > QS$CL_idx_max, Elevat],
+#                pp[Clearness_Kt > QS$CL_idx_max, Clearness_Kt],
+#                pch = 19, cex = 0.3, col = "red")
+#         points(pp[Clearness_Kt < QS$CL_idx_min, Elevat],
+#                pp[Clearness_Kt < QS$CL_idx_min, Clearness_Kt],
+#                pch = 19, cex = 0.3, col = "blue")
+#         abline(h = QS$CL_idx_max, col = "cyan", lwd = 0.5)
+#         abline(h = QS$CL_idx_min, col = "cyan", lwd = 0.5)
+#     }
+# }
+#
+# ## remove
+# DATA[QCF_GLB_09 %in% keys, wattGLB := NA]
+# ## info
+# cat(c(DATA[QCF_GLB_09 %in% keys, .N],
+#       " Global Records removed with:",
+#       keys), ".\n\n")
+# ## remove empty entries
+# DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
+# DATA$QCF_GLB_09 <- NULL
+# #' -----------------------------------------------------------------------------
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# #### ~ 6. Rayleigh Limit Diffuse Comparison ~ ####
+# keys  <- c("Rayleigh diffuse limit (18)")
+#
+# Rayleigh_diff <- function(SZA, Pressure) {
+#
+#     source("~/CODE/FUNCTIONS/R/trig_deg.R")
+#
+#     a    <-   209.3
+#     b    <-  -708.3
+#     c    <-  1128.7
+#     d    <-  -911.2
+#     e    <-   287.85
+#     f    <-     0.046725
+#     mu_0 <- cosde(SZA)
+#
+#     return( a * mu_0     +
+#                 b * mu_0 ^ 2 +
+#                 c * mu_0 ^ 3 +
+#                 d * mu_0 ^ 4 +
+#                 e * mu_0 ^ 5 +
+#                 f * mu_0 * Pressure )
+# }
+#
+# #'
+# #' \newpage
+# #' ## 6. Rayleigh Limit Diffuse Comparison
+# #'
+# #' Compare inferred diffuse radiation with a modeled value of diffuse,
+# #' based on SZA and atmospheric pressure.
+# #'
+# #' Reasons:
+# #' - Difference on Sun observation angle due to different instruments location.
+# #' - Cases of instrument windows cleaning
+# #'
+# #' `r print(Rayleigh_diff)`
+# #'
+# #+ echo=F, include=T
+#
+#
+#
+# DATA[ , RaylDIFF := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
+#
+#
 # test <- unique(DATA[ wattGLB > 50 &
-#                      (wattDIF / wattGLB) < 0.8 &
-#                      wattDIF < (RaylDIFF - 1)  &
-#                          SZA < 70,  ])
-
-
-for (ad in unique(as.Date(test$Date))) {
-    pp   <- DATA[ as.Date(Date) == ad, ]
-
-    layout(matrix(c(1,2), 2, 1, byrow = TRUE))
-    par(mar = c(2,4,2,1))
-
-    ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
-    plot( pp$Date, pp$wattDIF, "l",
-          ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
-    lines(pp$Date, pp$RaylDIFF, col = "red" )
-    title(as.Date(ad, origin = "1970-01-01"))
-    # par(new = T)
-
-    par(mar = c(2,4,1,1))
-    ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
-    plot( pp$Date, pp$wattGLB, "l",
-          ylim = ylim, col = "green", ylab = "", xlab = "")
-    lines(pp$Date, pp$wattDIR, col = "blue" )
-
-    points(pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), Date],
-           pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), wattDIR],
-           ylim = ylim, col = "red")
-    points(pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), Date],
-           pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), wattGLB],
-           ylim = ylim, col = "red")
-    cat("\n")
-
-}
-
-
-
-
-
-
-#### ~ Rest of the flags to check ~ ####
-
-wecare <- grep("QCF_DIR_|QCF_GLB_|QCF_BTH_" , names(DATA), value = T )
-for (fg in wecare) {
-    if (all(is.na(DATA[[fg]]))) {
-        DATA[[fg]] <- NULL
-    }
-}
-
-
-wecare <- grep("QCF_DIR_|QCF_GLB_|QCF_BTH_" , names(DATA), value = T )
-
-for (fg in wecare) {
-    cat(paste(fg),"\n")
-    cat(levels(DATA[[fg]]),"\n")
-}
-
-
-
+#                     (wattDIF / wattGLB) < 0.8 &
+#                      wattDIF < (RaylDIFF - 1),  ])
+#
+# hist(test$Azimuth, breaks = 100)
+# hist(test$SZA, breaks = 100)
+#
+# # test <- unique(DATA[ wattGLB > 50 &
+# #                      (wattDIF / wattGLB) < 0.8 &
+# #                      wattDIF < (RaylDIFF - 1)  &
+# #                          SZA < 70,  ])
+#
+#
+# for (ad in unique(as.Date(test$Date))) {
+#     pp   <- DATA[ as.Date(Date) == ad, ]
+#
+#     layout(matrix(c(1,2), 2, 1, byrow = TRUE))
+#     par(mar = c(2,4,2,1))
+#
+#     ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
+#     plot( pp$Date, pp$wattDIF, "l",
+#           ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
+#     lines(pp$Date, pp$RaylDIFF, col = "red" )
+#     title(as.Date(ad, origin = "1970-01-01"))
+#     # par(new = T)
+#
+#     par(mar = c(2,4,1,1))
+#     ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
+#     plot( pp$Date, pp$wattGLB, "l",
+#           ylim = ylim, col = "green", ylab = "", xlab = "")
+#     lines(pp$Date, pp$wattDIR, col = "blue" )
+#
+#     points(pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), Date],
+#            pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), wattDIR],
+#            ylim = ylim, col = "red")
+#     points(pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), Date],
+#            pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), wattGLB],
+#            ylim = ylim, col = "red")
+#     cat("\n")
+#
+# }
+#
+#
+#
+#
+#
+#
+# #### ~ Rest of the flags to check ~ ####
+#
+# wecare <- grep("QCF_DIR_|QCF_GLB_|QCF_BTH_" , names(DATA), value = T )
 # for (fg in wecare) {
-#     if (any(!is.na(DATA[[fg]]))) {
-#         try(hist( as.numeric( factor(DATA[[fg]]), main = fg)))
-#         try(plot(DATA$Date, factor(DATA[[fg]]), main = fg))
+#     if (all(is.na(DATA[[fg]]))) {
+#         DATA[[fg]] <- NULL
 #     }
 # }
 #
 #
-# #+ echo=F, include=T, results="asis"
-# ## loop years and read data
-# for (YY in yearSTA:yearEND) {
+# wecare <- grep("QCF_DIR_|QCF_GLB_|QCF_BTH_" , names(DATA), value = T )
 #
-#     cat("\n\n\\FloatBarrier\n\n")
-#     cat("\\newpage\n\n")
-#     cat("\n## Year:", YY, "\n\n")
-#
-#
-
-
-#     #### ~ ~ ~ ~  Data export ~ ~ ~ ~ ##########################################
-#     cat(paste("\nExport Data.\n\n"))
-#
-#     ## . . gather all suspect points for export ----------------------------####
-#     # suspect_choose  <- DATA_year$QCF_DIR != "good" | DATA_year$QCF_GLB != "good"
-#     # SUS_DATA        <- DATA_year[suspect_choose,]
-#     # SUS_DATA        <- SUS_DATA[order(SUS_DATA$Date30),]
-#     # SUS_DATA_gather <- rbind(SUS_DATA_gather, SUS_DATA)
-#
-#     # ## gather all suspect dates for export
-#     # daysinfo        <- SUS_DATA[,c("Date30","QCF_DIR","QCF_GLB")]
-#     # daysinfo$Day    <- as.Date(daysinfo$Date30)
-#     # daysinfo$Date30 <- NULL
-#     # daysinfo        <- daysinfo[order(daysinfo$Day),]
-#     # daysinfo        <- unique(daysinfo)
-#     # daysinfo_gather <- rbind(daysinfo_gather, daysinfo)
-
-
-# #    ## save data identification
-# #    DATA_year <- DATA_year[ DATA_year$Date < LAST_DAY_EXPR , ]
-# #    DATA_year <- DATA_year[ DATA_year$Date > PROJECT_START , ]
-#
-#    ## . . Export main data -------------------------------------------------####
-#    if ( !TESTING & dim(DATA_year)[1] > 0 ) {
-#        write_RDS(object = DATA_year,
-#                  file   = paste0(OUTPUT_BASE, basename(sub("\\.R$","_", Script.Name)),YY))
-#    }
-#     ##-------------------------------------------------------------------------##
-#
-#
-# #    ##-- Strict output for clear sky use ---------------------------------------
-# #    allow <- c( "good", "Possible Direct Obstruction (23)")
-# #    sels  <- DATA_year$QCF_DIR %in% allow | DATA_year$QCF_GLB %in% allow
-# #    STRICT_data <- DATA_year[sels,]
-# #
-# #    STRICT_data <- subset(STRICT_data, select = c( -CHP1temp,
-# #                                                   -CHP1tempSD,
-# #                                                   -CHP1tempUNC,
-# #                                                   -chp1TempCF,
-# #                                                   -TSIextEARTH_comb
-# #                                                   ))
-# #
-# #    ##-- Export strict data --------------------------------------------------##
-# #    if ( !TESTING & dim(STRICT_data)[1] > 0 ) {
-# #        myRtools::write_RDS(object = STRICT_data, paste0(OUTPUT_STRICT,YY)) }
-# #    ##------------------------------------------------------------------------##
-#
+# for (fg in wecare) {
+#     cat(paste(fg),"\n")
+#     cat(levels(DATA[[fg]]),"\n")
 # }
 #
-# # ##-- Export a record of the bad data -----------------------------------------##
-# # if (!TESTING) myRtools::write_RDS( SUS_DATA_gather, SUSPECTS_EXP )
-# # ##----------------------------------------------------------------------------##
 #
-
-#'
-#' **END**
-#+ include=T, echo=F
-tac <- Sys.time()
-cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+#
+# # for (fg in wecare) {
+# #     if (any(!is.na(DATA[[fg]]))) {
+# #         try(hist( as.numeric( factor(DATA[[fg]]), main = fg)))
+# #         try(plot(DATA$Date, factor(DATA[[fg]]), main = fg))
+# #     }
+# # }
+# #
+# #
+# # #+ echo=F, include=T, results="asis"
+# # ## loop years and read data
+# # for (YY in yearSTA:yearEND) {
+# #
+# #     cat("\n\n\\FloatBarrier\n\n")
+# #     cat("\\newpage\n\n")
+# #     cat("\n## Year:", YY, "\n\n")
+# #
+# #
+#
+#
+# #     #### ~ ~ ~ ~  Data export ~ ~ ~ ~ ##########################################
+# #     cat(paste("\nExport Data.\n\n"))
+# #
+# #     ## . . gather all suspect points for export ----------------------------####
+# #     # suspect_choose  <- DATA_year$QCF_DIR != "good" | DATA_year$QCF_GLB != "good"
+# #     # SUS_DATA        <- DATA_year[suspect_choose,]
+# #     # SUS_DATA        <- SUS_DATA[order(SUS_DATA$Date30),]
+# #     # SUS_DATA_gather <- rbind(SUS_DATA_gather, SUS_DATA)
+# #
+# #     # ## gather all suspect dates for export
+# #     # daysinfo        <- SUS_DATA[,c("Date30","QCF_DIR","QCF_GLB")]
+# #     # daysinfo$Day    <- as.Date(daysinfo$Date30)
+# #     # daysinfo$Date30 <- NULL
+# #     # daysinfo        <- daysinfo[order(daysinfo$Day),]
+# #     # daysinfo        <- unique(daysinfo)
+# #     # daysinfo_gather <- rbind(daysinfo_gather, daysinfo)
+#
+#
+# # #    ## save data identification
+# # #    DATA_year <- DATA_year[ DATA_year$Date < LAST_DAY_EXPR , ]
+# # #    DATA_year <- DATA_year[ DATA_year$Date > PROJECT_START , ]
+# #
+# #    ## . . Export main data -------------------------------------------------####
+# #    if ( !TESTING & dim(DATA_year)[1] > 0 ) {
+# #        write_RDS(object = DATA_year,
+# #                  file   = paste0(OUTPUT_BASE, basename(sub("\\.R$","_", Script.Name)),YY))
+# #    }
+# #     ##-------------------------------------------------------------------------##
+# #
+# #
+# # #    ##-- Strict output for clear sky use ---------------------------------------
+# # #    allow <- c( "good", "Possible Direct Obstruction (23)")
+# # #    sels  <- DATA_year$QCF_DIR %in% allow | DATA_year$QCF_GLB %in% allow
+# # #    STRICT_data <- DATA_year[sels,]
+# # #
+# # #    STRICT_data <- subset(STRICT_data, select = c( -CHP1temp,
+# # #                                                   -CHP1tempSD,
+# # #                                                   -CHP1tempUNC,
+# # #                                                   -chp1TempCF,
+# # #                                                   -TSIextEARTH_comb
+# # #                                                   ))
+# # #
+# # #    ##-- Export strict data --------------------------------------------------##
+# # #    if ( !TESTING & dim(STRICT_data)[1] > 0 ) {
+# # #        myRtools::write_RDS(object = STRICT_data, paste0(OUTPUT_STRICT,YY)) }
+# # #    ##------------------------------------------------------------------------##
+# #
+# # }
+# #
+# # # ##-- Export a record of the bad data -----------------------------------------##
+# # # if (!TESTING) myRtools::write_RDS( SUS_DATA_gather, SUSPECTS_EXP )
+# # # ##----------------------------------------------------------------------------##
+# #
+#
+# #'
+# #' **END**
+# #+ include=T, echo=F
+# tac <- Sys.time()
+# cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
