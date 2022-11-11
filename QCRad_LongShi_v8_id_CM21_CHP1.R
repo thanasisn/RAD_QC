@@ -548,9 +548,6 @@ for (YY in yearSTA:yearEND) {
         DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & Rayleigh_lim ] <- "Rayleigh diffuse limit (18)"
         DATA_year$QCF_BTH_06[ Rayleigh_lim ]                         <- "Rayleigh diffuse limit (18)"
 
-        ## . .  Info -------------------------------------------------------####
-        cat(sprintf( " %6d    %s\n\n", sum(Rayleigh_lim, na.rm = T), "Rayleigh diffuse limit                               (18)"))
-        rm(selg,seld,selr,Rayleigh_lim)
     } ##END if DO_TEST_06
 
 
