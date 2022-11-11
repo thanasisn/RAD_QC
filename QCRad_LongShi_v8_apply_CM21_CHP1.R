@@ -96,10 +96,10 @@ TEST_06      <- FALSE
 TEST_08      <- FALSE
 TEST_09      <- FALSE
 
-# TEST_04      <- TRUE
+TEST_04      <- TRUE
 TEST_06      <- TRUE
-# TEST_08      <- TRUE
-# TEST_09      <- TRUE
+TEST_08      <- TRUE
+TEST_09      <- TRUE
 
 
 
@@ -373,6 +373,153 @@ if (TEST_04) {
 
 
 
+####  6. Rayleigh Limit Diffuse Comparison  ####
+#'
+#' \newpage
+#' ## 6. Rayleigh Limit Diffuse Comparison
+#'
+#' Compare inferred diffuse radiation with a modeled value of diffuse,
+#' based on SZA and atmospheric pressure.
+#'
+#' The upper limit denotes no tracking of CHP-1.
+#'
+#' Reasons:
+#' - Difference on Sun observation angle due to different instruments location.
+#' - Cases of instrument windows cleaning
+#'
+#+ echo=TEST_06, include=T
+if (TEST_06) {
+    cat(paste("\n6. Rayleigh Limit Diffuse Comparison.\n\n"))
+
+    QS$Rayleigh_upper_lim <- 500   # Upper departure diffuse limit
+    QS$Rayleigh_lower_lim <-  -3   # Lower departure diffuse limit
+    QS$Rayleigh_dif_glo_r <-   0.8 # Low limit diffuse/global < threshold
+    QS$Rayleigh_glo_min   <-  50   # Low limit minimum global
+
+    Rayleigh_diff <- function(SZA, Pressure) {
+        a    <-   209.3
+        b    <-  -708.3
+        c    <-  1128.7
+        d    <-  -911.2
+        e    <-   287.85
+        f    <-     0.046725
+        mu_0 <- cosde(SZA)
+        return( a * mu_0     +
+                    b * mu_0 ^ 2 +
+                    c * mu_0 ^ 3 +
+                    d * mu_0 ^ 4 +
+                    e * mu_0 ^ 5 +
+                    f * mu_0 * Pressure )
+    }
+
+    DATA[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
+
+    ## . . Both ------------------------------------------------------------####
+    DATA[wattDIF - RaylDIFF > QS$Rayleigh_upper_lim,
+         QCF_BTH_06_1 := "Rayleigh diffuse limit (18)" ]
+
+    DATA[wattDIF - RaylDIFF < QS$Rayleigh_lower_lim,
+         QCF_BTH_06_2 := "Rayleigh diffuse limit (18)" ]
+
+    table(DATA$QCF_BTH_06_1, exclude = TRUE)
+    table(DATA$QCF_BTH_06_2, exclude = TRUE)
+}
+
+#+ echo=F, include=T
+if (TEST_06) {
+    hist( DATA[, wattDIF - RaylDIFF ], breaks = 100 )
+
+    if ( any(!is.na(DATA$QCF_BTH_06_1)) ) {
+        hist( DATA[ !is.na(QCF_BTH_06_1), wattDIF - RaylDIFF ], breaks = 100)
+    }
+
+    if ( any(!is.na(DATA$QCF_BTH_06_2)) ) {
+        hist( DATA[ !is.na(QCF_BTH_06_2), wattDIF - RaylDIFF ], breaks = 100)
+    }
+
+    if (DO_PLOTS) {
+        ## plot on upper limit
+
+        tmp <- DATA[ !is.na(QCF_BTH_06_1) ]
+
+        for (ad in sort(unique(c(as.Date(tmp$Date))))) {
+
+            pp   <- DATA[ as.Date(Date) == ad, ]
+
+            layout(matrix(c(1,2), 2, 1, byrow = TRUE))
+            par(mar = c(2,4,2,1))
+
+            ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
+            plot( pp$Date, pp$wattDIF, "l",
+                  ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
+            lines(pp$Date, pp$RaylDIFF, col = "magenta" )
+            lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_upper_lim, col = "red" )
+
+            title(paste("6_1", as.Date(ad, origin = "1970-01-01")))
+
+            par(mar = c(2,4,1,1))
+            ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
+            plot( pp$Date, pp$wattGLB, "l",
+                  ylim = ylim, col = "green", ylab = "", xlab = "")
+            lines(pp$Date, pp$wattDIR, col = "blue" )
+
+            points(pp[!is.na(QCF_BTH_06_1), Date],
+                   pp[!is.na(QCF_BTH_06_1), wattDIR],
+                   ylim = ylim, col = "red")
+            points(pp[!is.na(QCF_BTH_06_1), Date],
+                   pp[!is.na(QCF_BTH_06_1), wattGLB],
+                   ylim = ylim, col = "red")
+        }
+
+
+
+        ## plot on lower limit
+        DATA[ !is.na(QCF_BTH_06_2) , .N]
+        DATA[ !is.na(QCF_BTH_06_2) &
+                  (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) , .N]
+        DATA[ !is.na(QCF_BTH_06_2) &
+                  (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) &
+                  wattGLB > QS$Rayleigh_glo_min , .N]
+
+        tmp <- DATA[!is.na(QCF_BTH_06_2) &
+                        (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) &
+                        wattGLB > QS$Rayleigh_glo_min ]
+
+        for (ad in sort(unique(c(as.Date(tmp$Date))))) {
+
+            pp   <- DATA[ as.Date(Date) == ad, ]
+
+            layout(matrix(c(1,2), 2, 1, byrow = TRUE))
+            par(mar = c(2,4,2,1))
+
+            ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
+            plot( pp$Date, pp$wattDIF, "l",
+                  ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
+            lines(pp$Date, pp$RaylDIFF, col = "magenta" )
+            lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_lower_lim, col = "red" )
+
+            title(paste("6_2", as.Date(ad, origin = "1970-01-01")))
+
+            par(mar = c(2,4,1,1))
+            ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
+            plot( pp$Date, pp$wattGLB, "l",
+                  ylim = ylim, col = "green", ylab = "", xlab = "")
+            lines(pp$Date, pp$wattDIR, col = "blue" )
+
+            points(pp[!is.na(QCF_BTH_06_2), Date],
+                   pp[!is.na(QCF_BTH_06_2), wattDIR],
+                   ylim = ylim, col = "red")
+            points(pp[!is.na(QCF_BTH_06_2), Date],
+                   pp[!is.na(QCF_BTH_06_2), wattGLB],
+                   ylim = ylim, col = "red")
+        }
+    }
+}
+#' -----------------------------------------------------------------------------
+
+
+
+
 ####  8. Test for inverted values  ####
 #'
 #' \newpage
@@ -608,153 +755,10 @@ if (TEST_09) {
 
 
 
-#### ~ 6. Rayleigh Limit Diffuse Comparison ~ ####
-#'
-#' \newpage
-#' ## 6. Rayleigh Limit Diffuse Comparison
-#'
-#' Compare inferred diffuse radiation with a modeled value of diffuse,
-#' based on SZA and atmospheric pressure.
-#'
-#' Reasons:
-#' - Difference on Sun observation angle due to different instruments location.
-#' - Cases of instrument windows cleaning
-#'
-#+ echo=TEST_06, include=T
-if (TEST_06) {
-
-    QS$Rayleigh_upper_lim <- 500   # Upper departure diffuse limit
-    QS$Rayleigh_lower_lim <-  -3   # Lower departure diffuse limit
-    QS$Rayleigh_dif_glo_r <-   0.8 # Low limit diffuse/global < threshold
-    QS$Rayleigh_glo_min   <-  50   # Low limit minimum global
-
-    Rayleigh_diff <- function(SZA, Pressure) {
-        a    <-   209.3
-        b    <-  -708.3
-        c    <-  1128.7
-        d    <-  -911.2
-        e    <-   287.85
-        f    <-     0.046725
-        mu_0 <- cosde(SZA)
-        return( a * mu_0     +
-                    b * mu_0 ^ 2 +
-                    c * mu_0 ^ 3 +
-                    d * mu_0 ^ 4 +
-                    e * mu_0 ^ 5 +
-                    f * mu_0 * Pressure )
-    }
-
-    DATA[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
-
-    ## . . Both --------------------------------------------------------####
-    DATA[wattDIF - RaylDIFF > QS$Rayleigh_upper_lim,
-         QCF_BTH_06_1 := "Rayleigh diffuse limit (18)" ]
-
-    DATA[wattDIF - RaylDIFF < QS$Rayleigh_lower_lim,
-         QCF_BTH_06_2 := "Rayleigh diffuse limit (18)" ]
-
-    table(DATA$QCF_BTH_06_1, exclude = TRUE)
-    table(DATA$QCF_BTH_06_2, exclude = TRUE)
-}
-
-#+ echo=F, include=T
-if (TEST_06) {
-    hist( DATA[, wattDIF - RaylDIFF ], breaks = 100 )
-
-    if ( any(!is.na(DATA$QCF_BTH_06_1)) ) {
-        hist( DATA[ !is.na(QCF_BTH_06_1), wattDIF - RaylDIFF ], breaks = 100 )
-    }
-
-    if ( any(!is.na(DATA$QCF_BTH_06_2)) ) {
-        hist( DATA[ !is.na(QCF_BTH_06_2), wattDIF - RaylDIFF ], breaks = 100 )
-    }
-
-    if (DO_PLOTS) {
-        ## plot on upper limit
-
-        tmp <- DATA[ !is.na(QCF_BTH_06_1) ]
-
-        for (ad in sort(unique(c(as.Date(tmp$Date))))) {
-
-            pp   <- DATA[ as.Date(Date) == ad, ]
-
-            layout(matrix(c(1,2), 2, 1, byrow = TRUE))
-            par(mar = c(2,4,2,1))
-
-            ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
-            plot( pp$Date, pp$wattDIF, "l",
-                  ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
-            lines(pp$Date, pp$RaylDIFF, col = "magenta" )
-            lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_upper_lim, col = "red" )
-
-            title(as.Date(ad, origin = "1970-01-01"))
-            # par(new = T)
-
-            par(mar = c(2,4,1,1))
-            ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
-            plot( pp$Date, pp$wattGLB, "l",
-                  ylim = ylim, col = "green", ylab = "", xlab = "")
-            lines(pp$Date, pp$wattDIR, col = "blue" )
-
-            points(pp[!is.na(QCF_BTH_06_1), Date],
-                   pp[!is.na(QCF_BTH_06_1), wattDIR],
-                   ylim = ylim, col = "red")
-            points(pp[!is.na(QCF_BTH_06_1), Date],
-                   pp[!is.na(QCF_BTH_06_1), wattGLB],
-                   ylim = ylim, col = "red")
-        }
 
 
 
-        ## plot on lower limit
-        DATA[ !is.na(QCF_BTH_06_2) , .N]
-        DATA[ !is.na(QCF_BTH_06_2) &
-                  (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) , .N]
-        DATA[ !is.na(QCF_BTH_06_2) &
-                  (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) &
-                  wattGLB > QS$Rayleigh_glo_min , .N]
 
-        tmp <- DATA[!is.na(QCF_BTH_06_2) &
-                        (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) &
-                        wattGLB > QS$Rayleigh_glo_min ]
-
-        for (ad in sort(unique(c(as.Date(tmp$Date))))) {
-
-            pp   <- DATA[ as.Date(Date) == ad, ]
-
-            layout(matrix(c(1,2), 2, 1, byrow = TRUE))
-            par(mar = c(2,4,2,1))
-
-            ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
-            plot( pp$Date, pp$wattDIF, "l",
-                  ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
-            lines(pp$Date, pp$RaylDIFF, col = "magenta" )
-            lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_lower_lim, col = "red" )
-
-            title(as.Date(ad, origin = "1970-01-01"))
-            # par(new = T)
-
-            par(mar = c(2,4,1,1))
-            ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
-            plot( pp$Date, pp$wattGLB, "l",
-                  ylim = ylim, col = "green", ylab = "", xlab = "")
-            lines(pp$Date, pp$wattDIR, col = "blue" )
-
-            points(pp[!is.na(QCF_BTH_06_2), Date],
-                   pp[!is.na(QCF_BTH_06_2), wattDIR],
-                   ylim = ylim, col = "red")
-            points(pp[!is.na(QCF_BTH_06_2), Date],
-                   pp[!is.na(QCF_BTH_06_2), wattGLB],
-                   ylim = ylim, col = "red")
-        }
-    }
-}
-
-
-
-#
-# #### ~ Rest of the flags to check ~ ####
-#
 # wecare <- grep("QCF_DIR_|QCF_GLB_|QCF_BTH_" , names(DATA), value = T )
 # for (fg in wecare) {
 #     if (all(is.na(DATA[[fg]]))) {
@@ -762,14 +766,12 @@ if (TEST_06) {
 #     }
 # }
 #
-#
 # wecare <- grep("QCF_DIR_|QCF_GLB_|QCF_BTH_" , names(DATA), value = T )
 #
 # for (fg in wecare) {
 #     cat(paste(fg),"\n")
 #     cat(levels(DATA[[fg]]),"\n")
 # }
-#
 #
 #
 # # for (fg in wecare) {
@@ -787,9 +789,6 @@ if (TEST_06) {
 # #     cat("\n\n\\FloatBarrier\n\n")
 # #     cat("\\newpage\n\n")
 # #     cat("\n## Year:", YY, "\n\n")
-# #
-# #     #### ~ ~ ~ ~  Data export ~ ~ ~ ~ ##########################################
-# #     cat(paste("\nExport Data.\n\n"))
 # #
 # # #    ## save data identification
 # # #    DATA_year <- DATA_year[ DATA_year$Date < LAST_DAY_EXPR , ]
@@ -817,12 +816,11 @@ if (TEST_06) {
 # # #    ##-- Export strict data --------------------------------------------------##
 # # #    if ( !TESTING & dim(STRICT_data)[1] > 0 ) {
 # # #        myRtools::write_RDS(object = STRICT_data, paste0(OUTPUT_STRICT,YY)) }
-# # #    ##------------------------------------------------------------------------##
 # #
 # # }
-# #
-# #
-#
+
+
+
 # #'
 # #' **END**
 # #+ include=T, echo=F
