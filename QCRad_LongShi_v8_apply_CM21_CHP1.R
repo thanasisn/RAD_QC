@@ -191,13 +191,16 @@ if (TEST_01) {
     cat(paste("\n1. Physically Possible Limits.\n\n"))
 
     QS$dir_SWdn_min <-  -4  # Minimum direct value to consider valid measurement
+    QS$dir_SWdn_dif <- 340  # Closeness to to TSI
     QS$glo_SWdn_min <-  -4  # Minimum global value to consider valid measurement
     QS$glo_SWdn_off <- 100  # Global departure offset above the model
     QS$glo_SWdn_amp <- 1.5  # Global departure factor above the model
 
     ## . . Direct ----------------------------------------------------------####
-    DATA[wattDIR < QS$dir_SWdn_min,  QCF_DIR_01 := "Physical possible limit min (5)"]
-    DATA[wattDIR > TSIextEARTH_comb, QCF_DIR_01 := "Physical possible limit max (6)"]
+    DATA[wattDIR < QS$dir_SWdn_min,
+         QCF_DIR_01 := "Physical possible limit min (5)"]
+    DATA[TSIextEARTH_comb - wattDIR < QS$dir_SWdn_dif,
+         QCF_DIR_01 := "Physical possible limit max (6)"]
 
 
     ## . . Global ----------------------------------------------------------####
@@ -208,6 +211,47 @@ if (TEST_01) {
 
 
     cat(pander(table(DATA$QCF_DIR_01, exclude = NULL)))
+
+
+}
+
+#+ echo=F, include=T
+if (TEST_04) {
+
+    range(DATA[, TSIextEARTH_comb * cosde(SZA) - wattDIR ], na.rm = T)
+    hist(DATA[, TSIextEARTH_comb *cosde(SZA) - wattDIR ], breaks = 100)
+
+    DATA[TSIextEARTH_comb * cosde(SZA) - wattDIR < QS$dir_SWdn_dif, .N]
+
+
+
+    if (DO_PLOTS) {
+
+        test <- DATA[!is.na(QCF_DIR_01)]
+
+        for (ad in sort(unique(as.Date(test$Date)))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            if (any(!is.na(pp$wattDIR))) {
+                ylim <- range(pp$TSIextEARTH_comb, pp$wattDIR, na.rm = T)
+                plot(pp$Date, pp$wattDIR, "l", col = "blue",
+                     ylim = ylim, xlab = "", ylab = "wattDIR")
+                title(paste("1", as.Date(ad, origin = "1970-01-01")))
+                ## plot limits
+                lines(pp$Date, pp$TSIextEARTH_comb, col = "pink")
+                lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
+                ## mark offending data
+                points(pp[wattDIR > Dir_First_Clim_lim, Date],
+                       pp[wattDIR > Dir_First_Clim_lim, wattDIR],
+                       col = "pink", pch = 1)
+            }
+        }
+
+
+
+
+    }
+
+
 
 
 }
