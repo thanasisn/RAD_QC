@@ -150,8 +150,8 @@ TESTING_NP <- 1000000
 TESTING    <- FALSE
 # TESTING    <- TRUE
 
-# DO_TEST_01 <- F   # Physically Possible Limits
-# DO_TEST_02 <- F   # Extremely Rare Limits
+DO_TEST_01 <- FALSE # Physically Possible Limits
+DO_TEST_02 <- F   # Extremely Rare Limits
 # DO_TEST_03 <- F   # Comparison tests
 DO_TEST_04 <- FALSE # Climatological (configurable) Limits.
 # DO_TEST_05 <- F   # Tracking check

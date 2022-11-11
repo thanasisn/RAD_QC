@@ -91,11 +91,17 @@ cachedata    <- "~/RAD_QC/temp_data.Rds"
 
 ####  Execution control  ####
 
+TEST_01      <- FALSE
+TEST_02      <- FALSE
+TEST_03      <- FALSE
 TEST_04      <- FALSE
+TEST_05      <- FALSE
 TEST_06      <- FALSE
+TEST_07      <- FALSE
 TEST_08      <- FALSE
 TEST_09      <- FALSE
 
+TEST_01      <- TRUE
 TEST_04      <- TRUE
 TEST_06      <- TRUE
 TEST_08      <- TRUE
@@ -170,32 +176,65 @@ QS$dir_glo_glo_off  <-    5         # 8. Test for inverted values: apply for GLB
 
 
 ####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ####
-keys  <- c("Physical possible limit min (5)", "Physical possible limit max (6)")
 #'
 #' \newpage
 #' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
 #'
-#' Drop all data with flag: `r paste(keys)`.
+#' Test values are within physical/logical limits.
 #'
-#+ echo=F, include=T
+#' Direct upper constrain is the TSI.
+#'
+#' Global upper constrain is an modeled GHI value
+#'
+#+ echo=TEST_01, include=T
+if (TEST_01) {
+    cat(paste("\n1. Physically Possible Limits.\n\n"))
 
-## find
-sel_d <- DATA$QCF_DIR_01 %in% keys
-sel_g <- DATA$QCF_GLB_01 %in% keys
-## remove
-DATA$wattDIR[sel_d] <- NA
-DATA$wattGLB[sel_g] <- NA
-DATA$QCF_DIR_01     <- NULL
-DATA$QCF_GLB_01     <- NULL
-## info
-cat(c(sum(sel_d, na.rm = T), " Direct Records removed with:", keys), ".\n\n")
-cat(c(sum(sel_g, na.rm = T), " Global Records removed with:", keys), ".\n\n")
-if (sum(sel_d, sel_g) > 0) {
-    ## more code to add
-    cat("\n\n**CHECK OMITTED DATA**\n\n")
+    QS$dir_SWdn_min <-  -4  # Minimum direct value to consider valid measurement
+    QS$glo_SWdn_min <-  -4  # Minimum global value to consider valid measurement
+    QS$glo_SWdn_off <- 100  # Global departure offset above the model
+    QS$glo_SWdn_amp <- 1.5  # Global departure factor above the model
+
+    ## . . Direct ----------------------------------------------------------####
+    DATA[wattDIR < QS$dir_SWdn_min,  QCF_DIR_01 := "Physical possible limit min (5)"]
+    DATA[wattDIR > TSIextEARTH_comb, QCF_DIR_01 := "Physical possible limit max (6)"]
+
+
+    ## . . Global ----------------------------------------------------------####
+
+
+    DATA[wattGLB < QS$glo_SWdn_min, QCF_GLB_01 := "Physical possible limit min (5)"]
+
+
+
+    cat(pander(table(DATA$QCF_DIR_01, exclude = NULL)))
+
+
 }
+
+
 #' -----------------------------------------------------------------------------
 
+
+
+# Global_max_physical_limit <- DATA_year$TSIextEARTH_comb * QS$glo_SWdn_amp * cosde(DATA_year$SZA)^1.2 + QS$glo_SWdn_off
+# GSWdn_max                 <- DATA_year$wattGLB  >  Global_max_physical_limit
+#
+# DATA_year$QCF_GLB_02[ GSWdn_max ]                         <- "Physical possible limit max (6)"
+
+
+
+
+
+
+
+
+
+
+
+
+
+stop()
 
 
 
