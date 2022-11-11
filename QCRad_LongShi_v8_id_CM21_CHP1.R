@@ -152,9 +152,9 @@ TESTING    <- FALSE
 
 DO_TEST_01 <- FALSE # Physically Possible Limits
 DO_TEST_02 <- F   # Extremely Rare Limits
-# DO_TEST_03 <- F   # Comparison tests
+DO_TEST_03 <- F   # Comparison tests
 DO_TEST_04 <- FALSE # Climatological (configurable) Limits.
-# DO_TEST_05 <- F   # Tracking check
+DO_TEST_05 <- F   # Tracking check
 DO_TEST_06 <- F   # Rayleigh Limit Diffuse Comparison
 DO_TEST_07 <- F   # Obstacles removal
 DO_TEST_08 <- FALSE # Test for inverted values

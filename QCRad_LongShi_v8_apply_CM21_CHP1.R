@@ -102,6 +102,7 @@ TEST_08      <- FALSE
 TEST_09      <- FALSE
 
 TEST_01      <- TRUE
+TEST_02      <- TRUE
 TEST_04      <- TRUE
 TEST_06      <- TRUE
 TEST_08      <- TRUE
@@ -156,8 +157,6 @@ pander(pp, caption = "Input files")
 QS <- list()
 QS$sun_elev_min     <-   -2 * 0.103 # 0. Drop all data when sun is below this point
 QS$sun_elev_no_neg  <-    0         # 0. Don't allow negative values below this sun angle
-QS$glo_SWdn_min     <-   -4         # 1. MIN Physically Possible Limits
-QS$dir_SWdn_min     <-   -4         # 1. MIN Physically Possible Limits
 QS$glo_SWdn_min_ext <-   -2         # 2. MIN Extremely Rare Minimum Limits
 QS$dir_SWdn_min_ext <-   -2         # 2. MIN Extremely Rare Minimum Limits
 QS$dif_rati_min     <-    0.001     # 3. (12) extra comparison to check data
@@ -182,19 +181,23 @@ QS$dir_glo_glo_off  <-    5         # 8. Test for inverted values: apply for GLB
 #'
 #' Test values are within physical/logical limits.
 #'
-#' Direct upper constrain is the TSI.
+#' Direct upper constrain is a closeness to TSI at TOA. Shouldn't be any hits.
+#' or need to remove data.
 #'
-#' Global upper constrain is an modeled GHI value
+#' Global upper constrain is an modeled GHI value.
+#'
+#' These limit should not be met, they are defined neat the maximum observed
+#' values of the data set.
 #'
 #+ echo=TEST_01, include=T
 if (TEST_01) {
     cat(paste("\n1. Physically Possible Limits.\n\n"))
 
     QS$dir_SWdn_min <-  -4  # Minimum direct value to consider valid measurement
-    QS$dir_SWdn_dif <- 340  # Closeness to to TSI
+    QS$dir_SWdn_dif <- 327  # Closeness to to TSI
     QS$glo_SWdn_min <-  -4  # Minimum global value to consider valid measurement
-    QS$glo_SWdn_off <- 100  # Global departure offset above the model
-    QS$glo_SWdn_amp <- 1.5  # Global departure factor above the model
+    QS$glo_SWdn_off <- 160  # Global departure offset above the model
+    QS$glo_SWdn_amp <- 1.3  # Global departure factor above the model
 
     ## . . Direct ----------------------------------------------------------####
     DATA[wattDIR < QS$dir_SWdn_min,
@@ -202,83 +205,112 @@ if (TEST_01) {
     DATA[TSIextEARTH_comb - wattDIR < QS$dir_SWdn_dif,
          QCF_DIR_01 := "Physical possible limit max (6)"]
 
-
     ## . . Global ----------------------------------------------------------####
-
-
-    DATA[wattGLB < QS$glo_SWdn_min, QCF_GLB_01 := "Physical possible limit min (5)"]
-
-
+    DATA[wattGLB < QS$glo_SWdn_min,
+         QCF_GLB_01 := "Physical possible limit min (5)"]
+    DATA[, Glo_max_ref := TSIextEARTH_comb * QS$glo_SWdn_amp * cosde(SZA) ^ 1.2 + QS$glo_SWdn_off]
+    DATA[wattGLB > Glo_max_ref,
+         QCF_GLB_01 := "Physical possible limit max (6)"]
 
     cat(pander(table(DATA$QCF_DIR_01, exclude = NULL)))
-
-
+    cat(pander(table(DATA$QCF_GLB_01, exclude = NULL)))
 }
 
 #+ echo=F, include=T
 if (TEST_04) {
 
-    range(DATA[, TSIextEARTH_comb * cosde(SZA) - wattDIR ], na.rm = T)
-    hist(DATA[, TSIextEARTH_comb *cosde(SZA) - wattDIR ], breaks = 100)
+    range(DATA[, TSIextEARTH_comb - wattDIR ], na.rm = T)
+    hist(DATA[,  TSIextEARTH_comb - wattDIR ], breaks = 100)
 
-    DATA[TSIextEARTH_comb * cosde(SZA) - wattDIR < QS$dir_SWdn_dif, .N]
-
-
+    range(DATA[, Glo_max_ref - wattGLB ], na.rm = T)
+    hist(DATA[,  Glo_max_ref - wattGLB ], breaks = 100)
 
     if (DO_PLOTS) {
 
         test <- DATA[!is.na(QCF_DIR_01)]
-
         for (ad in sort(unique(as.Date(test$Date)))) {
             pp <- DATA[ as.Date(Date) == ad, ]
-            if (any(!is.na(pp$wattDIR))) {
-                ylim <- range(pp$TSIextEARTH_comb, pp$wattDIR, na.rm = T)
-                plot(pp$Date, pp$wattDIR, "l", col = "blue",
-                     ylim = ylim, xlab = "", ylab = "wattDIR")
-                title(paste("1", as.Date(ad, origin = "1970-01-01")))
-                ## plot limits
-                lines(pp$Date, pp$TSIextEARTH_comb, col = "pink")
-                lines(pp$Date, pp$Dir_Secon_Clim_lim, col = "red" )
-                ## mark offending data
-                points(pp[wattDIR > Dir_First_Clim_lim, Date],
-                       pp[wattDIR > Dir_First_Clim_lim, wattDIR],
-                       col = "pink", pch = 1)
-            }
+            ylim <- range(pp$TSIextEARTH_comb - QS$dir_SWdn_dif, pp$wattDIR, na.rm = T)
+            plot(pp$Date, pp$wattDIR, "l", col = "blue",
+                 ylim = ylim, xlab = "", ylab = "wattDIR")
+            # lines(pp$Date, pp[, 1.2 * TSIextEARTH_comb * 0.678 * cosde(SZA) ])
+            # lines(pp$Date, pp[, 0.8 * TSIextEARTH_comb * cosde(SZA)  ])
+            # lines(pp$Date, pp[, 1.2 * TSIextEARTH_comb ^ (0.678 * cosde(SZA)) ])
+            title(paste("1", as.Date(ad, origin = "1970-01-01")))
+            ## plot limits
+            lines(pp$Date, pp$TSIextEARTH_comb - QS$dir_SWdn_dif, col = "red")
+            ## mark offending data
+            # points(pp[!is.na(QCF_DIR_01), Date],
+            #        pp[!is.na(QCF_DIR_01), wattDIR],
+            #        col = "red", pch = 1)
         }
 
 
-
-
+        test <- DATA[ !is.na(QCF_GLB_01) ]
+        for (ad in sort(unique(as.Date(c(test$Date))))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$Glo_max_ref, pp$wattGLB, na.rm = T)
+            plot(pp$Date, pp$wattGLB, "l", col = "green",
+                 ylim = ylim, xlab = "", ylab = "wattGLB")
+            title(paste("1", as.Date(ad, origin = "1970-01-01")))
+            ## plot limits
+            lines(pp$Date, pp$Glo_max_ref, col = "red")
+            ## mark offending data
+            # points(pp[!is.na(QCF_DIR_01), Date],
+            #        pp[!is.na(QCF_DIR_01), wattDIR],
+            #        col = "red", pch = 1)
+        }
     }
-
-
-
-
+    DATA$Glo_max_ref <- NULL
 }
-
-
 #' -----------------------------------------------------------------------------
 
 
 
-# Global_max_physical_limit <- DATA_year$TSIextEARTH_comb * QS$glo_SWdn_amp * cosde(DATA_year$SZA)^1.2 + QS$glo_SWdn_off
-# GSWdn_max                 <- DATA_year$wattGLB  >  Global_max_physical_limit
+
+####  2. EXTREMELY RARE LIMITS PER BSRN  ####
+#'
+#' \newpage
+#' ##  2. EXTREMELY RARE LIMITS PER BSRN
+#'
+#'
+#'
+#'
+#+ echo=TEST_02, include=T
+if (TEST_02) {
+    cat(paste("\n2. Extremely Rare Limits.\n\n"))
+
+}
+
+
+#+ echo=F, include=T
+if (TEST_02) {
+
+}
+
+
+
+# ## . . Direct ------------------------------------------------------####
+# Direct_max_extremely_rare <- DATA_year$TSIextEARTH_comb * 0.95 * cosde(DATA_year$SZA)^0.2 + 10
+# DSWdn_min_ext             <- DATA_year$wattDIR  <  QS$dir_SWdn_min_ext
+# DSWdn_max_ext             <- DATA_year$wattDIR  >  Direct_max_extremely_rare
 #
-# DATA_year$QCF_GLB_02[ GSWdn_max ]                         <- "Physical possible limit max (6)"
+# DATA_year$QCF_DIR_02[ DSWdn_min_ext ]                         <- "Extremely rare limits min (3)"
+# DATA_year$QCF_DIR_02[ DSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
+#
+# ## . . Global ------------------------------------------------------####
+# Global_max_extremely_rare <- DATA_year$TSIextEARTH_comb * 1.2 * cosde(DATA_year$SZA)^1.2 + 50
+# GSWdn_min_ext             <- DATA_year$wattGLB  <  QS$glo_SWdn_min_ext
+# GSWdn_max_ext             <- DATA_year$wattGLB  >  Global_max_extremely_rare
+#
+# DATA_year$QCF_GLB_02[ GSWdn_min_ext ]                         <- "Extremely rare limits min (3)"
+# DATA_year$QCF_GLB_02[ GSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
 
 
 
 
 
 
-
-
-
-
-
-
-
-stop()
 
 
 
@@ -312,7 +344,6 @@ if (TEST_04) {
     DATA[, Dir_First_Clim_lim := TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10]
     DATA[wattDIR > Dir_First_Clim_lim,
          QCF_DIR_04_1 := "First climatological limit (17)"]
-
     DATA[, Dir_Secon_Clim_lim := TSIextEARTH_comb * QS$clim_lim_D3 * cosde(SZA)^0.2 + 15]
     DATA[wattDIR > Dir_Secon_Clim_lim,
          QCF_DIR_04_2 := "Second climatological limit (16)"]
@@ -500,7 +531,6 @@ if (TEST_06) {
     ## . . Both ------------------------------------------------------------####
     DATA[wattDIF - RaylDIFF > QS$Rayleigh_upper_lim,
          QCF_BTH_06_1 := "Rayleigh diffuse limit (18)" ]
-
     DATA[wattDIF - RaylDIFF < QS$Rayleigh_lower_lim,
          QCF_BTH_06_2 := "Rayleigh diffuse limit (18)" ]
 
