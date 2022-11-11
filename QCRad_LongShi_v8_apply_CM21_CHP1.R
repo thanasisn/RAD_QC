@@ -28,6 +28,7 @@
 #'     number_sections:  no
 #'     fig_caption:      no
 #'     keep_tex:         no
+#'     keep_md:          yes
 #'     latex_engine:     xelatex
 #'     toc:              yes
 #'     fig_width:        8
@@ -130,11 +131,10 @@ if (!file.exists(cachedata)) {
 #' **Data range: `r paste(range(DATA$Date), collapse = " to ")`**
 #'
 #+ echo=F, include=T
-#'
 pp <- data.frame(basename(fileslist), file.mtime(fileslist))
 names(pp) <- c("Filename", "File mtime")
 pander(pp, caption = "Input files")
-#+ echo=F, include=T
+
 
 
 ## . . Limits definitions  ####
@@ -162,9 +162,6 @@ QS$dir_glo_invert   <-    3         # 8. Test for inverted values: DIRhor - GLBh
 QS$dir_glo_glo_off  <-    5         # 8. Test for inverted values apply for GLBhor > offset
 QS$CL_idx_max       <-    1.3       # 9. Clearness index test
 QS$CL_idx_min       <-   -0.001     # 9. Clearness index test
-#+ echo=F, include=T
-
-
 
 
 
@@ -194,7 +191,6 @@ if (sum(sel_d, sel_g) > 0) {
     cat("\n\n**CHECK OMITTED DATA**\n\n")
 }
 #' -----------------------------------------------------------------------------
-#+ echo=F, include=T
 
 
 
@@ -371,7 +367,6 @@ if (TEST_04) {
     DATA$Glo_Secon_Clim_lim <- NULL
 }
 #' -----------------------------------------------------------------------------
-#+ echo=F, include=T
 
 
 
@@ -502,7 +497,6 @@ if (TEST_08) {
     DATA$Relative_diffuse <- NULL
 }
 #' -----------------------------------------------------------------------------
-#+ echo=F, include=T
 
 
 
@@ -582,7 +576,6 @@ cat(c(DATA[QCF_GLB_09 %in% keys, .N],
 DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
 DATA$QCF_GLB_09 <- NULL
 #' -----------------------------------------------------------------------------
-#+ echo=F, include=T
 
 
 
