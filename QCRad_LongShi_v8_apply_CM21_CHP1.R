@@ -92,12 +92,14 @@ cachedata    <- "~/RAD_QC/temp_data.Rds"
 ####  Execution control  ####
 
 TEST_04      <- FALSE
+TEST_06      <- FALSE
 TEST_08      <- FALSE
 TEST_09      <- FALSE
 
 # TEST_04      <- TRUE
+TEST_06      <- TRUE
 # TEST_08      <- TRUE
-TEST_09      <- TRUE
+# TEST_09      <- TRUE
 
 
 
@@ -163,8 +165,7 @@ QS$ClrSW_b          <-    1.095     # 5. Tracker off test Clear Sky factor b
 QS$ClrSW_lim        <-    0.85      # 5. Tracker off test Threshold
 QS$dir_glo_invert   <-    3         # 8. Test for inverted values: DIRhor - GLBhor > lim[%]
 QS$dir_glo_glo_off  <-    5         # 8. Test for inverted values: apply for GLBhor > offset
-QS$CL_idx_max       <-    1.3       # 9. Clearness index test
-QS$CL_idx_min       <-   -0.001     # 9. Clearness index test
+
 
 
 
@@ -246,7 +247,6 @@ if (TEST_04) {
     cat(pander(table(DATA$QCF_DIR_04_1, exclude = NULL)))
     cat(pander(table(DATA$QCF_DIR_04_2, exclude = NULL)))
 }
-
 
 #+ echo=F, include=T
 if (TEST_04) {
@@ -506,24 +506,22 @@ if (TEST_08) {
 #' \newpage
 #' ## 9. Clearness index test
 #'
-#' This filter is mine.
+#' This filter is mine, and is applied on GHI data.
 #'
-#' These data are near Elevation 0 and caused by the cos(SZA)
-#' kt = GLB / (cos(sza) * TSI)
-#' low GLB value end extreme cos(sza) values
-#' No actual reason to remove, as those angles are discarded most of the times.
+#' Data near elevation 0 are caused by the cos(SZA) while calculating
+#' kt = GLB / (cos(sza) * TSI).
 #'
-#' For larger elevation angles......
+#' For larger elevation angles manual inspection is needed.
 #'
 #+ echo=TEST_09, include=T
 if (TEST_09) {
     cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
 
-    QS$CL_idx_max <-  1.18   # Upper Clearness index accepted level
+    QS$CL_idx_max <-  1.13  # Upper Clearness index accepted level
     QS$CL_idx_min <- -0.001 # Lower Clearness index accepted level
-    QS$CL_idx_ele <-  2.5   # Apply for elevations above this angle
+    QS$CL_idx_ele <-  3     # Apply for elevations above this angle
 
-    ## . . Global ------------------------------------------------------####
+    ## . . Global ----------------------------------------------------------####
     DATA[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele,
          QCF_GLB_09 := "Clearness index limit max (19)" ]
     DATA[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele,
@@ -532,23 +530,25 @@ if (TEST_09) {
     cat(pander(table(DATA$QCF_GLB_09, exclude = TRUE)))
 }
 
-
+#+ echo=F, include=T
 if (TEST_09) {
+
+    range(DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], na.rm = T)
+    hist( DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], breaks = 100 )
+
+    if (any(!is.na(DATA$QCF_GLB_09))) {
+        hist(DATA[!is.na(QCF_GLB_09), wattGLB],      breaks = 100 )
+        hist(DATA[!is.na(QCF_GLB_09), Elevat ],      breaks = 100 )
+        hist(DATA[!is.na(QCF_GLB_09), Clearness_Kt], breaks = 100 )
+    }
+
+    # cosde(90.00000001)
+    # cosde(89.99999999)
+
     if (DO_PLOTS) {
 
-        range(DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], na.rm = T)
-        hist(DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], breaks = 100 )
-
-        if (any(!is.na(QCF_GLB_09))) {
-            hist(DATA[!is.na(QCF_GLB_09), wattGLB],      breaks = 100 )
-            hist(DATA[!is.na(QCF_GLB_09), Elevat ],      breaks = 100 )
-            hist(DATA[!is.na(QCF_GLB_09), Clearness_Kt], breaks = 100 )
-        }
-
-        # cosde(90.00000001)
-        # cosde(89.99999999)
-
         tmp <- DATA[ !is.na(QCF_GLB_09) ]
+
         ## plot offending years
         for (ay in unique(year(tmp$Date))) {
             pp <- DATA[year(Date) == ay]
@@ -583,12 +583,11 @@ if (TEST_09) {
             points(pp[!is.na(QCF_GLB_09), Date],
                    pp[!is.na(QCF_GLB_09), wattGLB],
                    col = "red", pch = 1)
-            ## no applicable to direct
+            ## no applicable to direct!!
             # points(pp[!is.na(QCF_GLB_09), Date],
             #        pp[!is.na(QCF_GLB_09), wattDIR],
             #        col = "red", pch = 1)
         }
-
     }
 
     # ## remove
@@ -609,95 +608,150 @@ if (TEST_09) {
 
 
 
-# #### ~ 6. Rayleigh Limit Diffuse Comparison ~ ####
-# keys  <- c("Rayleigh diffuse limit (18)")
-#
-# Rayleigh_diff <- function(SZA, Pressure) {
-#
-#     source("~/CODE/FUNCTIONS/R/trig_deg.R")
-#
-#     a    <-   209.3
-#     b    <-  -708.3
-#     c    <-  1128.7
-#     d    <-  -911.2
-#     e    <-   287.85
-#     f    <-     0.046725
-#     mu_0 <- cosde(SZA)
-#
-#     return( a * mu_0     +
-#                 b * mu_0 ^ 2 +
-#                 c * mu_0 ^ 3 +
-#                 d * mu_0 ^ 4 +
-#                 e * mu_0 ^ 5 +
-#                 f * mu_0 * Pressure )
-# }
-#
-# #'
-# #' \newpage
-# #' ## 6. Rayleigh Limit Diffuse Comparison
-# #'
-# #' Compare inferred diffuse radiation with a modeled value of diffuse,
-# #' based on SZA and atmospheric pressure.
-# #'
-# #' Reasons:
-# #' - Difference on Sun observation angle due to different instruments location.
-# #' - Cases of instrument windows cleaning
-# #'
-# #' `r print(Rayleigh_diff)`
-# #'
-# #+ echo=F, include=T
-#
-#
-#
-# DATA[ , RaylDIFF := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
-#
-#
-# test <- unique(DATA[ wattGLB > 50 &
-#                     (wattDIF / wattGLB) < 0.8 &
-#                      wattDIF < (RaylDIFF - 1),  ])
-#
-# hist(test$Azimuth, breaks = 100)
-# hist(test$SZA, breaks = 100)
-#
-# # test <- unique(DATA[ wattGLB > 50 &
-# #                      (wattDIF / wattGLB) < 0.8 &
-# #                      wattDIF < (RaylDIFF - 1)  &
-# #                          SZA < 70,  ])
-#
-#
-# for (ad in unique(as.Date(test$Date))) {
-#     pp   <- DATA[ as.Date(Date) == ad, ]
-#
-#     layout(matrix(c(1,2), 2, 1, byrow = TRUE))
-#     par(mar = c(2,4,2,1))
-#
-#     ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
-#     plot( pp$Date, pp$wattDIF, "l",
-#           ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
-#     lines(pp$Date, pp$RaylDIFF, col = "red" )
-#     title(as.Date(ad, origin = "1970-01-01"))
-#     # par(new = T)
-#
-#     par(mar = c(2,4,1,1))
-#     ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
-#     plot( pp$Date, pp$wattGLB, "l",
-#           ylim = ylim, col = "green", ylab = "", xlab = "")
-#     lines(pp$Date, pp$wattDIR, col = "blue" )
-#
-#     points(pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), Date],
-#            pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), wattDIR],
-#            ylim = ylim, col = "red")
-#     points(pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), Date],
-#            pp[wattGLB > 50 & (wattDIF / wattGLB) < 0.8 & wattDIF < (RaylDIFF - 1), wattGLB],
-#            ylim = ylim, col = "red")
-#     cat("\n")
-#
-# }
-#
-#
-#
-#
-#
+#### ~ 6. Rayleigh Limit Diffuse Comparison ~ ####
+#'
+#' \newpage
+#' ## 6. Rayleigh Limit Diffuse Comparison
+#'
+#' Compare inferred diffuse radiation with a modeled value of diffuse,
+#' based on SZA and atmospheric pressure.
+#'
+#' Reasons:
+#' - Difference on Sun observation angle due to different instruments location.
+#' - Cases of instrument windows cleaning
+#'
+#+ echo=TEST_06, include=T
+if (TEST_06) {
+
+    QS$Rayleigh_upper_lim <- 500   # Upper departure diffuse limit
+    QS$Rayleigh_lower_lim <-  -3   # Lower departure diffuse limit
+    QS$Rayleigh_dif_glo_r <-   0.8 # Low limit diffuse/global < threshold
+    QS$Rayleigh_glo_min   <-  50   # Low limit minimum global
+
+    Rayleigh_diff <- function(SZA, Pressure) {
+        a    <-   209.3
+        b    <-  -708.3
+        c    <-  1128.7
+        d    <-  -911.2
+        e    <-   287.85
+        f    <-     0.046725
+        mu_0 <- cosde(SZA)
+        return( a * mu_0     +
+                    b * mu_0 ^ 2 +
+                    c * mu_0 ^ 3 +
+                    d * mu_0 ^ 4 +
+                    e * mu_0 ^ 5 +
+                    f * mu_0 * Pressure )
+    }
+
+    DATA[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
+
+    ## . . Both --------------------------------------------------------####
+    DATA[wattDIF - RaylDIFF > QS$Rayleigh_upper_lim,
+         QCF_BTH_06_1 := "Rayleigh diffuse limit (18)" ]
+
+    DATA[wattDIF - RaylDIFF < QS$Rayleigh_lower_lim,
+         QCF_BTH_06_2 := "Rayleigh diffuse limit (18)" ]
+
+    table(DATA$QCF_BTH_06_1, exclude = TRUE)
+    table(DATA$QCF_BTH_06_2, exclude = TRUE)
+}
+
+#+ echo=F, include=T
+if (TEST_06) {
+    hist( DATA[, wattDIF - RaylDIFF ], breaks = 100 )
+
+    if ( any(!is.na(DATA$QCF_BTH_06_1)) ) {
+        hist( DATA[ !is.na(QCF_BTH_06_1), wattDIF - RaylDIFF ], breaks = 100 )
+    }
+
+    if ( any(!is.na(DATA$QCF_BTH_06_2)) ) {
+        hist( DATA[ !is.na(QCF_BTH_06_2), wattDIF - RaylDIFF ], breaks = 100 )
+    }
+
+    if (DO_PLOTS) {
+        ## plot on upper limit
+
+        tmp <- DATA[ !is.na(QCF_BTH_06_1) ]
+
+        for (ad in sort(unique(c(as.Date(tmp$Date))))) {
+
+            pp   <- DATA[ as.Date(Date) == ad, ]
+
+            layout(matrix(c(1,2), 2, 1, byrow = TRUE))
+            par(mar = c(2,4,2,1))
+
+            ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
+            plot( pp$Date, pp$wattDIF, "l",
+                  ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
+            lines(pp$Date, pp$RaylDIFF, col = "magenta" )
+            lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_upper_lim, col = "red" )
+
+            title(as.Date(ad, origin = "1970-01-01"))
+            # par(new = T)
+
+            par(mar = c(2,4,1,1))
+            ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
+            plot( pp$Date, pp$wattGLB, "l",
+                  ylim = ylim, col = "green", ylab = "", xlab = "")
+            lines(pp$Date, pp$wattDIR, col = "blue" )
+
+            points(pp[!is.na(QCF_BTH_06_1), Date],
+                   pp[!is.na(QCF_BTH_06_1), wattDIR],
+                   ylim = ylim, col = "red")
+            points(pp[!is.na(QCF_BTH_06_1), Date],
+                   pp[!is.na(QCF_BTH_06_1), wattGLB],
+                   ylim = ylim, col = "red")
+        }
+
+
+
+        ## plot on lower limit
+        DATA[ !is.na(QCF_BTH_06_2) , .N]
+        DATA[ !is.na(QCF_BTH_06_2) &
+                  (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) , .N]
+        DATA[ !is.na(QCF_BTH_06_2) &
+                  (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) &
+                  wattGLB > QS$Rayleigh_glo_min , .N]
+
+        tmp <- DATA[!is.na(QCF_BTH_06_2) &
+                        (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) &
+                        wattGLB > QS$Rayleigh_glo_min ]
+
+        for (ad in sort(unique(c(as.Date(tmp$Date))))) {
+
+            pp   <- DATA[ as.Date(Date) == ad, ]
+
+            layout(matrix(c(1,2), 2, 1, byrow = TRUE))
+            par(mar = c(2,4,2,1))
+
+            ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
+            plot( pp$Date, pp$wattDIF, "l",
+                  ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
+            lines(pp$Date, pp$RaylDIFF, col = "magenta" )
+            lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_lower_lim, col = "red" )
+
+            title(as.Date(ad, origin = "1970-01-01"))
+            # par(new = T)
+
+            par(mar = c(2,4,1,1))
+            ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
+            plot( pp$Date, pp$wattGLB, "l",
+                  ylim = ylim, col = "green", ylab = "", xlab = "")
+            lines(pp$Date, pp$wattDIR, col = "blue" )
+
+            points(pp[!is.na(QCF_BTH_06_2), Date],
+                   pp[!is.na(QCF_BTH_06_2), wattDIR],
+                   ylim = ylim, col = "red")
+            points(pp[!is.na(QCF_BTH_06_2), Date],
+                   pp[!is.na(QCF_BTH_06_2), wattGLB],
+                   ylim = ylim, col = "red")
+        }
+    }
+}
+
+
+
 #
 # #### ~ Rest of the flags to check ~ ####
 #
@@ -734,27 +788,9 @@ if (TEST_09) {
 # #     cat("\\newpage\n\n")
 # #     cat("\n## Year:", YY, "\n\n")
 # #
-# #
-#
-#
 # #     #### ~ ~ ~ ~  Data export ~ ~ ~ ~ ##########################################
 # #     cat(paste("\nExport Data.\n\n"))
 # #
-# #     ## . . gather all suspect points for export ----------------------------####
-# #     # suspect_choose  <- DATA_year$QCF_DIR != "good" | DATA_year$QCF_GLB != "good"
-# #     # SUS_DATA        <- DATA_year[suspect_choose,]
-# #     # SUS_DATA        <- SUS_DATA[order(SUS_DATA$Date30),]
-# #     # SUS_DATA_gather <- rbind(SUS_DATA_gather, SUS_DATA)
-# #
-# #     # ## gather all suspect dates for export
-# #     # daysinfo        <- SUS_DATA[,c("Date30","QCF_DIR","QCF_GLB")]
-# #     # daysinfo$Day    <- as.Date(daysinfo$Date30)
-# #     # daysinfo$Date30 <- NULL
-# #     # daysinfo        <- daysinfo[order(daysinfo$Day),]
-# #     # daysinfo        <- unique(daysinfo)
-# #     # daysinfo_gather <- rbind(daysinfo_gather, daysinfo)
-#
-#
 # # #    ## save data identification
 # # #    DATA_year <- DATA_year[ DATA_year$Date < LAST_DAY_EXPR , ]
 # # #    DATA_year <- DATA_year[ DATA_year$Date > PROJECT_START , ]
@@ -764,7 +800,6 @@ if (TEST_09) {
 # #        write_RDS(object = DATA_year,
 # #                  file   = paste0(OUTPUT_BASE, basename(sub("\\.R$","_", Script.Name)),YY))
 # #    }
-# #     ##-------------------------------------------------------------------------##
 # #
 # #
 # # #    ##-- Strict output for clear sky use ---------------------------------------
@@ -786,9 +821,6 @@ if (TEST_09) {
 # #
 # # }
 # #
-# # # ##-- Export a record of the bad data -----------------------------------------##
-# # # if (!TESTING) myRtools::write_RDS( SUS_DATA_gather, SUSPECTS_EXP )
-# # # ##----------------------------------------------------------------------------##
 # #
 #
 # #'
