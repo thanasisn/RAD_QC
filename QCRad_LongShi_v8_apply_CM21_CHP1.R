@@ -102,7 +102,8 @@ TEST_08      <- FALSE
 TEST_09      <- FALSE
 
 # TEST_01      <- TRUE
-TEST_02      <- TRUE
+# TEST_02      <- TRUE
+TEST_03      <- TRUE
 # TEST_04      <- TRUE
 # TEST_06      <- TRUE
 # TEST_08      <- TRUE
@@ -157,14 +158,8 @@ pander(pp, caption = "Input files")
 QS <- list()
 QS$sun_elev_min     <-   -2 * 0.103 # 0. Drop all data when sun is below this point
 QS$sun_elev_no_neg  <-    0         # 0. Don't allow negative values below this sun angle
-QS$glo_SWdn_min_ext <-   -2         # 2. MIN Extremely Rare Minimum Limits
-QS$dir_SWdn_min_ext <-   -2         # 2. MIN Extremely Rare Minimum Limits
 QS$dif_rati_min     <-    0.001     # 3. (12) extra comparison to check data
 QS$dif_rati_max     <-    1.01      # 3. (13) extra comparison to check data 1
-QS$clim_lim_C3      <-    0.81      # 4. Direct Climatological (configurable) Limit first level
-QS$clim_lim_D3      <-    0.90      # 4. Direct Climatological (configurable) Limit second level
-QS$clim_lim_C1      <-    1.15      # 4. Global Climatological (configurable) Limit first level
-QS$clim_lim_D1      <-    1.35      # 4. Global Climatological (configurable) Limit second level
 QS$ClrSW_a          <- 1050.5       # 5. Tracker off test Clear Sky factor a
 QS$ClrSW_b          <-    1.095     # 5. Tracker off test Clear Sky factor b
 QS$ClrSW_lim        <-    0.85      # 5. Tracker off test Threshold
@@ -283,50 +278,46 @@ if (TEST_04) {
 if (TEST_02) {
     cat(paste("\n2. Extremely Rare Limits.\n\n"))
 
-    QS$Dir_SWdn_amp     <-  0.90 # Direct departure factor above the model
-    QS$Dir_SWdn_off     <- 40    # Direct departure offset above the model
-    QS$dir_SWdn_min_ext <- -2    # 2. MIN Extremely Rare Minimum Limits
-    QS$glo_SWdn_min_ext <- -2    # 2. MIN Extremely Rare Minimum Limits
+    QS$Dir_SWdn_amp     <-    0.91 # Direct departure factor above the model
+    QS$Dir_SWdn_off     <- -140    # Direct departure offset above the model
+    QS$dir_SWdn_min_ext <-   -2    # 2. MIN Extremely Rare Minimum Limits
+    QS$glo_SWdn_min_ext <-   -2    # 2. MIN Extremely Rare Minimum Limits
 
-    QS$Glo_SWdn_amp     <- 1.18  # Global departure factor above the model
-    QS$Glo_SWdn_off     <- 40    # Global departure offset above the model
+    QS$Glo_SWdn_amp     <- 1.18   # Global departure factor above the model
+    QS$Glo_SWdn_off     <- 40     # Global departure offset above the model
 
 
     DATA[, Direct_max := TSIextEARTH_comb * QS$Dir_SWdn_amp * cosde(SZA) ^ 0.2 + QS$Dir_SWdn_off]
     DATA[, Global_max := TSIextEARTH_comb * QS$Glo_SWdn_amp * cosde(SZA) ^ 1.2 + QS$Glo_SWdn_off]
 
+    DATA[Direct_max < 3, Direct_max := NA]
+    DATA[Global_max < 3, Direct_max := NA]
+
     ## . . Direct ----------------------------------------------------------####
-    # DATA[wattDIR < QS$dir_SWdn_min_ext, QCF_DIR_02 := "Extremely rare limits min (3)"]
+    DATA[wattDIR < QS$dir_SWdn_min_ext, QCF_DIR_02 := "Extremely rare limits min (3)"]
     DATA[wattDIR > Direct_max,          QCF_DIR_02 := "Extremely rare limits max (4)"]
 
     # ## . . Global ------------------------------------------------------####
     DATA[wattGLB < QS$glo_SWdn_min_ext, QCF_GLB_02 := "Extremely rare limits min (3)"]
     DATA[wattGLB > Global_max,          QCF_GLB_02 := "Extremely rare limits max (4)"]
 
-    pander(table(DATA$QCF_GLB_02))
-    pander(table(DATA$QCF_DIR_02))
-
-
+    pander(table(DATA$QCF_DIR_02, exclude = TRUE))
+    pander(table(DATA$QCF_GLB_02, exclude = TRUE))
 }
-
 
 #+ echo=F, include=T
 if (TEST_02) {
-    cat("todo\n")
 
-    hist(DATA[, Direct_max - wattDIR ], breaks = 100)
-    hist(DATA[, Global_max - wattGLB ], breaks = 100)
+    range(DATA[, Direct_max - wattDIR])
+    hist(DATA[, Direct_max - wattDIR], breaks = 100)
 
-
-
-
+    range(DATA[, Global_max - wattGLB])
+    hist(DATA[, Global_max - wattGLB], breaks = 100)
 
     if (DO_PLOTS) {
 
-        test <- DATA[ !is.na(QCF_GLB_02) ]
-        test <- DATA[ wattDIR > Direct_max  ]
-
-
+        test <- DATA[ !is.na(QCF_DIR_02) ]
+        # test <- DATA[ wattDIR > Direct_max -50 ]
         for (ad in sort(unique(as.Date(test$Date)))) {
             pp <- DATA[ as.Date(Date) == ad, ]
             ylim <- range(pp$Direct_max, pp$wattDIR, na.rm = T)
@@ -336,11 +327,10 @@ if (TEST_02) {
             ## plot limits
             lines(pp$Date, pp$Direct_max, col = "red")
             ## mark offending data
-            # points(pp[!is.na(QCF_DIR_01), Date],
-            #        pp[!is.na(QCF_DIR_01), wattDIR],
-            #        col = "red", pch = 1)
+            points(pp[!is.na(QCF_DIR_02), Date],
+                   pp[!is.na(QCF_DIR_02), wattDIR],
+                   col = "red", pch = 1)
         }
-
 
         test <- DATA[ !is.na(QCF_GLB_02) ]
         # test <- DATA[ wattGLB > Global_max]
@@ -358,13 +348,28 @@ if (TEST_02) {
                    col = "red", pch = 1)
         }
     }
+    DATA$Direct_max <- NULL
+    DATA$Global_max <- NULL
+}
 
 
 
-    # DATA$Direct_max <- NULL
-    # DATA$Global_max <- NULL
 
+####  3. COMPARISON TESTS PER BSRN “non-definitive” ####################
+#'
+#' \newpage
+#' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
+#'
+#'
+#'
+#+ echo=TEST_03, include=T
+if (TEST_03) {
+    cat(paste("\n3. Comparison tests.\n\n"))
 
+}
+
+#+ echo=F, include=T
+if (TEST_03) {
 
 }
 
@@ -372,6 +377,29 @@ if (TEST_02) {
 
 
 
+#
+# ## . . Proposed filter ---------------------------------------------####
+# DFR_A    <- DATA_year$DiffuseFraction_Kd >   1.05 &
+#     DATA_year$SZA                <= 75    &
+#     DATA_year$wattGLB            >  50
+# DFR_B    <- DATA_year$DiffuseFraction_Kd >   1.10 &
+#     DATA_year$SZA                >  75    &
+#     DATA_year$SZA                <  93    &
+#     DATA_year$wattGLB            >  50
+# DFR_prop <- DFR_A | DFR_B
+#
+# DATA_year$QCF_GLB_03.1[ DFR_prop ]                       <- "Diffuse ratio comp max (11)"
+# DATA_year$QCF_DIR_03.1[ DFR_prop ]                       <- "Diffuse ratio comp max (11)"
+#
+# ## . . Extra filters by me -----------------------------------------####
+# DFR_low <- DATA_year$DiffuseFraction_Kd < QS$dif_rati_min
+# DATA_year$QCF_GLB_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
+# DATA_year$QCF_DIR_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
+#
+# DFR_hig <- DATA_year$DiffuseFraction_Kd > QS$dif_rati_max
+# DATA_year$QCF_GLB_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
+# DATA_year$QCF_DIR_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
+#
 
 
 
