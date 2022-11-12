@@ -366,6 +366,17 @@ if (TEST_02) {
 if (TEST_03) {
     cat(paste("\n3. Comparison tests.\n\n"))
 
+    ## . . Proposed filter ---------------------------------------------####
+    DFR_prop <- DATA[, DiffuseFraction_Kd > 1.05 & SZA  <= 75 & wattGLB > 50] |
+                DATA[, DiffuseFraction_Kd > 1.10 & SZA   > 75 & SZA < 93 & wattGLB > 50]
+
+    DATA[DFR_prop, QCF_BTH_03.1 := "Diffuse ratio comp max (11)"]
+
+
+
+
+
+
 }
 
 #+ echo=F, include=T
@@ -373,24 +384,9 @@ if (TEST_03) {
 
 }
 
+QS$dif_rati_min
+QS$dif_rati_max
 
-
-
-
-#
-# ## . . Proposed filter ---------------------------------------------####
-# DFR_A    <- DATA_year$DiffuseFraction_Kd >   1.05 &
-#     DATA_year$SZA                <= 75    &
-#     DATA_year$wattGLB            >  50
-# DFR_B    <- DATA_year$DiffuseFraction_Kd >   1.10 &
-#     DATA_year$SZA                >  75    &
-#     DATA_year$SZA                <  93    &
-#     DATA_year$wattGLB            >  50
-# DFR_prop <- DFR_A | DFR_B
-#
-# DATA_year$QCF_GLB_03.1[ DFR_prop ]                       <- "Diffuse ratio comp max (11)"
-# DATA_year$QCF_DIR_03.1[ DFR_prop ]                       <- "Diffuse ratio comp max (11)"
-#
 # ## . . Extra filters by me -----------------------------------------####
 # DFR_low <- DATA_year$DiffuseFraction_Kd < QS$dif_rati_min
 # DATA_year$QCF_GLB_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
