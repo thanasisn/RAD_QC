@@ -285,7 +285,7 @@ if (TEST_02) {
 
 #+ echo=F, include=T
 if (TEST_02) {
-
+    cat("todo\n")
 }
 
 
