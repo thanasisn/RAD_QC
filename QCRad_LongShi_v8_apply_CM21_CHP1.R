@@ -158,8 +158,6 @@ pander(pp, caption = "Input files")
 QS <- list()
 QS$sun_elev_min     <-   -2 * 0.103 # 0. Drop all data when sun is below this point
 QS$sun_elev_no_neg  <-    0         # 0. Don't allow negative values below this sun angle
-QS$dif_rati_min     <-    0.001     # 3. (12) extra comparison to check data
-QS$dif_rati_max     <-    1.01      # 3. (13) extra comparison to check data 1
 QS$ClrSW_a          <- 1050.5       # 5. Tracker off test Clear Sky factor a
 QS$ClrSW_b          <-    1.095     # 5. Tracker off test Clear Sky factor b
 QS$ClrSW_lim        <-    0.85      # 5. Tracker off test Threshold
@@ -169,7 +167,7 @@ QS$dir_glo_glo_off  <-    5         # 8. Test for inverted values: apply for GLB
 
 
 
-####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ####
+####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ##################################
 #'
 #' \newpage
 #' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
@@ -263,7 +261,7 @@ if (TEST_04) {
 
 
 
-####  2. EXTREMELY RARE LIMITS PER BSRN  ####
+####  2. EXTREMELY RARE LIMITS PER BSRN  #######################################
 #'
 #' \newpage
 #' ##  2. EXTREMELY RARE LIMITS PER BSRN
@@ -355,7 +353,7 @@ if (TEST_02) {
 
 
 
-####  3. COMPARISON TESTS PER BSRN “non-definitive” ####################
+####  3. COMPARISON TESTS PER BSRN “non-definitive”  ###########################
 #'
 #' \newpage
 #' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
@@ -366,15 +364,23 @@ if (TEST_02) {
 if (TEST_03) {
     cat(paste("\n3. Comparison tests.\n\n"))
 
-    ## . . Proposed filter ---------------------------------------------####
+    QS$dif_rati_min <- 0.001
+    QS$dif_rati_max <- 1.01
+
+    ## should plot this
+    ## . . Proposed filter -------------------------------------------------####
     DFR_prop <- DATA[, DiffuseFraction_Kd > 1.05 & SZA  <= 75 & wattGLB > 50] |
                 DATA[, DiffuseFraction_Kd > 1.10 & SZA   > 75 & SZA < 93 & wattGLB > 50]
 
     DATA[DFR_prop, QCF_BTH_03.1 := "Diffuse ratio comp max (11)"]
 
 
+    ## . . Extra filters by me ---------------------------------------------####
+    DATA[DiffuseFraction_Kd < QS$dif_rati_min, QCF_BTH_03.2 := "Diffuse ratio comp min (12)"]
+    DATA[DiffuseFraction_Kd > QS$dif_rati_max, QCF_BTH_03.2 := "Diffuse ratio comp max (13)"]
 
-
+    pander(table(DATA$QCF_BTH_03.1, exclude = TRUE))
+    pander(table(DATA$QCF_BTH_03.2, exclude = TRUE))
 
 
 }
@@ -382,20 +388,14 @@ if (TEST_03) {
 #+ echo=F, include=T
 if (TEST_03) {
 
+
+
+
+
+
 }
 
-QS$dif_rati_min
-QS$dif_rati_max
 
-# ## . . Extra filters by me -----------------------------------------####
-# DFR_low <- DATA_year$DiffuseFraction_Kd < QS$dif_rati_min
-# DATA_year$QCF_GLB_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
-# DATA_year$QCF_DIR_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
-#
-# DFR_hig <- DATA_year$DiffuseFraction_Kd > QS$dif_rati_max
-# DATA_year$QCF_GLB_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
-# DATA_year$QCF_DIR_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
-#
 
 
 
