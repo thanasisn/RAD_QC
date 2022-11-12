@@ -238,7 +238,6 @@ if (TEST_04) {
             #        col = "red", pch = 1)
         }
 
-
         test <- DATA[ !is.na(QCF_GLB_01) ]
         for (ad in sort(unique(as.Date(c(test$Date))))) {
             pp <- DATA[ as.Date(Date) == ad, ]
@@ -370,17 +369,18 @@ if (TEST_03) {
     QS$dif_sza_break <- 75
     QS$dif_rati_pr1  <-  1.03
     QS$dif_rati_pr2  <-  1.06
+    QS$dif_watt_lim  <-  10
 
     ## . . Proposed filter -------------------------------------------------####
-    DATA[DiffuseFraction_Kd > QS$dif_rati_pr1 & SZA  <= QS$dif_sza_break,
+    DATA[DiffuseFraction_Kd > QS$dif_rati_pr1 & SZA  <= QS$dif_sza_break & wattGLB > QS$dif_watt_lim,
          QCF_BTH_03.1 := "Diffuse ratio comp max (11)"]
-    DATA[DiffuseFraction_Kd > QS$dif_rati_pr2 & SZA   > QS$dif_sza_break,
+    DATA[DiffuseFraction_Kd > QS$dif_rati_pr2 & SZA   > QS$dif_sza_break & wattGLB > QS$dif_watt_lim,
          QCF_BTH_03.1 := "Diffuse ratio comp max (11)"]
 
     ## . . Extra filters by me ---------------------------------------------####
-    DATA[DiffuseFraction_Kd < QS$dif_rati_po1 & SZA  <= QS$dif_sza_break,
+    DATA[DiffuseFraction_Kd < QS$dif_rati_po1 & SZA  <= QS$dif_sza_break & wattGLB > QS$dif_watt_lim,
          QCF_BTH_03.2 := "Diffuse ratio comp min (12)"]
-    DATA[DiffuseFraction_Kd < QS$dif_rati_po1 & SZA   > QS$dif_sza_break,
+    DATA[DiffuseFraction_Kd < QS$dif_rati_po1 & SZA   > QS$dif_sza_break & wattGLB > QS$dif_watt_lim,
          QCF_BTH_03.2 := "Diffuse ratio comp min (12)"]
 
     pander(table(DATA$QCF_BTH_03.1, exclude = TRUE))
@@ -406,6 +406,11 @@ if (TEST_03) {
 
         segments(               0, QS$dif_rati_po1, QS$dif_sza_break, QS$dif_rati_po1, col = "blue" )
         segments(QS$dif_sza_break, QS$dif_rati_po2,               93, QS$dif_rati_po2, col = "blue" )
+
+        points( pp[!is.na(QCF_BTH_03.1), SZA], pp[!is.na(QCF_BTH_03.1), DiffuseFraction_Kd],
+                cex = .2, col = "red")
+        points( pp[!is.na(QCF_BTH_03.2), SZA], pp[!is.na(QCF_BTH_03.2), DiffuseFraction_Kd],
+                cex = .2, col = "blue")
 
 
         par(mar = c(4,4,2,1))
@@ -633,6 +638,46 @@ if (TEST_04) {
     DATA$Glo_Secon_Clim_lim <- NULL
 }
 #' -----------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+# ####  5. Tracker off test  #############################################
+# cat(paste("\n5. Tracking test.\n\n"))
+# ## . . Direct ------------------------------------------------------####
+# ## This test use a diffuse model will be implemented when one is produced
+# ## and accepted. For now we omit it to protect from over-fitting prior to
+# ## make one such model.
+#
+# ## Create Clear Sky Sort-Wave model
+# DATA_year[ , ClrSW := ( QS$ClrSW_a / sun_dist**2 ) * cosde(SZA)**QS$ClrSW_b ]
+#
+# # sel <- DATA_year[ is.na(DATA_year$QCF_DIR) &
+# #                       wattGLB / ClrSW   > QS$ClrSW_lim &
+# #                       wattDIF / wattGLB > QS$ClrSW_lim, .N ]
+#
+# ## apply test
+# DATA_year[ is.na(DATA_year$QCF_DIR) &
+#                wattGLB / ClrSW   > QS$ClrSW_lim &
+#                wattDIF / wattGLB > QS$ClrSW_lim,
+#            QCF_DIR := "No tracking possible (24)" ]
+# DATA_year[ wattGLB / ClrSW   > QS$ClrSW_lim &
+#                wattDIF / wattGLB > QS$ClrSW_lim,
+#            QCF_DIR_05 := "No tracking possible (24)" ]
+#
+# sel <- sum(!is.na(DATA_year$QCF_DIR_05))
+
+
+
+
+
+
+
 
 
 
