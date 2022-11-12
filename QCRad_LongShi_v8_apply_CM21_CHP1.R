@@ -101,12 +101,12 @@ TEST_07      <- FALSE
 TEST_08      <- FALSE
 TEST_09      <- FALSE
 
-TEST_01      <- TRUE
+# TEST_01      <- TRUE
 TEST_02      <- TRUE
-TEST_04      <- TRUE
-TEST_06      <- TRUE
-TEST_08      <- TRUE
-TEST_09      <- TRUE
+# TEST_04      <- TRUE
+# TEST_06      <- TRUE
+# TEST_08      <- TRUE
+# TEST_09      <- TRUE
 
 
 
@@ -692,7 +692,6 @@ if (TEST_08) {
         ## plot softer limit
         test <- DATA[ !is.na(QCF_BTH_08_1) ]
         xlim <- range( DATA[ Elevat > 0, Azimuth ] )
-
         for (ad in unique(as.Date(test$Date))) {
             pp   <- DATA[ as.Date(Date) == ad, ]
             ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
@@ -702,29 +701,28 @@ if (TEST_08) {
             title(paste("8_1", as.Date(ad, origin = "1970-01-01")))
             points(pp[!is.na(QCF_BTH_08_1), Azimuth],
                    pp[!is.na(QCF_BTH_08_1), wattHOR],
-                   ylim = ylim, col = "blue")
+                   ylim = ylim, col = "midnightblue")
             points(pp[!is.na(QCF_BTH_08_1), Azimuth],
                    pp[!is.na(QCF_BTH_08_1), wattGLB],
-                   ylim = ylim, col = "green")
+                   ylim = ylim, col = "darkgreen")
         }
 
         ## plot harder limit
         test <- DATA[ !is.na(QCF_BTH_08_2) ]
         xlim <- range( DATA[ Elevat > 0, Azimuth ] )
-
         for (ad in unique(as.Date(test$Date))) {
             pp   <- DATA[ as.Date(Date) == ad, ]
             ylim <- range(pp$wattGLB, pp$wattHOR, na.rm = T)
             plot( pp$Azimuth, pp$wattHOR, "l",
-                  ylim = ylim, col = "blue", ylab = "", xlab = "")
+                  xlim = xlim, ylim = ylim, col = "blue", ylab = "", xlab = "")
             lines(pp$Azimuth, pp$wattGLB, col = "green" )
             title(paste("8_2", as.Date(ad, origin = "1970-01-01")))
             points(pp[!is.na(QCF_BTH_08_2), Azimuth],
                    pp[!is.na(QCF_BTH_08_2), wattHOR],
-                   ylim = ylim, col = "blue")
+                   ylim = ylim, col = "midnightblue")
             points(pp[!is.na(QCF_BTH_08_2), Azimuth],
                    pp[!is.na(QCF_BTH_08_2), wattGLB],
-                   ylim = ylim, col = "green")
+                   ylim = ylim, col = "darkgreen")
         }
 
         # test <- DATA[ , Relative_diffuse < -200 ]
