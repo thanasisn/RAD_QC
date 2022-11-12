@@ -1441,8 +1441,7 @@ for (YY in yearSTA:yearEND) {
 
     ## Drop some columns ##
     DATA_year <- subset( DATA_year, select = c(-Pressure_Source,
-                                               -Times,
-                                               -ClrSW
+                                               -Times
     ))
 
 
