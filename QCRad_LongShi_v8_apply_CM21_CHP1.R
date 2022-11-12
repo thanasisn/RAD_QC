@@ -236,7 +236,7 @@ if (TEST_04) {
             # lines(pp$Date, pp[, 1.2 * TSIextEARTH_comb * 0.678 * cosde(SZA) ])
             # lines(pp$Date, pp[, 0.8 * TSIextEARTH_comb * cosde(SZA)  ])
             # lines(pp$Date, pp[, 1.2 * TSIextEARTH_comb ^ (0.678 * cosde(SZA)) ])
-            title(paste("1", as.Date(ad, origin = "1970-01-01")))
+            title(paste("1_", as.Date(ad, origin = "1970-01-01")))
             ## plot limits
             lines(pp$Date, pp$TSIextEARTH_comb - QS$dir_SWdn_dif, col = "red")
             ## mark offending data
@@ -252,7 +252,7 @@ if (TEST_04) {
             ylim <- range(pp$Glo_max_ref, pp$wattGLB, na.rm = T)
             plot(pp$Date, pp$wattGLB, "l", col = "green",
                  ylim = ylim, xlab = "", ylab = "wattGLB")
-            title(paste("1", as.Date(ad, origin = "1970-01-01")))
+            title(paste("1_", as.Date(ad, origin = "1970-01-01")))
             ## plot limits
             lines(pp$Date, pp$Glo_max_ref, col = "red")
             ## mark offending data
@@ -276,38 +276,35 @@ if (TEST_04) {
 #' These should be a little more restrictive than 1. in order to start
 #' catching erroneous values.
 #'
+#' The choose of those settings may be optimized with an iterative process.
 #'
 #'
 #+ echo=TEST_02, include=T
 if (TEST_02) {
     cat(paste("\n2. Extremely Rare Limits.\n\n"))
 
-    QS$Dir_SWdn_amp     <-  0.95 # Direct departure factor above the model
-    QS$Dir_SWdn_off     <- 10    # Direct departure offset above the model
+    QS$Dir_SWdn_amp     <-  0.90 # Direct departure factor above the model
+    QS$Dir_SWdn_off     <- 40    # Direct departure offset above the model
     QS$dir_SWdn_min_ext <- -2    # 2. MIN Extremely Rare Minimum Limits
     QS$glo_SWdn_min_ext <- -2    # 2. MIN Extremely Rare Minimum Limits
 
-    QS$Glo_SWdn_amp     <- 1.2   # Global departure factor above the model
-    QS$Glo_SWdn_off     <- 10    # Global departure offset above the model
+    QS$Glo_SWdn_amp     <- 1.18  # Global departure factor above the model
+    QS$Glo_SWdn_off     <- 40    # Global departure offset above the model
 
 
     DATA[, Direct_max := TSIextEARTH_comb * QS$Dir_SWdn_amp * cosde(SZA) ^ 0.2 + QS$Dir_SWdn_off]
     DATA[, Global_max := TSIextEARTH_comb * QS$Glo_SWdn_amp * cosde(SZA) ^ 1.2 + QS$Glo_SWdn_off]
 
     ## . . Direct ----------------------------------------------------------####
+    # DATA[wattDIR < QS$dir_SWdn_min_ext, QCF_DIR_02 := "Extremely rare limits min (3)"]
+    DATA[wattDIR > Direct_max,          QCF_DIR_02 := "Extremely rare limits max (4)"]
 
-        # DSWdn_max_ext             <- DATA_year$wattDIR  >  Direct_max_extremely_rare
-
-    DATA[ wattDIR < QS$dir_SWdn_min_ext, QCF_DIR_02 := "Extremely rare limits min (3)" ]
-    # DATA_year$QCF_DIR_02[ DSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
-    #
     # ## . . Global ------------------------------------------------------####
-    # Global_max_extremely_rare <- DATA_year$TSIextEARTH_comb * 1.2 * cosde(DATA_year$SZA)^1.2 + 50
+    DATA[wattGLB < QS$glo_SWdn_min_ext, QCF_GLB_02 := "Extremely rare limits min (3)"]
+    DATA[wattGLB > Global_max,          QCF_GLB_02 := "Extremely rare limits max (4)"]
 
-    # GSWdn_max_ext             <- DATA_year$wattGLB  >  Global_max_extremely_rare
-
-    DATA[ wattGLB < QS$glo_SWdn_min_ext, QCF_GLB_02 := "Extremely rare limits min (3)" ]
-    # DATA_year$QCF_GLB_02[ GSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
+    pander(table(DATA$QCF_GLB_02))
+    pander(table(DATA$QCF_DIR_02))
 
 
 }
@@ -317,9 +314,55 @@ if (TEST_02) {
 if (TEST_02) {
     cat("todo\n")
 
+    hist(DATA[, Direct_max - wattDIR ], breaks = 100)
+    hist(DATA[, Global_max - wattGLB ], breaks = 100)
 
 
 
+
+
+    if (DO_PLOTS) {
+
+        test <- DATA[ !is.na(QCF_GLB_02) ]
+        test <- DATA[ wattDIR > Direct_max  ]
+
+
+        for (ad in sort(unique(as.Date(test$Date)))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$Direct_max, pp$wattDIR, na.rm = T)
+            plot(pp$Date, pp$wattDIR, "l", col = "blue",
+                 ylim = ylim, xlab = "", ylab = "wattDIR")
+            title(paste("2_", as.Date(ad, origin = "1970-01-01")))
+            ## plot limits
+            lines(pp$Date, pp$Direct_max, col = "red")
+            ## mark offending data
+            # points(pp[!is.na(QCF_DIR_01), Date],
+            #        pp[!is.na(QCF_DIR_01), wattDIR],
+            #        col = "red", pch = 1)
+        }
+
+
+        test <- DATA[ !is.na(QCF_GLB_02) ]
+        # test <- DATA[ wattGLB > Global_max]
+        for (ad in sort(unique(as.Date(c(test$Date))))) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$Global_max, pp$wattGLB, na.rm = T)
+            plot(pp$Date, pp$wattGLB, "l", col = "green",
+                 ylim = ylim, xlab = "", ylab = "wattGLB")
+            title(paste("2_", as.Date(ad, origin = "1970-01-01")))
+            ## plot limits
+            lines(pp$Date, pp$Global_max, col = "red")
+            ## mark offending data
+            points(pp[!is.na(QCF_GLB_02), Date],
+                   pp[!is.na(QCF_GLB_02), wattGLB],
+                   col = "red", pch = 1)
+        }
+    }
+
+
+
+    # DATA$Direct_max <- NULL
+    # DATA$Global_max <- NULL
 
 
 
