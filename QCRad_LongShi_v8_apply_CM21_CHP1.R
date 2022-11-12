@@ -288,6 +288,12 @@ if (TEST_02) {
     cat("todo\n")
 }
 
+QS$Dir_SWdn_amp <-  0.95 # Global departure factor above the model
+QS$Dir_SWdn_off <- 10    # Direct departure offset above the model
+
+
+DATA[, Direct_max := TSIextEARTH_comb * QS$Dir_SWdn_amp * cosde(SZA)^0.2 + QS$Dir_SWdn_off ]
+
 
 
 # ## . . Direct ------------------------------------------------------####
