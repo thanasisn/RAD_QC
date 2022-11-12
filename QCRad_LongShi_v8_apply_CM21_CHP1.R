@@ -91,30 +91,31 @@ cachedata    <- "~/RAD_QC/temp_data.Rds"
 
 ####  Execution control  ####
 
-TEST_01      <- FALSE
-TEST_02      <- FALSE
-TEST_03      <- FALSE
-TEST_04      <- FALSE
-TEST_05      <- FALSE
-TEST_06      <- FALSE
-TEST_07      <- FALSE
-TEST_08      <- FALSE
-TEST_09      <- FALSE
+TEST_01   <- FALSE
+TEST_02   <- FALSE
+TEST_03   <- FALSE
+TEST_04   <- FALSE
+TEST_05   <- FALSE
+TEST_06   <- FALSE
+TEST_07   <- FALSE
+TEST_08   <- FALSE
+TEST_09   <- FALSE
 
-# TEST_01      <- TRUE
-# TEST_02      <- TRUE
-TEST_03      <- TRUE
-# TEST_04      <- TRUE
-# TEST_06      <- TRUE
-# TEST_08      <- TRUE
-# TEST_09      <- TRUE
-
-
+TEST_01   <- TRUE
+TEST_02   <- TRUE
+TEST_03   <- TRUE
+TEST_04   <- TRUE
+TEST_05   <- TRUE
+TEST_06   <- TRUE
+TEST_07   <- TRUE
+TEST_08   <- TRUE
+TEST_09   <- TRUE
 
 DO_PLOTS     <- TRUE
 if (interactive()) {
     DO_PLOTS <- FALSE
 }
+
 
 #+ echo=F, include=T
 ####  Load all data  ####
@@ -161,8 +162,7 @@ QS$sun_elev_no_neg  <-    0         # 0. Don't allow negative values below this 
 QS$ClrSW_a          <- 1050.5       # 5. Tracker off test Clear Sky factor a
 QS$ClrSW_b          <-    1.095     # 5. Tracker off test Clear Sky factor b
 QS$ClrSW_lim        <-    0.85      # 5. Tracker off test Threshold
-QS$dir_glo_invert   <-    3         # 8. Test for inverted values: DIRhor - GLBhor > lim[%]
-QS$dir_glo_glo_off  <-    5         # 8. Test for inverted values: apply for GLBhor > offset
+
 
 
 
@@ -349,6 +349,7 @@ if (TEST_02) {
     DATA$Direct_max <- NULL
     DATA$Global_max <- NULL
 }
+#' -----------------------------------------------------------------------------
 
 
 
@@ -364,25 +365,23 @@ if (TEST_02) {
 if (TEST_03) {
     cat(paste("\n3. Comparison tests.\n\n"))
 
-    QS$dif_rati_min  <-  0.1
-    QS$dif_rati_max  <-  1.01
+    QS$dif_rati_po1  <-  0.03
+    QS$dif_rati_po2  <-  0.08
     QS$dif_sza_break <- 75
-    QS$dif_rati_pr1  <-  1.04
-    QS$dif_rati_pr2  <-  1.09
+    QS$dif_rati_pr1  <-  1.03
+    QS$dif_rati_pr2  <-  1.06
 
-
-    ## should plot this
     ## . . Proposed filter -------------------------------------------------####
-    # DFR_prop <- DATA[DiffuseFraction_Kd > 1.05 & SZA  <= QS$dif_sza_break & wattGLB > 50] |
-    #             DATA[DiffuseFraction_Kd > 1.10 & SZA   > QS$dif_sza_break & wattGLB > 50]
     DATA[DiffuseFraction_Kd > QS$dif_rati_pr1 & SZA  <= QS$dif_sza_break,
          QCF_BTH_03.1 := "Diffuse ratio comp max (11)"]
     DATA[DiffuseFraction_Kd > QS$dif_rati_pr2 & SZA   > QS$dif_sza_break,
          QCF_BTH_03.1 := "Diffuse ratio comp max (11)"]
 
     ## . . Extra filters by me ---------------------------------------------####
-    DATA[DiffuseFraction_Kd < QS$dif_rati_min, QCF_BTH_03.2 := "Diffuse ratio comp min (12)"]
-    # DATA[DiffuseFraction_Kd > QS$dif_rati_max, QCF_BTH_03.2 := "Diffuse ratio comp max (13)"]
+    DATA[DiffuseFraction_Kd < QS$dif_rati_po1 & SZA  <= QS$dif_sza_break,
+         QCF_BTH_03.2 := "Diffuse ratio comp min (12)"]
+    DATA[DiffuseFraction_Kd < QS$dif_rati_po1 & SZA   > QS$dif_sza_break,
+         QCF_BTH_03.2 := "Diffuse ratio comp min (12)"]
 
     pander(table(DATA$QCF_BTH_03.1, exclude = TRUE))
     pander(table(DATA$QCF_BTH_03.2, exclude = TRUE))
@@ -395,60 +394,72 @@ if (TEST_03) {
     for (ay in years) {
         pp <- DATA[year(Date) == ay]
         ylim <- c(-0.5, 1.5)
+
+        par(mar = c(4,4,2,1))
         plot( pp$SZA, pp$DiffuseFraction_Kd,
               ylab = "Diffuse fraction", xlab = "SZA", ylim = ylim,
               cex = .1)
         title(paste("3_", ay))
 
-        segments( 0, QS$dif_rati_pr1, QS$dif_sza_break, QS$dif_rati_pr1, col = "red" )
-        segments(QS$dif_sza_break, QS$dif_rati_pr2, 93, QS$dif_rati_pr2, col = "red" )
+        segments(               0, QS$dif_rati_pr1, QS$dif_sza_break, QS$dif_rati_pr1, col = "red" )
+        segments(QS$dif_sza_break, QS$dif_rati_pr2,               93, QS$dif_rati_pr2, col = "red" )
 
-        abline( h = QS$dif_rati_min, col = "blue")
+        segments(               0, QS$dif_rati_po1, QS$dif_sza_break, QS$dif_rati_po1, col = "blue" )
+        segments(QS$dif_sza_break, QS$dif_rati_po2,               93, QS$dif_rati_po2, col = "blue" )
 
 
+        par(mar = c(4,4,2,1))
+        plot( pp$Azimuth, pp$DiffuseFraction_Kd,
+              ylim = ylim,
+              ylab = "Diffuse fraction", xlab = "Azimuth",
+              cex = .1)
+        title(paste("3_", ay))
+
+        points( pp[!is.na(QCF_BTH_03.1), Azimuth], pp[!is.na(QCF_BTH_03.1), DiffuseFraction_Kd],
+                cex = .2, col = "red")
+        points( pp[!is.na(QCF_BTH_03.2), Azimuth], pp[!is.na(QCF_BTH_03.2), DiffuseFraction_Kd],
+                cex = .2, col = "blue")
     }
 
+    if (DO_PLOTS) {
+        tmp <- DATA[ !is.na(QCF_BTH_03.1) | !is.na(QCF_BTH_03.2) ]
+        for (ad in sort(unique(c(as.Date(tmp$Date))))) {
+            pp   <- DATA[ as.Date(Date) == ad, ]
+            layout(matrix(c(1,2), 2, 1, byrow = TRUE))
+            par(mar = c(2,4,2,1))
 
+            plot( pp$Date, pp$DiffuseFraction_Kd, "l",
+                  col = "cyan", ylab = "Diffuse Fraction", xlab = "")
 
+            abline(h = QS$dif_rati_pr1, col = "red")
+            abline(h = QS$dif_rati_pr2, col = "red", lty = 2)
+            abline(h = QS$dif_rati_po1, col = "blue")
+            abline(h = QS$dif_rati_po2, col = "blue", lty = 2)
 
+            title(paste("3_", as.Date(ad, origin = "1970-01-01")))
 
+            par(mar = c(2,4,1,1))
+            ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
+            plot( pp$Date, pp$wattGLB, "l",
+                  ylim = ylim, col = "green", ylab = "", xlab = "")
+            lines(pp$Date, pp$wattDIR, col = "blue" )
+
+            points(pp[!is.na(QCF_BTH_03.1), Date],
+                   pp[!is.na(QCF_BTH_03.1), wattDIR],
+                   ylim = ylim, col = "magenta")
+            points(pp[!is.na(QCF_BTH_03.1), Date],
+                   pp[!is.na(QCF_BTH_03.1), wattGLB],
+                   ylim = ylim, col = "magenta")
+            points(pp[!is.na(QCF_BTH_03.2), Date],
+                   pp[!is.na(QCF_BTH_03.2), wattDIR],
+                   ylim = ylim, col = "cyan")
+            points(pp[!is.na(QCF_BTH_03.2), Date],
+                   pp[!is.na(QCF_BTH_03.2), wattGLB],
+                   ylim = ylim, col = "cyan")
+        }
+    }
 }
-
-
-
-
-# ## plot flagged
-# points(DATA_year$SZA[hard], DATA_year$DiffuseFraction_Kd[hard],
-#        col = "magenta", cex = 0.5)
-# points(DATA_year$SZA[soft], DATA_year$DiffuseFraction_Kd[soft],
-#        col = "cyan",    cex = 0.5)
-#
-#
-# ####  Diffuse fraction by azimuth  ####
-# cat("\n\n")
-# plot( DATA_year$Azimuth[Ggood | Dgood], DATA_year$DiffuseFraction_Kd[Ggood | Dgood],
-#       ylim = yrange,
-#       ylab = "Diffuse fraction", xlab = "Azimuth",
-#       cex = .1)
-#
-# ## 3. Diffuse ratio comp max (11)
-# segments(0, 1.05, 360, 1.05, lwd = 2, lty = 2, col = "red")
-# segments(0, 1.10, 360, 1.10, lwd = 2, lty = 2, col = "red")
-# ## 3. Diffuse ratio comp min (12)
-# abline(h = QS$dif_rati_max, lwd = 2, col = "blue")
-# ## 3. Diffuse ratio comp max (13)
-# abline(h = QS$dif_rati_min, lwd = 2, col = "blue")
-#
-# ## plot flagged
-# points(DATA_year$Azimuth[hard], DATA_year$DiffuseFraction_Kd[hard],
-#        col = "magenta", cex = 0.5)
-# points(DATA_year$Azimuth[soft], DATA_year$DiffuseFraction_Kd[soft],
-#        col = "cyan",    cex = 0.5)
-
-
-
-
-
+#' -----------------------------------------------------------------------------
 
 
 
