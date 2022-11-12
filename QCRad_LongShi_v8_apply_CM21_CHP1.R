@@ -273,6 +273,8 @@ if (TEST_04) {
 #' \newpage
 #' ##  2. EXTREMELY RARE LIMITS PER BSRN
 #'
+#' These should be a little more restrictive than 1. in order to start
+#' catching erroneous values.
 #'
 #'
 #'
@@ -280,37 +282,52 @@ if (TEST_04) {
 if (TEST_02) {
     cat(paste("\n2. Extremely Rare Limits.\n\n"))
 
+    QS$Dir_SWdn_amp     <-  0.95 # Direct departure factor above the model
+    QS$Dir_SWdn_off     <- 10    # Direct departure offset above the model
+    QS$dir_SWdn_min_ext <- -2    # 2. MIN Extremely Rare Minimum Limits
+    QS$glo_SWdn_min_ext <- -2    # 2. MIN Extremely Rare Minimum Limits
+
+    QS$Glo_SWdn_amp     <- 1.2   # Global departure factor above the model
+    QS$Glo_SWdn_off     <- 10    # Global departure offset above the model
+
+
+    DATA[, Direct_max := TSIextEARTH_comb * QS$Dir_SWdn_amp * cosde(SZA) ^ 0.2 + QS$Dir_SWdn_off]
+    DATA[, Global_max := TSIextEARTH_comb * QS$Glo_SWdn_amp * cosde(SZA) ^ 1.2 + QS$Glo_SWdn_off]
+
+    ## . . Direct ----------------------------------------------------------####
+
+        # DSWdn_max_ext             <- DATA_year$wattDIR  >  Direct_max_extremely_rare
+
+    DATA[ wattDIR < QS$dir_SWdn_min_ext, QCF_DIR_02 := "Extremely rare limits min (3)" ]
+    # DATA_year$QCF_DIR_02[ DSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
+    #
+    # ## . . Global ------------------------------------------------------####
+    # Global_max_extremely_rare <- DATA_year$TSIextEARTH_comb * 1.2 * cosde(DATA_year$SZA)^1.2 + 50
+
+    # GSWdn_max_ext             <- DATA_year$wattGLB  >  Global_max_extremely_rare
+
+    DATA[ wattGLB < QS$glo_SWdn_min_ext, QCF_GLB_02 := "Extremely rare limits min (3)" ]
+    # DATA_year$QCF_GLB_02[ GSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
+
+
 }
 
 
 #+ echo=F, include=T
 if (TEST_02) {
     cat("todo\n")
+
+
+
+
+
+
+
 }
 
-QS$Dir_SWdn_amp <-  0.95 # Global departure factor above the model
-QS$Dir_SWdn_off <- 10    # Direct departure offset above the model
-
-
-DATA[, Direct_max := TSIextEARTH_comb * QS$Dir_SWdn_amp * cosde(SZA)^0.2 + QS$Dir_SWdn_off ]
 
 
 
-# ## . . Direct ------------------------------------------------------####
-# Direct_max_extremely_rare <- DATA_year$TSIextEARTH_comb * 0.95 * cosde(DATA_year$SZA)^0.2 + 10
-# DSWdn_min_ext             <- DATA_year$wattDIR  <  QS$dir_SWdn_min_ext
-# DSWdn_max_ext             <- DATA_year$wattDIR  >  Direct_max_extremely_rare
-#
-# DATA_year$QCF_DIR_02[ DSWdn_min_ext ]                         <- "Extremely rare limits min (3)"
-# DATA_year$QCF_DIR_02[ DSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
-#
-# ## . . Global ------------------------------------------------------####
-# Global_max_extremely_rare <- DATA_year$TSIextEARTH_comb * 1.2 * cosde(DATA_year$SZA)^1.2 + 50
-# GSWdn_min_ext             <- DATA_year$wattGLB  <  QS$glo_SWdn_min_ext
-# GSWdn_max_ext             <- DATA_year$wattGLB  >  Global_max_extremely_rare
-#
-# DATA_year$QCF_GLB_02[ GSWdn_min_ext ]                         <- "Extremely rare limits min (3)"
-# DATA_year$QCF_GLB_02[ GSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
 
 
 
