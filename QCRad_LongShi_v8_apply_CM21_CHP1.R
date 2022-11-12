@@ -364,30 +364,49 @@ if (TEST_02) {
 if (TEST_03) {
     cat(paste("\n3. Comparison tests.\n\n"))
 
-    QS$dif_rati_min <- 0.001
-    QS$dif_rati_max <- 1.01
+    QS$dif_rati_min  <-  0.1
+    QS$dif_rati_max  <-  1.01
+    QS$dif_sza_break <- 75
+    QS$dif_rati_pr1  <-  1.04
+    QS$dif_rati_pr2  <-  1.09
+
 
     ## should plot this
     ## . . Proposed filter -------------------------------------------------####
-    DFR_prop <- DATA[, DiffuseFraction_Kd > 1.05 & SZA  <= 75 & wattGLB > 50] |
-                DATA[, DiffuseFraction_Kd > 1.10 & SZA   > 75 & SZA < 93 & wattGLB > 50]
-
-    DATA[DFR_prop, QCF_BTH_03.1 := "Diffuse ratio comp max (11)"]
-
+    # DFR_prop <- DATA[DiffuseFraction_Kd > 1.05 & SZA  <= QS$dif_sza_break & wattGLB > 50] |
+    #             DATA[DiffuseFraction_Kd > 1.10 & SZA   > QS$dif_sza_break & wattGLB > 50]
+    DATA[DiffuseFraction_Kd > QS$dif_rati_pr1 & SZA  <= QS$dif_sza_break,
+         QCF_BTH_03.1 := "Diffuse ratio comp max (11)"]
+    DATA[DiffuseFraction_Kd > QS$dif_rati_pr2 & SZA   > QS$dif_sza_break,
+         QCF_BTH_03.1 := "Diffuse ratio comp max (11)"]
 
     ## . . Extra filters by me ---------------------------------------------####
     DATA[DiffuseFraction_Kd < QS$dif_rati_min, QCF_BTH_03.2 := "Diffuse ratio comp min (12)"]
-    DATA[DiffuseFraction_Kd > QS$dif_rati_max, QCF_BTH_03.2 := "Diffuse ratio comp max (13)"]
+    # DATA[DiffuseFraction_Kd > QS$dif_rati_max, QCF_BTH_03.2 := "Diffuse ratio comp max (13)"]
 
     pander(table(DATA$QCF_BTH_03.1, exclude = TRUE))
     pander(table(DATA$QCF_BTH_03.2, exclude = TRUE))
-
-
 }
 
 #+ echo=F, include=T
 if (TEST_03) {
 
+    years <- DATA[ !is.na(DiffuseFraction_Kd), unique(year(Date)) ]
+    for (ay in years) {
+        pp <- DATA[year(Date) == ay]
+        ylim <- c(-0.5, 1.5)
+        plot( pp$SZA, pp$DiffuseFraction_Kd,
+              ylab = "Diffuse fraction", xlab = "SZA", ylim = ylim,
+              cex = .1)
+        title(paste("3_", ay))
+
+        segments( 0, QS$dif_rati_pr1, QS$dif_sza_break, QS$dif_rati_pr1, col = "red" )
+        segments(QS$dif_sza_break, QS$dif_rati_pr2, 93, QS$dif_rati_pr2, col = "red" )
+
+        abline( h = QS$dif_rati_min, col = "blue")
+
+
+    }
 
 
 
@@ -395,6 +414,36 @@ if (TEST_03) {
 
 }
 
+
+
+
+# ## plot flagged
+# points(DATA_year$SZA[hard], DATA_year$DiffuseFraction_Kd[hard],
+#        col = "magenta", cex = 0.5)
+# points(DATA_year$SZA[soft], DATA_year$DiffuseFraction_Kd[soft],
+#        col = "cyan",    cex = 0.5)
+#
+#
+# ####  Diffuse fraction by azimuth  ####
+# cat("\n\n")
+# plot( DATA_year$Azimuth[Ggood | Dgood], DATA_year$DiffuseFraction_Kd[Ggood | Dgood],
+#       ylim = yrange,
+#       ylab = "Diffuse fraction", xlab = "Azimuth",
+#       cex = .1)
+#
+# ## 3. Diffuse ratio comp max (11)
+# segments(0, 1.05, 360, 1.05, lwd = 2, lty = 2, col = "red")
+# segments(0, 1.10, 360, 1.10, lwd = 2, lty = 2, col = "red")
+# ## 3. Diffuse ratio comp min (12)
+# abline(h = QS$dif_rati_max, lwd = 2, col = "blue")
+# ## 3. Diffuse ratio comp max (13)
+# abline(h = QS$dif_rati_min, lwd = 2, col = "blue")
+#
+# ## plot flagged
+# points(DATA_year$Azimuth[hard], DATA_year$DiffuseFraction_Kd[hard],
+#        col = "magenta", cex = 0.5)
+# points(DATA_year$Azimuth[soft], DATA_year$DiffuseFraction_Kd[soft],
+#        col = "cyan",    cex = 0.5)
 
 
 
