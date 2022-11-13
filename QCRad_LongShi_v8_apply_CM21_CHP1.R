@@ -101,15 +101,15 @@ TEST_07  <- FALSE
 TEST_08  <- FALSE
 TEST_09  <- FALSE
 
-TEST_01  <- TRUE
-TEST_02  <- TRUE
-TEST_03  <- TRUE
-TEST_04  <- TRUE
-TEST_05  <- TRUE
-TEST_06  <- TRUE
+# TEST_01  <- TRUE
+# TEST_02  <- TRUE
+# TEST_03  <- TRUE
+# TEST_04  <- TRUE
+# TEST_05  <- TRUE
+# TEST_06  <- TRUE
 TEST_07  <- TRUE
-TEST_08  <- TRUE
-TEST_09  <- TRUE
+# TEST_08  <- TRUE
+# TEST_09  <- TRUE
 
 ## mostly for daily plots
 DO_PLOTS     <- TRUE
@@ -138,6 +138,8 @@ if (!file.exists(cachedata)) {
     cat("\n\n**USING CACHED DATA!!**\n\n")
 }
 
+## Obstacles definitions
+load("~/Aerosols/source_R/Obstacles.Rda")
 
 
 #'
@@ -253,7 +255,7 @@ if (TEST_04) {
             #        col = "red", pch = 1)
         }
     }
-    DATA$Glo_max_ref <- NULL
+    # DATA$Glo_max_ref <- NULL
 }
 #' -----------------------------------------------------------------------------
 
@@ -345,8 +347,8 @@ if (TEST_02) {
                    col = "red", pch = 1)
         }
     }
-    DATA$Direct_max <- NULL
-    DATA$Global_max <- NULL
+    # DATA$Direct_max <- NULL
+    # DATA$Global_max <- NULL
 }
 #' -----------------------------------------------------------------------------
 
@@ -612,30 +614,10 @@ if (TEST_04) {
         }
 
     }
-
-    # ## find
-    # sel_d <- DATA$QCF_DIR_04_1 %in% keys | DATA$QCF_DIR_04_2 %in% keys
-    # sel_g <- DATA$QCF_GLB_04_1 %in% keys | DATA$QCF_GLB_04_2 %in% keys
-    # ## remove
-    # DATA$wattDIR[sel_d] <- NA
-    # DATA$wattGLB[sel_g] <- NA
-    # DATA$QCF_DIR_04_1   <- NULL
-    # DATA$QCF_DIR_04_2   <- NULL
-    # DATA$QCF_GLB_04_1   <- NULL
-    # DATA$QCF_GLB_04_2   <- NULL
-    # ## remove empty entries
-    # DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
-    # ## info
-    # cat(c(sum(sel_d, na.rm = T),
-    #       " Direct Records removed with:",
-    #       keys), ".\n\n")
-    # cat(c(sum(sel_g, na.rm = T),
-    #       " Global Records removed with:",
-    #       keys), ".\n\n")
-    DATA$Dir_First_Clim_lim <- NULL
-    DATA$Glo_First_Clim_lim <- NULL
-    DATA$Dir_Secon_Clim_lim <- NULL
-    DATA$Glo_Secon_Clim_lim <- NULL
+    # DATA$Dir_First_Clim_lim <- NULL
+    # DATA$Glo_First_Clim_lim <- NULL
+    # DATA$Dir_Secon_Clim_lim <- NULL
+    # DATA$Glo_Secon_Clim_lim <- NULL
 }
 #' -----------------------------------------------------------------------------
 
@@ -697,7 +679,7 @@ if (TEST_05) {
                    col = "red", pch = 1)
         }
     }
-    DATA$ClrSW_ref2 <- NULL
+    # DATA$ClrSW_ref2 <- NULL
 }
 #' -----------------------------------------------------------------------------
 
@@ -858,6 +840,28 @@ if (TEST_06) {
 if (TEST_07) {
     cat(paste("\n7. Obstacles test.\n\n"))
 
+    ## . . Direct ----------------------------------------------------------####
+
+    ## get biology building tag
+    biol     <- biolog_build(DATA$Azimuth, DATA$Elevat )
+    # ## apply filter for biology building
+    # ## this is not pretty we are using the indexes to mark data
+    # ## have to parse all the original data although the filter is applicable
+    # ## for a specific range of Azimuth angles
+    # building <- which(biol$type == "bellow")
+    # existing <- which(is.na(DATA_year$QCF_DIR))
+    # exclude  <- building %in% existing
+    #
+    # DATA_year$QCF_DIR[    building[exclude] ] <- "Biology Building (22)"
+    # DATA_year$QCF_DIR_07[ building[exclude] ] <- "Biology Building (22)"
+    #
+    # ## Pole obstraction is a possibility, should combine with Direct to decide
+    # suspects <- DATA_year$Azimuth > Pole_az_lim[1] & DATA_year$Azimuth < Pole_az_lim[2]
+    # DATA_year$QCF_DIR[    suspects ]          <- "Possible Direct Obstruction (23)"
+    # DATA_year$QCF_DIR_07[ suspects ]          <- "Possible Direct Obstruction (23)"
+
+
+
 }
 
 #+ echo=F, include=T
@@ -865,32 +869,6 @@ if (TEST_06) {
 
 }
 #' -----------------------------------------------------------------------------
-
-
-# ## . . Direct ------------------------------------------------------####
-#
-# ## get biology building tag
-# biol     <- biolog_build(DATA_year$Azimuth, DATA_year$Elevat )
-# ## apply filter for biology building
-# ## this is not pretty we are using the indexes to mark data
-# ## have to parse all the original data although the filter is applicable
-# ## for a specific range of Azimuth angles
-# building <- which(biol$type == "bellow")
-# existing <- which(is.na(DATA_year$QCF_DIR))
-# exclude  <- building %in% existing
-#
-# DATA_year$QCF_DIR[    building[exclude] ] <- "Biology Building (22)"
-# DATA_year$QCF_DIR_07[ building[exclude] ] <- "Biology Building (22)"
-#
-# ## Pole obstraction is a possibility, should combine with Direct to decide
-# suspects <- DATA_year$Azimuth > Pole_az_lim[1] & DATA_year$Azimuth < Pole_az_lim[2]
-# DATA_year$QCF_DIR[    suspects ]          <- "Possible Direct Obstruction (23)"
-# DATA_year$QCF_DIR_07[ suspects ]          <- "Possible Direct Obstruction (23)"
-
-
-
-
-
 
 
 
@@ -1005,15 +983,6 @@ if (TEST_08) {
         # }
 
     }
-    # ## remove
-    # DATA[ QCF_BTH_08 %in% keys, wattGLB := NA ]
-    # DATA[ QCF_BTH_08 %in% keys, wattHOR := NA ]
-    # DATA[ QCF_BTH_08 %in% keys, wattDIR := NA ]
-    # ## info
-    # cat(c(DATA[ QCF_BTH_08 %in% keys, .N ], " Global or Direct Records removed with:", keys), ".\n\n")
-    # ## remove empty entries
-    # DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
-    # DATA$QCF_BTH_08 <- NULL
     DATA$Relative_diffuse <- NULL
 }
 #' -----------------------------------------------------------------------------
@@ -1109,16 +1078,6 @@ if (TEST_09) {
             #        col = "red", pch = 1)
         }
     }
-
-    # ## remove
-    # DATA[QCF_GLB_09 %in% keys, wattGLB := NA]
-    # ## info
-    # cat(c(DATA[QCF_GLB_09 %in% keys, .N],
-    #       " Global Records removed with:",
-    #       keys), ".\n\n")
-    # ## remove empty entries
-    # DATA <- DATA[!(is.na(wattDIR) & is.na(wattGLB)), ]
-    # DATA$QCF_GLB_09 <- NULL
 }
 #' -----------------------------------------------------------------------------
 

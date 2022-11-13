@@ -28,6 +28,7 @@
 #'     number_sections:  no
 #'     fig_caption:      no
 #'     keep_tex:         no
+#'     keep_md:          no
 #'     latex_engine:     xelatex
 #'     toc:              yes
 #'     fig_width:        8
@@ -62,6 +63,7 @@
 #+ echo=F, include=T
 
 ####_  Document options _####
+knitr::opts_chunk$set(echo       =  FALSE   )
 knitr::opts_chunk$set(comment    = ""       )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"    )
