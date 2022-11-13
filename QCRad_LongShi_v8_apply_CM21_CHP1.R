@@ -111,6 +111,7 @@ TEST_07  <- TRUE
 TEST_08  <- TRUE
 TEST_09  <- TRUE
 
+## mostly for daily plots
 DO_PLOTS     <- TRUE
 if (interactive()) {
     DO_PLOTS <- FALSE
@@ -641,10 +642,10 @@ if (TEST_04) {
 
 
 
-####  5. Tracker off test  #####################################################
+####  5. Tracker is off test  ##################################################
 #'
 #' \newpage
-#' ## 5. Tracker off test
+#' ## 5. Tracker is off test
 #'
 # This test use a diffuse model will be implemented when one is produced
 # and accepted. For now we omit it to protect from over-fitting prior to
@@ -654,11 +655,11 @@ if (TEST_04) {
 if (TEST_05) {
     cat(paste("\n5. Tracking test.\n\n"))
     ## criteria
-    QS$ClrSW_li  <-    0.85
-    QS$glo_min   <-   30
+    QS$ClrSW_lim  <-    0.85
+    QS$glo_min    <-   25
     ## Global Clear SW model
-    QS$ClrSW_a   <- 1050.5
-    QS$ClrSW_b   <-    1.095
+    QS$ClrSW_a    <- 1050.5
+    QS$ClrSW_b    <-    1.095
     ## Clear Sky Sort-Wave model
     DATA[, ClrSW_ref2 := ( QS$ClrSW_a / sun_dist ^ 2 ) * cosde(SZA) ^ QS$ClrSW_b ]
     # DATA[, ClrSW_ref1 := TSIextEARTH_comb * cosde(SZA) ^ QS$ClrSW_b ]
@@ -673,28 +674,30 @@ if (TEST_05) {
 #+ echo=F, include=T
 if (TEST_05) {
 
-    # hist(DATA[,ClrSW_ref1 - wattDIR], breaks = 100 )
-    hist(DATA[,ClrSW_ref2 - wattDIR], breaks = 100 )
+    hist(DATA[, ClrSW_ref2 - wattDIR], breaks = 100 )
+    hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100 )
+    hist(DATA[, wattDIF / wattGLB ], breaks = 100 )
 
-    tmp <- DATA[ !is.na(QCF_DIR_05), unique(as.Date(Date)) ]
-    # tmp <- sample(DATA[!is.na(wattDIR), unique(as.Date(Date))], 10)
-    for (ad in sort(tmp)) {
-        pp <- DATA[ as.Date(Date) == ad, ]
-        ylim <- range(pp$ClrSW_ref, pp$wattDIR, pp$wattGLB, na.rm = T)
-        plot(pp$Date, pp$wattDIR, "l", col = "blue",
-             ylim = ylim, xlab = "", ylab = "wattDIR")
-        lines(pp$Date, pp$wattGLB, col = "green")
-        title(paste("5_", as.Date(ad, origin = "1970-01-01")))
-        ## plot limits
-        # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
-        lines(pp$Date, pp$ClrSW_ref2, col = "cyan")
-        ## mark offending data
-        points(pp[!is.na(QCF_DIR_05), Date],
-               pp[!is.na(QCF_DIR_05), wattDIR],
-               col = "red", pch = 1)
+    if (DO_PLOTS) {
+        tmp <- DATA[ !is.na(QCF_DIR_05), unique(as.Date(Date)) ]
+        # tmp <- sample(DATA[!is.na(wattDIR), unique(as.Date(Date))], 10)
+        for (ad in sort(tmp)) {
+            pp <- DATA[ as.Date(Date) == ad, ]
+            ylim <- range(pp$ClrSW_ref2, pp$wattDIR, pp$wattGLB, na.rm = T)
+            plot(pp$Date, pp$wattDIR, "l", col = "blue",
+                 ylim = ylim, xlab = "", ylab = "wattDIR")
+            lines(pp$Date, pp$wattGLB, col = "green")
+            title(paste("5_", as.Date(ad, origin = "1970-01-01")))
+            ## plot limits
+            # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
+            lines(pp$Date, pp$ClrSW_ref2, col = "cyan")
+            ## mark offending data
+            points(pp[!is.na(QCF_DIR_05), Date],
+                   pp[!is.na(QCF_DIR_05), wattDIR],
+                   col = "red", pch = 1)
+        }
     }
-
-    # DATA$ClrSW_ref2 <- NULL
+    DATA$ClrSW_ref2 <- NULL
 }
 #' -----------------------------------------------------------------------------
 
@@ -733,11 +736,11 @@ if (TEST_06) {
         f    <-     0.046725
         mu_0 <- cosde(SZA)
         return( a * mu_0     +
-                    b * mu_0 ^ 2 +
-                    c * mu_0 ^ 3 +
-                    d * mu_0 ^ 4 +
-                    e * mu_0 ^ 5 +
-                    f * mu_0 * Pressure )
+                b * mu_0 ^ 2 +
+                c * mu_0 ^ 3 +
+                d * mu_0 ^ 4 +
+                e * mu_0 ^ 5 +
+                f * mu_0 * Pressure )
     }
     DATA[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
 
