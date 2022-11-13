@@ -84,32 +84,32 @@ source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/RAD_QC/Functions_write_data.R")
 
 
-####  Variables init  ####
+####_  Variables init  _####
 DATA_BASE    <- "~/DATA/Broad_Band/QCRad_LongShi/"
 IN_PREFIX    <- "LAP_QCRad_LongShi_v8_id_CM21_CHP1_"
 cachedata    <- "~/RAD_QC/temp_data.Rds"
 
-####  Execution control  ####
+#### ~ ~ Execution control ~ ~ ####
 
-TEST_01   <- FALSE
-TEST_02   <- FALSE
-TEST_03   <- FALSE
-TEST_04   <- FALSE
-TEST_05   <- FALSE
-TEST_06   <- FALSE
-TEST_07   <- FALSE
-TEST_08   <- FALSE
-TEST_09   <- FALSE
+TEST_01  <- FALSE
+TEST_02  <- FALSE
+TEST_03  <- FALSE
+TEST_04  <- FALSE
+TEST_05  <- FALSE
+TEST_06  <- FALSE
+TEST_07  <- FALSE
+TEST_08  <- FALSE
+TEST_09  <- FALSE
 
-# TEST_01   <- TRUE
-# TEST_02   <- TRUE
-# TEST_03   <- TRUE
-# TEST_04   <- TRUE
-TEST_05   <- TRUE
-# TEST_06   <- TRUE
-# TEST_07   <- TRUE
-# TEST_08   <- TRUE
-# TEST_09   <- TRUE
+TEST_01  <- TRUE
+TEST_02  <- TRUE
+TEST_03  <- TRUE
+TEST_04  <- TRUE
+TEST_05  <- TRUE
+TEST_06  <- TRUE
+TEST_07  <- TRUE
+TEST_08  <- TRUE
+TEST_09  <- TRUE
 
 DO_PLOTS     <- TRUE
 if (interactive()) {
@@ -118,7 +118,7 @@ if (interactive()) {
 
 
 #+ echo=F, include=T
-####  Load all data  ####
+#### ~ ~ Load all data ~ ~ ####
 fileslist <- list.files(path    = DATA_BASE,
                         pattern = paste0(IN_PREFIX, ".*.Rds"),
                         full.names = TRUE)
@@ -159,9 +159,8 @@ pander(pp, caption = "Input files")
 QS <- list()
 QS$sun_elev_min     <-   -2 * 0.103 # 0. Drop all data when sun is below this point
 QS$sun_elev_no_neg  <-    0         # 0. Don't allow negative values below this sun angle
-QS$ClrSW_a          <- 1050.5       # 5. Tracker off test Clear Sky factor a
-QS$ClrSW_b          <-    1.095     # 5. Tracker off test Clear Sky factor b
-QS$ClrSW_lim        <-    0.85      # 5. Tracker off test Threshold
+
+
 
 
 
@@ -654,74 +653,50 @@ if (TEST_04) {
 #+ echo=TEST_05, include=T
 if (TEST_05) {
     cat(paste("\n5. Tracking test.\n\n"))
-
-
-    QS$ClrSW_a <- 1050.5
-    QS$ClrSW_b <-    1.095
-
+    ## criteria
+    QS$ClrSW_li  <-    0.85
+    QS$glo_min   <-   30
+    ## Global Clear SW model
+    QS$ClrSW_a   <- 1050.5
+    QS$ClrSW_b   <-    1.095
     ## Clear Sky Sort-Wave model
-    DATA[, ClrSW_ref := ( QS$ClrSW_a / sun_dist ^ 2 ) * cosde(SZA) ^ QS$ClrSW_b ]
-    DATA[, ClrSW_ref := TSIextEARTH_comb * cosde(SZA) ^ QS$ClrSW_b ]
-
+    DATA[, ClrSW_ref2 := ( QS$ClrSW_a / sun_dist ^ 2 ) * cosde(SZA) ^ QS$ClrSW_b ]
+    # DATA[, ClrSW_ref1 := TSIextEARTH_comb * cosde(SZA) ^ QS$ClrSW_b ]
 
     ## . . Direct ----------------------------------------------------------####
+    DATA[wattGLB / ClrSW_ref2 > QS$ClrSW_lim & wattDIF / wattGLB > QS$ClrSW_lim & wattGLB > QS$glo_min,
+         QCF_DIR_05 := "Possible no tracking (24)"]
 
-
+    pander(table(DATA$QCF_DIR_05, exclude = T))
 }
 
 #+ echo=F, include=T
 if (TEST_05) {
 
+    # hist(DATA[,ClrSW_ref1 - wattDIR], breaks = 100 )
+    hist(DATA[,ClrSW_ref2 - wattDIR], breaks = 100 )
 
-    hist(DATA[,ClrSW_ref] )
-
-
-
-
-    tmp <- DATA[ !is.na(QCF_DIR_05) ]
-
-    tmp <- sample(DATA[!is.na(wattDIR), unique(as.Date(Date))], 10)
-
-
+    tmp <- DATA[ !is.na(QCF_DIR_05), unique(as.Date(Date)) ]
+    # tmp <- sample(DATA[!is.na(wattDIR), unique(as.Date(Date))], 10)
     for (ad in sort(tmp)) {
         pp <- DATA[ as.Date(Date) == ad, ]
-        ylim <- range(pp$ClrSW_ref, pp$wattDIR, na.rm = T)
+        ylim <- range(pp$ClrSW_ref, pp$wattDIR, pp$wattGLB, na.rm = T)
         plot(pp$Date, pp$wattDIR, "l", col = "blue",
              ylim = ylim, xlab = "", ylab = "wattDIR")
-        title(paste("5", as.Date(ad, origin = "1970-01-01")))
+        lines(pp$Date, pp$wattGLB, col = "green")
+        title(paste("5_", as.Date(ad, origin = "1970-01-01")))
         ## plot limits
-        lines(pp$Date, pp$ClrSW_ref, col = "cyan")
+        # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
+        lines(pp$Date, pp$ClrSW_ref2, col = "cyan")
         ## mark offending data
-        # points(pp[wattDIR > Dir_First_Clim_lim, Date],
-        #        pp[wattDIR > Dir_First_Clim_lim, wattDIR],
-        #        col = "pink", pch = 1)
+        points(pp[!is.na(QCF_DIR_05), Date],
+               pp[!is.na(QCF_DIR_05), wattDIR],
+               col = "red", pch = 1)
     }
 
-
-
-    # DATA$ClrSW_ref <- NULL
+    # DATA$ClrSW_ref2 <- NULL
 }
 #' -----------------------------------------------------------------------------
-
-
-
-# ## apply test
-# DATA_year[ is.na(DATA_year$QCF_DIR) &
-#                wattGLB / ClrSW   > QS$ClrSW_lim &
-#                wattDIF / wattGLB > QS$ClrSW_lim,
-#            QCF_DIR := "No tracking possible (24)" ]
-# DATA_year[ wattGLB / ClrSW   > QS$ClrSW_lim &
-#                wattDIF / wattGLB > QS$ClrSW_lim,
-#            QCF_DIR_05 := "No tracking possible (24)" ]
-#
-# sel <- sum(!is.na(DATA_year$QCF_DIR_05))
-
-
-
-
-
-
-
 
 
 
@@ -743,12 +718,12 @@ if (TEST_05) {
 #+ echo=TEST_06, include=T
 if (TEST_06) {
     cat(paste("\n6. Rayleigh Limit Diffuse Comparison.\n\n"))
-
+    # criteria
     QS$Rayleigh_upper_lim <- 500   # Upper departure diffuse limit
     QS$Rayleigh_lower_lim <-  -3   # Lower departure diffuse limit
     QS$Rayleigh_dif_glo_r <-   0.8 # Low limit diffuse/global < threshold
     QS$Rayleigh_glo_min   <-  50   # Low limit minimum global
-
+    # model
     Rayleigh_diff <- function(SZA, Pressure) {
         a    <-   209.3
         b    <-  -708.3
@@ -764,7 +739,6 @@ if (TEST_06) {
                     e * mu_0 ^ 5 +
                     f * mu_0 * Pressure )
     }
-
     DATA[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
 
     ## . . Both ------------------------------------------------------------####
@@ -824,7 +798,6 @@ if (TEST_06) {
         }
 
 
-
         ## plot on lower limit
         DATA[ !is.na(QCF_BTH_06_2) , .N]
         DATA[ !is.na(QCF_BTH_06_2) &
@@ -868,6 +841,53 @@ if (TEST_06) {
     }
 }
 #' -----------------------------------------------------------------------------
+
+
+
+
+####  7. Test for obstacles  ###################################################
+#'
+#' \newpage
+#' ## 7. Test for obstacles
+#'
+#'
+#+ echo=TEST_07, include=T
+if (TEST_07) {
+    cat(paste("\n7. Obstacles test.\n\n"))
+
+}
+
+#+ echo=F, include=T
+if (TEST_06) {
+
+}
+#' -----------------------------------------------------------------------------
+
+
+# ## . . Direct ------------------------------------------------------####
+#
+# ## get biology building tag
+# biol     <- biolog_build(DATA_year$Azimuth, DATA_year$Elevat )
+# ## apply filter for biology building
+# ## this is not pretty we are using the indexes to mark data
+# ## have to parse all the original data although the filter is applicable
+# ## for a specific range of Azimuth angles
+# building <- which(biol$type == "bellow")
+# existing <- which(is.na(DATA_year$QCF_DIR))
+# exclude  <- building %in% existing
+#
+# DATA_year$QCF_DIR[    building[exclude] ] <- "Biology Building (22)"
+# DATA_year$QCF_DIR_07[ building[exclude] ] <- "Biology Building (22)"
+#
+# ## Pole obstraction is a possibility, should combine with Direct to decide
+# suspects <- DATA_year$Azimuth > Pole_az_lim[1] & DATA_year$Azimuth < Pole_az_lim[2]
+# DATA_year$QCF_DIR[    suspects ]          <- "Possible Direct Obstruction (23)"
+# DATA_year$QCF_DIR_07[ suspects ]          <- "Possible Direct Obstruction (23)"
+
+
+
+
+
 
 
 
@@ -1075,7 +1095,7 @@ if (TEST_09) {
             plot(pp$Date, pp$wattGLB, "l", col = "green",
                  ylim = ylim, xlab = "", ylab = "wattGLB")
             lines(pp$Date, pp$wattDIR, col = "blue")
-            title(paste("9.", as.Date(ad, origin = "1970-01-01")))
+            title(paste("9_", as.Date(ad, origin = "1970-01-01")))
             ## mark offending data
             points(pp[!is.na(QCF_GLB_09), Date],
                    pp[!is.na(QCF_GLB_09), wattGLB],
