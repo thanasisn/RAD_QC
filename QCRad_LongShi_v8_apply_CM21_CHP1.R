@@ -101,15 +101,15 @@ TEST_07   <- FALSE
 TEST_08   <- FALSE
 TEST_09   <- FALSE
 
-TEST_01   <- TRUE
-TEST_02   <- TRUE
-TEST_03   <- TRUE
-TEST_04   <- TRUE
+# TEST_01   <- TRUE
+# TEST_02   <- TRUE
+# TEST_03   <- TRUE
+# TEST_04   <- TRUE
 TEST_05   <- TRUE
-TEST_06   <- TRUE
-TEST_07   <- TRUE
-TEST_08   <- TRUE
-TEST_09   <- TRUE
+# TEST_06   <- TRUE
+# TEST_07   <- TRUE
+# TEST_08   <- TRUE
+# TEST_09   <- TRUE
 
 DO_PLOTS     <- TRUE
 if (interactive()) {
@@ -642,25 +642,69 @@ if (TEST_04) {
 
 
 
-
-
-
-
-
-# ####  5. Tracker off test  #############################################
-# cat(paste("\n5. Tracking test.\n\n"))
-# ## . . Direct ------------------------------------------------------####
-# ## This test use a diffuse model will be implemented when one is produced
-# ## and accepted. For now we omit it to protect from over-fitting prior to
-# ## make one such model.
+####  5. Tracker off test  #####################################################
+#'
+#' \newpage
+#' ## 5. Tracker off test
+#'
+# This test use a diffuse model will be implemented when one is produced
+# and accepted. For now we omit it to protect from over-fitting prior to
+# make one such model.
 #
-# ## Create Clear Sky Sort-Wave model
-# DATA_year[ , ClrSW := ( QS$ClrSW_a / sun_dist**2 ) * cosde(SZA)**QS$ClrSW_b ]
-#
-# # sel <- DATA_year[ is.na(DATA_year$QCF_DIR) &
-# #                       wattGLB / ClrSW   > QS$ClrSW_lim &
-# #                       wattDIF / wattGLB > QS$ClrSW_lim, .N ]
-#
+#+ echo=TEST_05, include=T
+if (TEST_05) {
+    cat(paste("\n5. Tracking test.\n\n"))
+
+
+    QS$ClrSW_a <- 1050.5
+    QS$ClrSW_b <-    1.095
+
+    ## Clear Sky Sort-Wave model
+    DATA[, ClrSW_ref := ( QS$ClrSW_a / sun_dist ^ 2 ) * cosde(SZA) ^ QS$ClrSW_b ]
+    DATA[, ClrSW_ref := TSIextEARTH_comb * cosde(SZA) ^ QS$ClrSW_b ]
+
+
+    ## . . Direct ----------------------------------------------------------####
+
+
+}
+
+#+ echo=F, include=T
+if (TEST_05) {
+
+
+    hist(DATA[,ClrSW_ref] )
+
+
+
+
+    tmp <- DATA[ !is.na(QCF_DIR_05) ]
+
+    tmp <- sample(DATA[!is.na(wattDIR), unique(as.Date(Date))], 10)
+
+
+    for (ad in sort(tmp)) {
+        pp <- DATA[ as.Date(Date) == ad, ]
+        ylim <- range(pp$ClrSW_ref, pp$wattDIR, na.rm = T)
+        plot(pp$Date, pp$wattDIR, "l", col = "blue",
+             ylim = ylim, xlab = "", ylab = "wattDIR")
+        title(paste("5", as.Date(ad, origin = "1970-01-01")))
+        ## plot limits
+        lines(pp$Date, pp$ClrSW_ref, col = "cyan")
+        ## mark offending data
+        # points(pp[wattDIR > Dir_First_Clim_lim, Date],
+        #        pp[wattDIR > Dir_First_Clim_lim, wattDIR],
+        #        col = "pink", pch = 1)
+    }
+
+
+
+    # DATA$ClrSW_ref <- NULL
+}
+#' -----------------------------------------------------------------------------
+
+
+
 # ## apply test
 # DATA_year[ is.na(DATA_year$QCF_DIR) &
 #                wattGLB / ClrSW   > QS$ClrSW_lim &
