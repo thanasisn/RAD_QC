@@ -101,15 +101,15 @@ TEST_07  <- FALSE
 TEST_08  <- FALSE
 TEST_09  <- FALSE
 
-# TEST_01  <- TRUE
-# TEST_02  <- TRUE
-# TEST_03  <- TRUE
-# TEST_04  <- TRUE
-# TEST_05  <- TRUE
+TEST_01  <- TRUE
+TEST_02  <- TRUE
+TEST_03  <- TRUE
+TEST_04  <- TRUE
+TEST_05  <- TRUE
 TEST_06  <- TRUE
-TEST_07  <- TEST_06
-# TEST_08  <- TRUE
-# TEST_09  <- TRUE
+# TEST_07  <- TEST_06
+TEST_08  <- TRUE
+TEST_09  <- TRUE
 
 ## mostly for daily plots
 DO_PLOTS     <- TRUE
@@ -841,7 +841,7 @@ if (TEST_07) {
     cat(paste("\n7. Obstacles test.\n\n"))
 
     ## . . Direct ----------------------------------------------------------####
-stop()
+
     source("./QCRad_Obstacles_definition_v2.R")
 
     ## get biology building tag
