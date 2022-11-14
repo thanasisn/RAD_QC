@@ -106,8 +106,8 @@ TEST_09  <- FALSE
 # TEST_03  <- TRUE
 # TEST_04  <- TRUE
 # TEST_05  <- TRUE
-TEST_06  <- TRUE
-TEST_07  <- TEST_06
+# TEST_06  <- TRUE
+TEST_07  <- TRUE
 # TEST_08  <- TRUE
 # TEST_09  <- TRUE
 
@@ -841,11 +841,9 @@ if (TEST_07) {
     cat(paste("\n7. Obstacles test.\n\n"))
 
     ## . . Direct ----------------------------------------------------------####
-stop()
-    source("./QCRad_Obstacles_definition_v2.R")
 
     ## get biology building tag
-    # biol     <- biolog_build(DATA$Azimuth, DATA$Elevat )
+    biol     <- biolog_build(DATA$Azimuth, DATA$Elevat )
     # ## apply filter for biology building
     # ## this is not pretty we are using the indexes to mark data
     # ## have to parse all the original data although the filter is applicable
@@ -857,7 +855,7 @@ stop()
     # DATA_year$QCF_DIR[    building[exclude] ] <- "Biology Building (22)"
     # DATA_year$QCF_DIR_07[ building[exclude] ] <- "Biology Building (22)"
     #
-    # ## Pole abstraction is a possibility, should combine with Direct to decide
+    # ## Pole obstraction is a possibility, should combine with Direct to decide
     # suspects <- DATA_year$Azimuth > Pole_az_lim[1] & DATA_year$Azimuth < Pole_az_lim[2]
     # DATA_year$QCF_DIR[    suspects ]          <- "Possible Direct Obstruction (23)"
     # DATA_year$QCF_DIR_07[ suspects ]          <- "Possible Direct Obstruction (23)"
