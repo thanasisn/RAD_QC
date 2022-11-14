@@ -276,19 +276,18 @@ if (TEST_04) {
 #+ echo=TEST_02, include=T
 if (TEST_02) {
     cat(paste("\n2. Extremely Rare Limits.\n\n"))
-
+    # Upper modeled values
     QS$Dir_SWdn_amp     <-    0.91 # Direct departure factor above the model
     QS$Dir_SWdn_off     <- -140    # Direct departure offset above the model
+    QS$Glo_SWdn_amp     <- 1.18    # Global departure factor above the model
+    QS$Glo_SWdn_off     <- 40      # Global departure offset above the model
+    # Minimum accepted values
     QS$dir_SWdn_min_ext <-   -2    # 2. MIN Extremely Rare Minimum Limits
     QS$glo_SWdn_min_ext <-   -2    # 2. MIN Extremely Rare Minimum Limits
-
-    QS$Glo_SWdn_amp     <- 1.18   # Global departure factor above the model
-    QS$Glo_SWdn_off     <- 40     # Global departure offset above the model
-
-
+    # Compute reference values
     DATA[, Direct_max := TSIextEARTH_comb * QS$Dir_SWdn_amp * cosde(SZA) ^ 0.2 + QS$Dir_SWdn_off]
     DATA[, Global_max := TSIextEARTH_comb * QS$Glo_SWdn_amp * cosde(SZA) ^ 1.2 + QS$Glo_SWdn_off]
-
+    # Ignore too low values near horizon
     DATA[Direct_max < 3, Direct_max := NA]
     DATA[Global_max < 3, Direct_max := NA]
 
@@ -344,7 +343,7 @@ if (TEST_02) {
             ## mark offending data
             points(pp[!is.na(QCF_GLB_02), Date],
                    pp[!is.na(QCF_GLB_02), wattGLB],
-                   col = "red", pch = 1)
+                   col = "magenta", pch = 1)
         }
     }
     # DATA$Direct_max <- NULL
@@ -412,7 +411,7 @@ if (TEST_03) {
         points( pp[!is.na(QCF_BTH_03.1), SZA], pp[!is.na(QCF_BTH_03.1), DiffuseFraction_Kd],
                 cex = .2, col = "red")
         points( pp[!is.na(QCF_BTH_03.2), SZA], pp[!is.na(QCF_BTH_03.2), DiffuseFraction_Kd],
-                cex = .2, col = "blue")
+                cex = .2, col = "cyan")
 
 
         par(mar = c(4,4,2,1))
@@ -425,7 +424,7 @@ if (TEST_03) {
         points( pp[!is.na(QCF_BTH_03.1), Azimuth], pp[!is.na(QCF_BTH_03.1), DiffuseFraction_Kd],
                 cex = .2, col = "red")
         points( pp[!is.na(QCF_BTH_03.2), Azimuth], pp[!is.na(QCF_BTH_03.2), DiffuseFraction_Kd],
-                cex = .2, col = "blue")
+                cex = .2, col = "cyan")
     }
 
     if (DO_PLOTS) {
@@ -453,16 +452,16 @@ if (TEST_03) {
 
             points(pp[!is.na(QCF_BTH_03.1), Date],
                    pp[!is.na(QCF_BTH_03.1), wattDIR],
-                   ylim = ylim, col = "magenta")
+                   ylim = ylim, col = "red")
             points(pp[!is.na(QCF_BTH_03.1), Date],
                    pp[!is.na(QCF_BTH_03.1), wattGLB],
                    ylim = ylim, col = "magenta")
             points(pp[!is.na(QCF_BTH_03.2), Date],
                    pp[!is.na(QCF_BTH_03.2), wattDIR],
-                   ylim = ylim, col = "cyan")
+                   ylim = ylim, col = "red")
             points(pp[!is.na(QCF_BTH_03.2), Date],
                    pp[!is.na(QCF_BTH_03.2), wattGLB],
-                   ylim = ylim, col = "cyan")
+                   ylim = ylim, col = "magenta")
         }
     }
 }
@@ -551,7 +550,7 @@ if (TEST_04) {
                 ## mark offending data
                 points(pp[wattDIR > Dir_First_Clim_lim, Date],
                        pp[wattDIR > Dir_First_Clim_lim, wattDIR],
-                       col = "pink", pch = 1)
+                       col = "red", pch = 1)
             }
         }
 
@@ -590,7 +589,7 @@ if (TEST_04) {
                 ## mark offending data
                 points(pp[wattGLB > Glo_First_Clim_lim, Date],
                        pp[wattGLB > Glo_First_Clim_lim, wattGLB],
-                       col = "pink", pch = 1)
+                       col = "magenta", pch = 1)
             }
         }
 
@@ -609,7 +608,7 @@ if (TEST_04) {
                 ## mark offending data
                 points(pp[wattGLB > Glo_Secon_Clim_lim, Date],
                        pp[wattGLB > Glo_Secon_Clim_lim, wattGLB],
-                       col = "red", pch = 1)
+                       col = "magenta", pch = 1)
             }
         }
 
@@ -656,9 +655,9 @@ if (TEST_05) {
 #+ echo=F, include=T
 if (TEST_05) {
 
-    hist(DATA[, ClrSW_ref2 - wattDIR], breaks = 100 )
-    hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100 )
-    hist(DATA[, wattDIF / wattGLB ], breaks = 100 )
+    hist(DATA[, ClrSW_ref2 - wattDIR ], breaks = 100)
+    hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100)
+    hist(DATA[, wattDIF / wattGLB    ], breaks = 100)
 
     if (DO_PLOTS) {
         tmp <- DATA[ !is.na(QCF_DIR_05), unique(as.Date(Date)) ]
@@ -781,7 +780,6 @@ if (TEST_06) {
                    pp[!is.na(QCF_BTH_06_1), wattGLB],
                    ylim = ylim, col = "red")
         }
-
 
         ## plot on lower limit
         DATA[ !is.na(QCF_BTH_06_2) , .N]
@@ -943,10 +941,10 @@ if (TEST_08) {
             title(paste("8_1", as.Date(ad, origin = "1970-01-01")))
             points(pp[!is.na(QCF_BTH_08_1), Azimuth],
                    pp[!is.na(QCF_BTH_08_1), wattHOR],
-                   ylim = ylim, col = "midnightblue")
+                   ylim = ylim, col = "red")
             points(pp[!is.na(QCF_BTH_08_1), Azimuth],
                    pp[!is.na(QCF_BTH_08_1), wattGLB],
-                   ylim = ylim, col = "darkgreen")
+                   ylim = ylim, col = "magenta")
         }
 
         ## plot harder limit
@@ -961,10 +959,10 @@ if (TEST_08) {
             title(paste("8_2", as.Date(ad, origin = "1970-01-01")))
             points(pp[!is.na(QCF_BTH_08_2), Azimuth],
                    pp[!is.na(QCF_BTH_08_2), wattHOR],
-                   ylim = ylim, col = "midnightblue")
+                   ylim = ylim, col = "red")
             points(pp[!is.na(QCF_BTH_08_2), Azimuth],
                    pp[!is.na(QCF_BTH_08_2), wattGLB],
-                   ylim = ylim, col = "darkgreen")
+                   ylim = ylim, col = "magenta")
         }
 
         # test <- DATA[ , Relative_diffuse < -200 ]
@@ -1028,9 +1026,9 @@ if (TEST_09) {
     hist( DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], breaks = 100 )
 
     if (any(!is.na(DATA$QCF_GLB_09))) {
-        hist(DATA[!is.na(QCF_GLB_09), wattGLB],      breaks = 100 )
-        hist(DATA[!is.na(QCF_GLB_09), Elevat ],      breaks = 100 )
-        hist(DATA[!is.na(QCF_GLB_09), Clearness_Kt], breaks = 100 )
+        hist(DATA[!is.na(QCF_GLB_09), wattGLB],      breaks = 100)
+        hist(DATA[!is.na(QCF_GLB_09), Elevat ],      breaks = 100)
+        hist(DATA[!is.na(QCF_GLB_09), Clearness_Kt], breaks = 100)
     }
 
     # cosde(90.00000001)
