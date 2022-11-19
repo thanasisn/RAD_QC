@@ -51,7 +51,13 @@
 #'
 #' reads: QCRad_LongShi_v8_id_*
 #'
-#' exports:
+#' exports: TODO
+#'
+#' TODO:
+#' - plot combination of flag for each point
+#' - plot cumulative graphs like the old
+#' - Plot daily graphs with all available flags
+#'
 #'
 #+ echo=F, include=T
 
