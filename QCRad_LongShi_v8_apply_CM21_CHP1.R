@@ -58,7 +58,6 @@
 #' - plot cumulative graphs like the old
 #' - Plot daily graphs with all available flags
 #'
-#'
 #+ echo=F, include=T
 
 
@@ -288,8 +287,8 @@ if (TEST_02) {
     QS$Glo_SWdn_amp     <- 1.18    # Global departure factor above the model
     QS$Glo_SWdn_off     <- 40      # Global departure offset above the model
     # Minimum accepted values
-    QS$dir_SWdn_min_ext <-   -2    # 2. MIN Extremely Rare Minimum Limits
-    QS$glo_SWdn_min_ext <-   -2    # 2. MIN Extremely Rare Minimum Limits
+    QS$dir_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
+    QS$glo_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
     # Compute reference values
     DATA[, Direct_max := TSIextEARTH_comb * QS$Dir_SWdn_amp * cosde(SZA) ^ 0.2 + QS$Dir_SWdn_off]
     DATA[, Global_max := TSIextEARTH_comb * QS$Glo_SWdn_amp * cosde(SZA) ^ 1.2 + QS$Glo_SWdn_off]
@@ -1097,70 +1096,20 @@ if (TEST_09) {
 
 
 
-# wecare <- grep("QCF_DIR_|QCF_GLB_|QCF_BTH_" , names(DATA), value = T )
-# for (fg in wecare) {
-#     if (all(is.na(DATA[[fg]]))) {
-#         DATA[[fg]] <- NULL
-#     }
-# }
-#
-# wecare <- grep("QCF_DIR_|QCF_GLB_|QCF_BTH_" , names(DATA), value = T )
-#
-# for (fg in wecare) {
-#     cat(paste(fg),"\n")
-#     cat(levels(DATA[[fg]]),"\n")
-# }
-#
-#
-# # for (fg in wecare) {
-# #     if (any(!is.na(DATA[[fg]]))) {
-# #         try(hist( as.numeric( factor(DATA[[fg]]), main = fg)))
-# #         try(plot(DATA$Date, factor(DATA[[fg]]), main = fg))
-# #     }
-# # }
-# #
-# #
-# # #+ echo=F, include=T, results="asis"
-# # ## loop years and read data
-# # for (YY in yearSTA:yearEND) {
-# #
-# #     cat("\n\n\\FloatBarrier\n\n")
-# #     cat("\\newpage\n\n")
-# #     cat("\n## Year:", YY, "\n\n")
-# #
-# # #    ## save data identification
-# # #    DATA_year <- DATA_year[ DATA_year$Date < LAST_DAY_EXPR , ]
-# # #    DATA_year <- DATA_year[ DATA_year$Date > PROJECT_START , ]
-# #
-# #    ## . . Export main data -------------------------------------------------####
-# #    if ( !TESTING & dim(DATA_year)[1] > 0 ) {
-# #        write_RDS(object = DATA_year,
-# #                  file   = paste0(OUTPUT_BASE, basename(sub("\\.R$","_", Script.Name)),YY))
-# #    }
-# #
-# #
-# # #    ##-- Strict output for clear sky use ---------------------------------------
-# # #    allow <- c( "good", "Possible Direct Obstruction (23)")
-# # #    sels  <- DATA_year$QCF_DIR %in% allow | DATA_year$QCF_GLB %in% allow
-# # #    STRICT_data <- DATA_year[sels,]
-# # #
-# # #    STRICT_data <- subset(STRICT_data, select = c( -CHP1temp,
-# # #                                                   -CHP1tempSD,
-# # #                                                   -CHP1tempUNC,
-# # #                                                   -chp1TempCF,
-# # #                                                   -TSIextEARTH_comb
-# # #                                                   ))
-# # #
-# # #    ##-- Export strict data --------------------------------------------------##
-# # #    if ( !TESTING & dim(STRICT_data)[1] > 0 ) {
-# # #        myRtools::write_RDS(object = STRICT_data, paste0(OUTPUT_STRICT,YY)) }
-# #
-# # }
 
 
 
-# #'
-# #' **END**
-# #+ include=T, echo=F
-# tac <- Sys.time()
-# cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+#### ~ ~  Export Data ~ ~ ####
+#+ echo=F, include=T, results="asis"
+for (YY in unique(year(DATA$Date))) {
+    write_RDS(object = DATA[ year(Date) == YY, ],
+              file   = paste0(DATA_BASE,
+                              basename(sub("\\.R$","_", Script.Name)), YY))
+}
+
+
+#'
+#' **END**
+#+ include=T, echo=F
+tac <- Sys.time()
+cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
