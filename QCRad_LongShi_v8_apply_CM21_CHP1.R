@@ -379,18 +379,18 @@ if (TEST_03) {
 
     ## . . Proposed filter -------------------------------------------------####
     DATA[DiffuseFraction_Kd > QS$dif_rati_pr1 & SZA  <= QS$dif_sza_break & wattGLB > QS$dif_watt_lim,
-         QCF_BTH_03.1 := "Diffuse ratio comp max (11)"]
+         QCF_BTH_03_1 := "Diffuse ratio comp max (11)"]
     DATA[DiffuseFraction_Kd > QS$dif_rati_pr2 & SZA   > QS$dif_sza_break & wattGLB > QS$dif_watt_lim,
-         QCF_BTH_03.1 := "Diffuse ratio comp max (11)"]
+         QCF_BTH_03_1 := "Diffuse ratio comp max (11)"]
 
     ## . . Extra filters by me ---------------------------------------------####
     DATA[DiffuseFraction_Kd < QS$dif_rati_po1 & SZA  <= QS$dif_sza_break & wattGLB > QS$dif_watt_lim,
-         QCF_BTH_03.2 := "Diffuse ratio comp min (12)"]
+         QCF_BTH_03_2 := "Diffuse ratio comp min (12)"]
     DATA[DiffuseFraction_Kd < QS$dif_rati_po1 & SZA   > QS$dif_sza_break & wattGLB > QS$dif_watt_lim,
-         QCF_BTH_03.2 := "Diffuse ratio comp min (12)"]
+         QCF_BTH_03_2 := "Diffuse ratio comp min (12)"]
 
-    pander(table(DATA$QCF_BTH_03.1, exclude = TRUE))
-    pander(table(DATA$QCF_BTH_03.2, exclude = TRUE))
+    pander(table(DATA$QCF_BTH_03_1, exclude = TRUE))
+    pander(table(DATA$QCF_BTH_03_2, exclude = TRUE))
 }
 
 #+ echo=F, include=T
@@ -413,9 +413,9 @@ if (TEST_03) {
         segments(               0, QS$dif_rati_po1, QS$dif_sza_break, QS$dif_rati_po1, col = "blue" )
         segments(QS$dif_sza_break, QS$dif_rati_po2,               93, QS$dif_rati_po2, col = "blue" )
 
-        points( pp[!is.na(QCF_BTH_03.1), SZA], pp[!is.na(QCF_BTH_03.1), DiffuseFraction_Kd],
+        points( pp[!is.na(QCF_BTH_03_1), SZA], pp[!is.na(QCF_BTH_03_1), DiffuseFraction_Kd],
                 cex = .2, col = "red")
-        points( pp[!is.na(QCF_BTH_03.2), SZA], pp[!is.na(QCF_BTH_03.2), DiffuseFraction_Kd],
+        points( pp[!is.na(QCF_BTH_03_2), SZA], pp[!is.na(QCF_BTH_03_2), DiffuseFraction_Kd],
                 cex = .2, col = "cyan")
 
 
@@ -426,14 +426,14 @@ if (TEST_03) {
               cex = .1)
         title(paste("3_", ay))
 
-        points( pp[!is.na(QCF_BTH_03.1), Azimuth], pp[!is.na(QCF_BTH_03.1), DiffuseFraction_Kd],
+        points( pp[!is.na(QCF_BTH_03_1), Azimuth], pp[!is.na(QCF_BTH_03_1), DiffuseFraction_Kd],
                 cex = .2, col = "red")
-        points( pp[!is.na(QCF_BTH_03.2), Azimuth], pp[!is.na(QCF_BTH_03.2), DiffuseFraction_Kd],
+        points( pp[!is.na(QCF_BTH_03_2), Azimuth], pp[!is.na(QCF_BTH_03_2), DiffuseFraction_Kd],
                 cex = .2, col = "cyan")
     }
 
     if (DO_PLOTS) {
-        tmp <- DATA[ !is.na(QCF_BTH_03.1) | !is.na(QCF_BTH_03.2) ]
+        tmp <- DATA[ !is.na(QCF_BTH_03_1) | !is.na(QCF_BTH_03_2) ]
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
             pp   <- DATA[ as.Date(Date) == ad, ]
             layout(matrix(c(1,2), 2, 1, byrow = TRUE))
@@ -447,7 +447,7 @@ if (TEST_03) {
             abline(h = QS$dif_rati_po1, col = "blue")
             abline(h = QS$dif_rati_po2, col = "blue", lty = 2)
 
-            title(paste("3_", as.Date(ad, origin = "1970-01-01")))
+            title(paste("3_1_2", as.Date(ad, origin = "1970-01-01")))
 
             par(mar = c(2,4,1,1))
             ylim <- range(pp$wattGLB, pp$wattDIR, na.rm = T)
@@ -455,17 +455,17 @@ if (TEST_03) {
                   ylim = ylim, col = "green", ylab = "", xlab = "")
             lines(pp$Date, pp$wattDIR, col = "blue" )
 
-            points(pp[!is.na(QCF_BTH_03.1), Date],
-                   pp[!is.na(QCF_BTH_03.1), wattDIR],
+            points(pp[!is.na(QCF_BTH_03_1), Date],
+                   pp[!is.na(QCF_BTH_03_1), wattDIR],
                    ylim = ylim, col = "red")
-            points(pp[!is.na(QCF_BTH_03.1), Date],
-                   pp[!is.na(QCF_BTH_03.1), wattGLB],
+            points(pp[!is.na(QCF_BTH_03_1), Date],
+                   pp[!is.na(QCF_BTH_03_1), wattGLB],
+                   ylim = ylim, col = "red")
+            points(pp[!is.na(QCF_BTH_03_2), Date],
+                   pp[!is.na(QCF_BTH_03_2), wattDIR],
                    ylim = ylim, col = "magenta")
-            points(pp[!is.na(QCF_BTH_03.2), Date],
-                   pp[!is.na(QCF_BTH_03.2), wattDIR],
-                   ylim = ylim, col = "red")
-            points(pp[!is.na(QCF_BTH_03.2), Date],
-                   pp[!is.na(QCF_BTH_03.2), wattGLB],
+            points(pp[!is.na(QCF_BTH_03_2), Date],
+                   pp[!is.na(QCF_BTH_03_2), wattGLB],
                    ylim = ylim, col = "magenta")
         }
     }

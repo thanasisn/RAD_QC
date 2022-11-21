@@ -363,8 +363,6 @@ for (YY in yearSTA:yearEND) {
         DSWdn_min <- DATA_year$wattDIR  <  QS$dir_SWdn_min
         DSWdn_max <- DATA_year$wattDIR  >  DATA_year$TSIextEARTH_comb
 
-        DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DSWdn_min ] <- "Physical possible limit min (5)"
-        DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DSWdn_max ] <- "Physical possible limit max (6)"
         DATA_year$QCF_DIR_01[ DSWdn_min ]                         <- "Physical possible limit min (5)"
         DATA_year$QCF_DIR_01[ DSWdn_max ]                         <- "Physical possible limit max (6)"
 
@@ -373,8 +371,6 @@ for (YY in yearSTA:yearEND) {
         Global_max_physical_limit <- DATA_year$TSIextEARTH_comb * 1.5 * cosde(DATA_year$SZA)^1.2 + 100
         GSWdn_max                 <- DATA_year$wattGLB  >  Global_max_physical_limit
 
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & GSWdn_min ] <- "Physical possible limit min (5)"
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & GSWdn_max ] <- "Physical possible limit max (6)"
         DATA_year$QCF_GLB_01[ GSWdn_min ]                         <- "Physical possible limit min (5)"
         DATA_year$QCF_GLB_02[ GSWdn_max ]                         <- "Physical possible limit max (6)"
 
@@ -397,8 +393,6 @@ for (YY in yearSTA:yearEND) {
         DSWdn_min_ext             <- DATA_year$wattDIR  <  QS$dir_SWdn_min_ext
         DSWdn_max_ext             <- DATA_year$wattDIR  >  Direct_max_extremely_rare
 
-        DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DSWdn_min_ext ] <- "Extremely rare limits min (3)"
-        DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DSWdn_max_ext ] <- "Extremely rare limits max (4)"
         DATA_year$QCF_DIR_02[ DSWdn_min_ext ]                         <- "Extremely rare limits min (3)"
         DATA_year$QCF_DIR_02[ DSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
 
@@ -407,8 +401,6 @@ for (YY in yearSTA:yearEND) {
         GSWdn_min_ext             <- DATA_year$wattGLB  <  QS$glo_SWdn_min_ext
         GSWdn_max_ext             <- DATA_year$wattGLB  >  Global_max_extremely_rare
 
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & GSWdn_min_ext ] <- "Extremely rare limits min (3)"
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & GSWdn_max_ext ] <- "Extremely rare limits max (4)"
         DATA_year$QCF_GLB_02[ GSWdn_min_ext ]                         <- "Extremely rare limits min (3)"
         DATA_year$QCF_GLB_02[ GSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
 
@@ -436,23 +428,16 @@ for (YY in yearSTA:yearEND) {
                     DATA_year$wattGLB            >  50
         DFR_prop <- DFR_A | DFR_B
 
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & DFR_prop ] <- "Diffuse ratio comp max (11)"
         DATA_year$QCF_GLB_03.1[ DFR_prop ]                       <- "Diffuse ratio comp max (11)"
-
-        DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DFR_prop ] <- "Diffuse ratio comp max (11)"
         DATA_year$QCF_DIR_03.1[ DFR_prop ]                       <- "Diffuse ratio comp max (11)"
 
         ## . . Extra filters by me -----------------------------------------####
         DFR_low <- DATA_year$DiffuseFraction_Kd < QS$dif_rati_min
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & DFR_low ] <- "Diffuse ratio comp min (12)"
         DATA_year$QCF_GLB_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
-        DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DFR_low ] <- "Diffuse ratio comp min (12)"
         DATA_year$QCF_DIR_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
 
         DFR_hig <- DATA_year$DiffuseFraction_Kd > QS$dif_rati_max
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & DFR_hig ] <- "Diffuse ratio comp max (13)"
         DATA_year$QCF_GLB_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
-        DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & DFR_hig ] <- "Diffuse ratio comp max (13)"
         DATA_year$QCF_DIR_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
 
         ## . . Info --------------------------------------------------------####
@@ -505,10 +490,6 @@ for (YY in yearSTA:yearEND) {
         #                       wattDIF / wattGLB > QS$ClrSW_lim, .N ]
 
         ## apply test
-        DATA_year[ is.na(DATA_year$QCF_DIR) &
-                       wattGLB / ClrSW   > QS$ClrSW_lim &
-                       wattDIF / wattGLB > QS$ClrSW_lim,
-                   QCF_DIR := "No tracking possible (24)" ]
         DATA_year[ wattGLB / ClrSW   > QS$ClrSW_lim &
                    wattDIF / wattGLB > QS$ClrSW_lim,
                    QCF_DIR_05 := "No tracking possible (24)" ]
