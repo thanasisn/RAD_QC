@@ -220,8 +220,8 @@ yearSTA <- as.numeric( format(PROJECT_START, format = "%Y") )
 yearEND <- as.numeric( format(x = as.POSIXct(Sys.Date()), format = "%Y")     )
 
 ## override years
-# yearSTA <- 2016
-# yearEND <- 2016
+yearSTA <- 2022
+yearEND <- 2022
 
 # yearSTA <- 1993
 # yearEND <- 1993
