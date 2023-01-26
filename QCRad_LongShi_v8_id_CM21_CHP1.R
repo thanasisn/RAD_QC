@@ -107,7 +107,7 @@ template_file  <- "~/DATA/Broad_Band/LAP_CHP1_L1_2016.Rds"
 
 ## date to start run
 PROJECT_START  <- as.POSIXct("1993-01-01")  ## when both instruments were operational
-LAST_DAY_EXPR  <- as.POSIXct("2022-03-31")  ## day of last manual data clean
+LAST_DAY_EXPR  <- as.POSIXct("2023-01-01")  ## day of last manual data clean
 
 
 
@@ -220,8 +220,8 @@ yearSTA <- as.numeric( format(PROJECT_START, format = "%Y") )
 yearEND <- as.numeric( format(x = as.POSIXct(Sys.Date()), format = "%Y")     )
 
 ## override years
-# yearSTA <- 2016
-# yearEND <- 2016
+# yearSTA <- 2022
+# yearEND <- 2022
 
 # yearSTA <- 1993
 # yearEND <- 1993
