@@ -144,6 +144,14 @@ if (!file.exists(cachedata)) {
     cat("\n\n**USING CACHED DATA!!**\n\n")
 }
 
+
+if (TRUE) {
+    cat("Partial data run")
+    DATA <- DATA[year(Date) >= 2022, ]
+}
+
+
+
 ## Obstacles definitions
 load("~/RAD_QC/Obstacles.Rda")
 ```
