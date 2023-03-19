@@ -541,7 +541,7 @@ for (YY in yearSTA:yearEND) {
         ## . . Direct ------------------------------------------------------####
 
         ## get biology building tag
-        biol     <- biolog_build(DATA_year$Azimuth, DATA_year$Elevat )
+        biol     <- biolog_build(DATA_year$Azimuth, DATA_year$Elevat)
         ## apply filter for biology building
         ## this is not pretty we are using the indexes to mark data
         ## have to parse all the original data although the filter is applicable
