@@ -1003,7 +1003,14 @@ if (TEST_08) {
 
 
 
-####  9. Clearness index test  ####
+
+
+##  9. Clearness index test  ---------------------------------------------------
+
+QS$CL_idx_max <-  1.13  # Upper Clearness index accepted level
+QS$CL_idx_min <- -0.001 # Lower Clearness index accepted level
+QS$CL_idx_ele <-  5     # Apply for elevations above this angle
+
 #'
 #' \newpage
 #' ## 9. Clearness index test
@@ -1015,15 +1022,15 @@ if (TEST_08) {
 #'
 #' For larger elevation angles manual inspection is needed.
 #'
+#' - Upper kt  < `r QS$CL_idx_max`
+#' - Lower kt  > `r QS$CL_idx_min`
+#' - Elevation > `r QS$CL_idx_ele`
+#'
 #+ echo=TEST_09, include=T
 if (TEST_09) {
     cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
 
-    QS$CL_idx_max <-  1.13  # Upper Clearness index accepted level
-    QS$CL_idx_min <- -0.001 # Lower Clearness index accepted level
-    QS$CL_idx_ele <-  3     # Apply for elevations above this angle
-
-    ## . . Global ----------------------------------------------------------####
+    ## . . Global --------------------------------------------------------------
     DATA[Clearness_Kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele,
          QCF_GLB_09 := "Clearness index limit max (19)" ]
     DATA[Clearness_Kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele,
