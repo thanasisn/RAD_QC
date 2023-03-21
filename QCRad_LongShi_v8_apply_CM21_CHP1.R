@@ -144,10 +144,10 @@ if (!file.exists(cachedata)) {
 }
 
 
-if (TRUE) {
-    cat("Partial data run")
-    DATA <- DATA[year(Date) >= 2022, ]
-}
+# if (TRUE) {
+#     cat("Partial data run")
+#     DATA <- DATA[year(Date) >= 2022, ]
+# }
 
 
 
