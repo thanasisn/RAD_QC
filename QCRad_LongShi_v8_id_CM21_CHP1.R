@@ -217,8 +217,8 @@ daysinfo_gather <- data.table()
 SUS_DATA_gather <- data.table()
 
 ## get year range
-yearSTA <- as.numeric( format(PROJECT_START, format = "%Y") )
-yearEND <- as.numeric( format(x = as.POSIXct(Sys.Date()), format = "%Y")     )
+yearSTA <- as.numeric(format(PROJECT_START, format = "%Y"))
+yearEND <- as.numeric(format(x = as.POSIXct(Sys.Date()), format = "%Y"))
 
 ## override years
 # yearSTA <- 2022
@@ -250,7 +250,7 @@ for (YY in yearSTA:yearEND) {
         }
     }
 
-    ####  Get Direct if available  #####
+    ##  Get Direct if available  -----------------------------------------------
     year_file1 <- paste0(CHP1_BASE_IN, "_L1_", YY, ".Rds")
     cat( paste(year_file1), "\n\n")
 
@@ -273,7 +273,7 @@ for (YY in yearSTA:yearEND) {
 
     if (TESTING) { CHP1_year <- CHP1_year[ 1:TESTING_NP, ] }
 
-    ## drop some columns
+    ## __ Drop some columns ----------------------------------------------------
     CHP1_year <- subset( CHP1_year, select = c(-Async,
                                                -AsynStep,
                                                -CHP1value,
@@ -287,11 +287,11 @@ for (YY in yearSTA:yearEND) {
 
     names(CHP1_year)[names(CHP1_year) == "Date30"] <- "Date"
 
-    ## Drop night data
+    ## __ Drop night data ------------------------------------------------------
     CHP1_year <- CHP1_year[ Elevat > QS$sun_elev_min,    ]
     cat(sprintf(" %6d   %s\n", nrow(CHP1_year), "Records without night from CHP-1"),"\n")
 
-    ## don't allow negative values when sun is too low
+    ## __ Zero negative values when sun is too low -----------------------------
     sel <- CHP1_year[ Elevat < QS$sun_elev_no_neg & wattDIR < 0, .N ]
     CHP1_year[ Elevat < QS$sun_elev_no_neg & wattDIR < 0, wattDIR        := 0 ]
     CHP1_year[ Elevat < QS$sun_elev_no_neg & wattDIR < 0, wattDIR_tmp_cr := 0 ]
@@ -301,7 +301,7 @@ for (YY in yearSTA:yearEND) {
 
 
 
-    ####  Get Global  #####
+    ##  Get Global  ------------------------------------------------------------
     year_file <- paste0(CM21_BASE_IN, "LAP_CM21_H_L1_", YY, ".Rds")
     cat( paste(year_file), "\n\n")
     if ( !file.exists(year_file) ) { stop("Missing input file ", year_file) }
@@ -311,12 +311,12 @@ for (YY in yearSTA:yearEND) {
     if (TESTING) { CM21_year <- CM21_year[ 1:TESTING_NP, ] }
 
 
-    ## Drop night data
+    ## __ Drop night data  -----------------------------------------------------
     CM21_year <- CM21_year[ Elevat > QS$sun_elev_min ]
     cat(sprintf( " %6d   %s\n", nrow(CM21_year), "Records without night from CM-21"),"\n")
 
 
-    ## Don't allow negative values when sun is too low
+    ## __ Zero negative values when sun is too low  ----------------------------
     sel <- CM21_year[ Elevat < QS$sun_elev_no_neg & wattGLB < 0, .N ]
     CM21_year[        Elevat < QS$sun_elev_no_neg & wattGLB < 0, wattGLB := 0 ]
     cat(sprintf( " %6d   %s\n", sel, "Negative Records from CM-21 near sunset sunrise set to zero!"),"\n")
@@ -336,13 +336,13 @@ for (YY in yearSTA:yearEND) {
     levels(DATA_year$QCF_GLB) <- categories
 
 
-    ## create diffuse irradiance
+    ##  Diffuse irradiance  ----------------------------------------------------
     DATA_year[ , wattDIF            := DATA_year$wattGLB - DATA_year$wattHOR ]
 
-    ## create clearness index k_t
+    ##  Clearness index k_t  ---------------------------------------------------
     DATA_year[ , Clearness_Kt       := wattGLB / ( cosde(SZA) * TSIextEARTH_comb ) ]
 
-    ## Diffuse fraction k_d
+    ##  Diffuse fraction k_d  --------------------------------------------------
     DATA_year[ , DiffuseFraction_Kd := wattDIF / wattGLB ]
 
     ## create a time of day representation
@@ -367,7 +367,7 @@ for (YY in yearSTA:yearEND) {
         DATA_year$QCF_DIR_01[ DSWdn_min ]                         <- "Physical possible limit min (5)"
         DATA_year$QCF_DIR_01[ DSWdn_max ]                         <- "Physical possible limit max (6)"
 
-        ## . . Global ------------------------------------------------------####
+        ## . . Global ----------------------------------------------------------
         GSWdn_min                 <- DATA_year$wattGLB  <  QS$glo_SWdn_min
         Global_max_physical_limit <- DATA_year$TSIextEARTH_comb * 1.5 * cosde(DATA_year$SZA)^1.2 + 100
         GSWdn_max                 <- DATA_year$wattGLB  >  Global_max_physical_limit
@@ -375,7 +375,7 @@ for (YY in yearSTA:yearEND) {
         DATA_year$QCF_GLB_01[ GSWdn_min ]                         <- "Physical possible limit min (5)"
         DATA_year$QCF_GLB_02[ GSWdn_max ]                         <- "Physical possible limit max (6)"
 
-        ## . . Info --------------------------------------------------------####
+        ## . . Info ------------------------------------------------------------
         cat(sprintf( " %6d    %s\n\n",      sum(DSWdn_max, na.rm = T), "Direct Records above physical limit (6)"))
         cat(sprintf( " %6d    %s [%s]\n\n", sum(DSWdn_min, na.rm = T), "Direct Records below physical limit (5)", QS$dir_SWdn_min))
         cat(sprintf( " %6d    %s\n\n",      sum(GSWdn_max, na.rm = T), "Global Records above physical limit (6)"))

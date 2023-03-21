@@ -15,17 +15,13 @@ library(knitr)
 setwd("~/RAD_QC/")
 
 
-## environmental variables are killed by rm(ls) inside each script
-
-OUTPUT_FORMAT <- NULL
-
 
 ####  render scripts  ####
 
 
-# render("./QCRad_LongShi_v8_id_CM21_CHP1.R",
-#        clean                = TRUE,
-#        output_dir           = "./REPORTS/")
+render("./QCRad_LongShi_v8_id_CM21_CHP1.R",
+       clean                = TRUE,
+       output_dir           = "./REPORTS/")
 
 
 render("./QCRad_LongShi_v8_apply_CM21_CHP1.R",
@@ -34,11 +30,6 @@ render("./QCRad_LongShi_v8_apply_CM21_CHP1.R",
 
 
 
-
-
-## some more nice plots
-
-# source("./CM21_P98_Plot_all_years_LAP.R")
 
 
 
