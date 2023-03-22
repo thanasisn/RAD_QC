@@ -649,17 +649,21 @@ if (TEST_04) {
 if (TEST_05) {
     cat(paste("\n5. Tracking test.\n\n"))
     ## criteria
-    QS$ClrSW_lim  <-    0.85
-    QS$glo_min    <-   25
+    QS$Tracking_min_elev <-    3
+    QS$ClrSW_lim         <-    0.85
+    QS$glo_min           <-   25
     ## Global Clear SW model
-    QS$ClrSW_a    <- 1050.5
-    QS$ClrSW_b    <-    1.095
+    QS$ClrSW_a           <- 1050.5
+    QS$ClrSW_b           <-    1.095
     ## Clear Sky Sort-Wave model
     DATA[, ClrSW_ref2 := ( QS$ClrSW_a / sun_dist ^ 2 ) * cosde(SZA) ^ QS$ClrSW_b ]
     # DATA[, ClrSW_ref1 := TSIextEARTH_comb * cosde(SZA) ^ QS$ClrSW_b ]
 
     ## . . Direct ----------------------------------------------------------####
-    DATA[wattGLB / ClrSW_ref2 > QS$ClrSW_lim & wattDIF / wattGLB > QS$ClrSW_lim & wattGLB > QS$glo_min,
+    DATA[wattGLB / ClrSW_ref2 > QS$ClrSW_lim &
+         wattDIF / wattGLB    > QS$ClrSW_lim &
+         wattGLB              > QS$glo_min   &
+         Elevat               > QS$Tracking_min_elev,
          QCF_DIR_05 := "Possible no tracking (24)"]
 
     pander(table(DATA$QCF_DIR_05, exclude = T))
