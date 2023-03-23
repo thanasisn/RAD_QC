@@ -774,12 +774,15 @@ if (TEST_06) {
     DATA[wattDIF - RaylDIFF < QS$Rayleigh_lower_lim,
          QCF_BTH_06_2 := "Rayleigh diffuse limit (18)" ]
 
-    table(DATA$QCF_BTH_06_1, exclude = TRUE)
-    table(DATA$QCF_BTH_06_2, exclude = TRUE)
 }
 
 #+ echo=F, include=T, results="asis"
 if (TEST_06) {
+
+    cat(pander(table(DATA$QCF_BTH_06_1, exclude = TRUE)))
+    cat("\n\n")
+    cat(pander(table(DATA$QCF_BTH_06_2, exclude = TRUE)))
+    cat("\n\n")
 
     hist( DATA[, wattDIF - RaylDIFF ], breaks = 100 )
 
