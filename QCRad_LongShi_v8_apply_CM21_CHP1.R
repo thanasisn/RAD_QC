@@ -52,10 +52,12 @@
 #' reads: QCRad_LongShi_v8_id_*
 #'
 #' exports:
+#'
 #' - `Broad_Band/QCRad_LongShi/QCRad_LongShi_v8_apply_CM21_CHP1_YYYY.Rds`
 #' - Plots at runtime or render
 #'
-#' TODO
+#' TODO:
+#'
 #' - plot combination of flag for each point
 #' - plot cumulative graphs like the old
 #' - Plot daily graphs with all available flags
@@ -77,10 +79,11 @@ knitr::opts_chunk$set(cache      =  FALSE   )
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "./QCRad_LongShi_v8_apply_CM21_CHP1.R"
+lockfile    <- paste0("~/RAD_QC/RUNTIME/",
+                      basename(sub("\\.R$",".stopfile", Script.Name)))
 if (!interactive()) {
-    pdf(    file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(   file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
-    filelock::lock(paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".loc", Script.Name))), timeout = 100)
+    pdf( file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink(file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
 }
 
 library(scales)
@@ -88,7 +91,10 @@ library(data.table)
 library(pander)
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/RAD_QC/Functions_write_data.R")
+source("~/CODE/FUNCTIONS/R/execlock.R")
 
+mylock(lockfile)
+on.exit(myunlock(lockfile))
 
 ####_  Variables init  _####
 DATA_BASE    <- "~/DATA/Broad_Band/QCRad_LongShi/"
@@ -184,8 +190,6 @@ QS$sun_elev_no_neg  <-    0         # 0. Don't allow negative values below this 
 
 
 
-
-
 ####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ----------------------------------
 #' \FloatBarrier
 #' \newpage
@@ -220,21 +224,25 @@ if (TEST_01) {
     ## . . Global --------------------------------------------------------------
     DATA[wattGLB < QS$glo_SWdn_min,
          QCF_GLB_01 := "Physical possible limit min (5)"]
-    DATA[, Glo_max_ref := TSIextEARTH_comb * QS$glo_SWdn_amp * cosde(SZA) ^ 1.2 + QS$glo_SWdn_off]
+    DATA[, Glo_max_ref := TSIextEARTH_comb * QS$glo_SWdn_amp * cosde(SZA)^1.2 + QS$glo_SWdn_off]
     DATA[wattGLB > Glo_max_ref,
          QCF_GLB_01 := "Physical possible limit max (6)"]
 }
 
-#+ echo=F, include=T
-if (TEST_04) {
+#+ echo=F, include=T, results="asis"
+if (TEST_01) {
 
     cat(pander(table(DATA$QCF_DIR_01, exclude = NULL)))
+    cat("\n\n")
     cat(pander(table(DATA$QCF_GLB_01, exclude = NULL)))
+    cat("\n\n")
 
     range(DATA[, TSIextEARTH_comb - wattDIR ], na.rm = T)
+
     hist(DATA[,  TSIextEARTH_comb - wattDIR ], breaks = 100)
 
     range(DATA[, Glo_max_ref - wattGLB ], na.rm = T)
+
     hist(DATA[,  Glo_max_ref - wattGLB ], breaks = 100)
 
     if (DO_PLOTS) {
@@ -301,8 +309,8 @@ if (TEST_02) {
     QS$dir_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
     QS$glo_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
     # Compute reference values
-    DATA[, Direct_max := TSIextEARTH_comb * QS$Dir_SWdn_amp * cosde(SZA) ^ 0.2 + QS$Dir_SWdn_off]
-    DATA[, Global_max := TSIextEARTH_comb * QS$Glo_SWdn_amp * cosde(SZA) ^ 1.2 + QS$Glo_SWdn_off]
+    DATA[, Direct_max := TSIextEARTH_comb * QS$Dir_SWdn_amp * cosde(SZA)^0.2 + QS$Dir_SWdn_off]
+    DATA[, Global_max := TSIextEARTH_comb * QS$Glo_SWdn_amp * cosde(SZA)^1.2 + QS$Glo_SWdn_off]
     # Ignore too low values near horizon
     DATA[Direct_max < 3, Direct_max := NA]
     DATA[Global_max < 3, Direct_max := NA]
@@ -316,11 +324,13 @@ if (TEST_02) {
     DATA[wattGLB > Global_max,          QCF_GLB_02 := "Extremely rare limits max (4)"]
 }
 
-#+ echo=F, include=T
+#+ echo=F, include=T, results="asis"
 if (TEST_02) {
 
-    pander(table(DATA$QCF_DIR_02, exclude = TRUE))
-    pander(table(DATA$QCF_GLB_02, exclude = TRUE))
+    cat(pander(table(DATA$QCF_DIR_02, exclude = TRUE)))
+    cat("\n\n")
+    cat(pander(table(DATA$QCF_GLB_02, exclude = TRUE)))
+    cat("\n\n")
 
     range(DATA[, Direct_max - wattDIR])
     hist(DATA[, Direct_max - wattDIR], breaks = 100)
@@ -408,10 +418,13 @@ if (TEST_03) {
          QCF_BTH_03_2 := "Diffuse ratio comp min (12)"]
 }
 
-#+ echo=F, include=T
+#+ echo=F, include=T, results="asis"
 if (TEST_03) {
-    pander(table(DATA$QCF_BTH_03_1, exclude = TRUE))
-    pander(table(DATA$QCF_BTH_03_2, exclude = TRUE))
+
+    cat(pander(table(DATA$QCF_BTH_03_1, exclude = TRUE)))
+    cat("\n\n")
+    cat(pander(table(DATA$QCF_BTH_03_2, exclude = TRUE)))
+    cat("\n\n")
 
     years <- DATA[ !is.na(DiffuseFraction_Kd), unique(year(Date)) ]
     for (ay in years) {
@@ -534,13 +547,17 @@ if (TEST_04) {
          QCF_GLB_04_2 := "Second climatological limit (16)"]
 }
 
-#+ echo=F, include=T
+#+ echo=F, include=T, results="asis"
 if (TEST_04) {
 
-    pander(table(DATA$QCF_GLB_04_1, exclude = NULL))
-    pander(table(DATA$QCF_GLB_04_2, exclude = NULL))
-    pander(table(DATA$QCF_DIR_04_1, exclude = NULL))
-    pander(table(DATA$QCF_DIR_04_2, exclude = NULL))
+    cat(pander(table(DATA$QCF_GLB_04_1, exclude = NULL)))
+    cat("\n\n")
+    cat(pander(table(DATA$QCF_GLB_04_2, exclude = NULL)))
+    cat("\n\n")
+    cat(pander(table(DATA$QCF_DIR_04_1, exclude = NULL)))
+    cat("\n\n")
+    cat(pander(table(DATA$QCF_DIR_04_2, exclude = NULL)))
+    cat("\n\n")
 
     hist(DATA[, wattDIR - Dir_First_Clim_lim], breaks = 100,
          main = "Departure Direct from first climatological limti")
@@ -657,7 +674,7 @@ if (TEST_04) {
 if (TEST_05) {
     cat(paste("\n5. Tracking test.\n\n"))
     ## criteria
-    QS$Tracking_min_elev <-   10
+    QS$Tracking_min_elev <-   15
     QS$ClrSW_lim         <-    0.85
     QS$glo_min           <-   25
     ## Global Clear SW model
@@ -675,9 +692,11 @@ if (TEST_05) {
          QCF_DIR_05 := "Possible no tracking (24)"]
 }
 
-#+ echo=F, include=T
+#+ echo=F, include=T, results="asis"
 if (TEST_05) {
-    pander(table(DATA$QCF_DIR_05, exclude = T))
+
+    cat(pander(table(DATA$QCF_DIR_05, exclude = T)))
+    cat("\n\n")
 
     hist(DATA[, ClrSW_ref2 - wattDIR ], breaks = 100)
     hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100)
@@ -759,8 +778,9 @@ if (TEST_06) {
     table(DATA$QCF_BTH_06_2, exclude = TRUE)
 }
 
-#+ echo=F, include=T
+#+ echo=F, include=T, results="asis"
 if (TEST_06) {
+
     hist( DATA[, wattDIF - RaylDIFF ], breaks = 100 )
 
     if ( any(!is.na(DATA$QCF_BTH_06_1)) ) {
@@ -940,8 +960,10 @@ if (TEST_08) {
 #+ echo=F
 if (TEST_08) {
 
-    pander(table(DATA$QCF_BTH_08_1, exclude = TRUE))
-    pander(table(DATA$QCF_BTH_08_2, exclude = TRUE))
+    cat(pander(table(DATA$QCF_BTH_08_1, exclude = TRUE)))
+    cat("\n\n")
+    cat(pander(table(DATA$QCF_BTH_08_2, exclude = TRUE)))
+    cat("\n\n")
 
     hist(DATA[ !is.na(QCF_BTH_08_1), Relative_diffuse], breaks = 100)
     hist(DATA[ !is.na(QCF_BTH_08_2), Relative_diffuse], breaks = 100)
@@ -1045,9 +1067,11 @@ if (TEST_09) {
 
 }
 
-#+ echo=F, include=T
+#+ echo=F, include=T, results="asis"
 if (TEST_09) {
-    pander(table(DATA$QCF_GLB_09, exclude = TRUE))
+
+    cat(pander(table(DATA$QCF_GLB_09, exclude = TRUE)))
+    cat("\n\n")
 
     range(DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], na.rm = T)
     hist( DATA[Elevat > QS$CL_idx_ele, Clearness_Kt], breaks = 100 )
@@ -1128,7 +1152,8 @@ for (YYYY in unique(year(DATA$Date))) {
 }
 
 
-#'
+
+
 #' **END**
 #+ include=T, echo=F
 tac <- Sys.time()

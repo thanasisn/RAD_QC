@@ -67,9 +67,9 @@ knitr::opts_chunk$set(echo       =  FALSE   )
 knitr::opts_chunk$set(comment    = ""       )
 # knitr::opts_chunk$set(dev        = "pdf"   )
 knitr::opts_chunk$set(dev        = "png"    )
-knitr::opts_chunk$set(out.width  = "100%"   )
+knitr::opts_chunk$set(out.height = "30%"    )
 knitr::opts_chunk$set(fig.align  = "center" )
-knitr::opts_chunk$set(cache      =  FALSE    )
+knitr::opts_chunk$set(cache      =  FALSE   )
 # knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
@@ -77,17 +77,22 @@ knitr::opts_chunk$set(cache      =  FALSE    )
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "./QCRad_LongShi_v8_id_CM21_CHP1.R"
+lockfile    <- paste0("~/RAD_QC/RUNTIME/",
+                      basename(sub("\\.R$",".stopfile", Script.Name)))
 if (!interactive()) {
-    pdf(    file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(   file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
-    filelock::lock(paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".loc", Script.Name))), timeout = 0)
+    pdf( file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
+    sink(file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
 }
 
 library(scales)
 library(data.table)
+library(pander)
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/RAD_QC/Functions_write_data.R")
+source("~/CODE/FUNCTIONS/R/execlock.R")
 
+mylock(lockfile)
+on.exit(myunlock(lockfile))
 
 ####  Variables init  ####
 
