@@ -129,7 +129,7 @@ QS <- list(
     NULL
 )
 ## Obstacles definitions
-load("~/Aerosols/source_R/Obstacles.Rda")
+load("~/RAD_QC/Obstacles.Rda")
 
 DO_TEST_01 <- TRUE   # Physically Possible Limits
 DO_TEST_02 <- TRUE   # Extremely Rare Limits
