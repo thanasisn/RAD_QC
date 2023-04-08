@@ -94,7 +94,7 @@ source("~/RAD_QC/Functions_write_data.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 
 mylock(lockfile)
-on.exit(myunlock(lockfile))
+
 
 ####_  Variables init  _####
 DATA_BASE    <- "~/DATA/Broad_Band/QCRad_LongShi/"
@@ -1159,5 +1159,6 @@ for (YYYY in unique(year(DATA$Date))) {
 
 #' **END**
 #+ include=T, echo=F
+myunlock(lockfile)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))

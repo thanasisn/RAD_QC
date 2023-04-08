@@ -92,7 +92,7 @@ source("~/RAD_QC/Functions_write_data.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 
 mylock(lockfile)
-on.exit(myunlock(lockfile))
+
 
 ####  Variables init  ####
 
@@ -284,10 +284,7 @@ for (YY in yearSTA:yearEND) {
                                                -CHP1value,
                                                -CHP1sd,
                                                -DumDarkCHP1,
-                                               -Date,
-                                               -rel_Time,
-                                               -rel_Elev,
-                                               -Times
+                                               -Date
     ))
 
     names(CHP1_year)[names(CHP1_year) == "Date30"] <- "Date"
@@ -1482,5 +1479,6 @@ for (YY in yearSTA:yearEND) {
 
 #' **END**
 #+ include=T, echo=F
+myunlock(lockfile)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
