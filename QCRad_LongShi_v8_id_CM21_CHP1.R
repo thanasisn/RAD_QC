@@ -234,7 +234,7 @@ yearEND <- as.numeric(format(x = as.POSIXct(Sys.Date()), format = "%Y"))
 
 
 ## graph options
-par(mar = c(2,4,1.1,.5))
+par(mar = c(2, 4, 1.1,.5))
 par(pch = 19)
 xlim <- c(18, 92)
 
@@ -270,6 +270,7 @@ for (YY in yearSTA:yearEND) {
         Date30    <- Date + 30
         temp      <- data.table(Date, Date30)
         temp[, (cols) := NA ]
+        ## Use an empty table
         CHP1_year <- temp
         rm(temp)
     } else {
@@ -322,7 +323,7 @@ for (YY in yearSTA:yearEND) {
     sel <- CM21_year[ Elevat < QS$sun_elev_no_neg & wattGLB < 0, .N ]
     CM21_year[        Elevat < QS$sun_elev_no_neg & wattGLB < 0, wattGLB := 0 ]
     cat(sprintf( " %6d   %s\n", sel, "Negative Records from CM-21 near sunset sunrise set to zero!"),"\n")
-
+stop()
     ## unify data
     DATA_year <- merge( CHP1_year, CM21_year, all  = TRUE  )
     DATA_year <- merge( DATA_year, tsi_build, by.x = "Date", by.y = "nominal_dates", all.x = T)
@@ -339,7 +340,7 @@ for (YY in yearSTA:yearEND) {
 
 
     ##  Diffuse irradiance  ----------------------------------------------------
-    DATA_year[ , wattDIF            := DATA_year$wattGLB - DATA_year$wattHOR ]
+    DATA_year[ , wattDIF            := DATA_year$wattGLB - DATA_year$wattDIR ]
 
     ##  Clearness index k_t  ---------------------------------------------------
     DATA_year[ , Clearness_Kt       := wattGLB / ( cosde(SZA) * TSIextEARTH_comb ) ]
@@ -488,9 +489,6 @@ for (YY in yearSTA:yearEND) {
         ## Create Clear Sky Sort-Wave model
         DATA_year[ , ClrSW := ( QS$ClrSW_a / sun_dist**2 ) * cosde(SZA)**QS$ClrSW_b ]
 
-        # sel <- DATA_year[ is.na(DATA_year$QCF_DIR) &
-        #                       wattGLB / ClrSW   > QS$ClrSW_lim &
-        #                       wattDIF / wattGLB > QS$ClrSW_lim, .N ]
 
         ## apply test
         DATA_year[ wattGLB / ClrSW   > QS$ClrSW_lim &
@@ -1405,75 +1403,28 @@ for (YY in yearSTA:yearEND) {
     # m <- with(tempplto, tapply(wattGLB, list(Azimuth, Elevat), I))
 
 
-    #### ~ ~ ~ ~  Data export ~ ~ ~ ~ ##########################################
-    cat(paste("\nExport Data.\n\n"))
-
-    ## . . gather all suspect points for export ----------------------------####
-    # suspect_choose  <- DATA_year$QCF_DIR != "good" | DATA_year$QCF_GLB != "good"
-    # SUS_DATA        <- DATA_year[suspect_choose,]
-    # SUS_DATA        <- SUS_DATA[order(SUS_DATA$Date30),]
-    # SUS_DATA_gather <- rbind(SUS_DATA_gather, SUS_DATA)
-
-    # ## gather all suspect dates for export
-    # daysinfo        <- SUS_DATA[,c("Date30","QCF_DIR","QCF_GLB")]
-    # daysinfo$Day    <- as.Date(daysinfo$Date30)
-    # daysinfo$Date30 <- NULL
-    # daysinfo        <- daysinfo[order(daysinfo$Day),]
-    # daysinfo        <- unique(daysinfo)
-    # daysinfo_gather <- rbind(daysinfo_gather, daysinfo)
 
 
     ## . . Prepare main data for export ------------------------------------####
+    cat(paste("\nExport Data.\n\n"))
 
     ## Drop some columns ##
     DATA_year <- subset( DATA_year, select = c(-Pressure_Source,
                                                -Times
     ))
 
-
-#    ## Do some filtering (data drop) ##
-#
-#    ## Drop empty records
-#    empty     <- is.na(DATA_year$wattDIR) & is.na(DATA_year$wattGLB)
-#    DATA_year <- DATA_year[ !empty, ]
-#
-#    ## save data identification
-#    DATA_year <- DATA_year[ DATA_year$Date < LAST_DAY_EXPR , ]
-#    DATA_year <- DATA_year[ DATA_year$Date > PROJECT_START , ]
+    ## . . Export main data ------------------------------------------------####
+    if ( !TESTING & dim(DATA_year)[1] > 0 ) {
+        write_RDS(object = DATA_year,
+                  file   = paste0(OUTPUT_BASE,
+                                  basename(sub("\\.R$","_", Script.Name)), YY))
+    }
+    ##------------------------------------------------------------------------##
 
 
-
-   ## . . Export main data -------------------------------------------------####
-   if ( !TESTING & dim(DATA_year)[1] > 0 ) {
-       write_RDS(object = DATA_year,
-                 file   = paste0(OUTPUT_BASE,
-                                 basename(sub("\\.R$","_", Script.Name)), YY))
-   }
-   ##-------------------------------------------------------------------------##
-
-
-#    ##-- Strict output for clear sky use ---------------------------------------
-#    allow <- c( "good", "Possible Direct Obstruction (23)")
-#    sels  <- DATA_year$QCF_DIR %in% allow | DATA_year$QCF_GLB %in% allow
-#    STRICT_data <- DATA_year[sels,]
-#
-#    STRICT_data <- subset(STRICT_data, select = c( -CHP1temp,
-#                                                   -CHP1tempSD,
-#                                                   -CHP1tempUNC,
-#                                                   -chp1TempCF,
-#                                                   -TSIextEARTH_comb
-#                                                   ))
-#
-#    ##-- Export strict data --------------------------------------------------##
-#    if ( !TESTING & dim(STRICT_data)[1] > 0 ) {
-#        myRtools::write_RDS(object = STRICT_data, paste0(OUTPUT_STRICT,YY)) }
-#    ##------------------------------------------------------------------------##
 
 }
 
-# ##-- Export a record of the bad data -----------------------------------------##
-# if (!TESTING) myRtools::write_RDS( SUS_DATA_gather, SUSPECTS_EXP )
-# ##----------------------------------------------------------------------------##
 
 
 
