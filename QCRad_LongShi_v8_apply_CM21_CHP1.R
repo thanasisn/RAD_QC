@@ -34,12 +34,14 @@
 #'     fig_width:        8
 #'     fig_height:       5
 #'   html_document:
-#'     toc: true
+#'     toc:        true
 #'     fig_width:  9
 #'     fig_height: 4
-#'   pdf_document:
+#'
 #' date: "`r format(Sys.time(), '%F')`"
+#'
 #' ---
+
 #'
 #' **Source code: [github.com/thanasisn/RAD_QC](https://github.com/thanasisn/RAD_QC)**
 #'
@@ -75,7 +77,7 @@ knitr::opts_chunk$set(cache      =  FALSE   )
 # knitr::opts_chunk$set(fig.pos    = '!h'    )
 
 
-####_  Set environment  _####
+## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
 Script.Name <- "./QCRad_LongShi_v8_apply_CM21_CHP1.R"
