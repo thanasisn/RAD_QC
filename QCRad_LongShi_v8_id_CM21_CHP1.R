@@ -112,7 +112,7 @@ template_file  <- "~/DATA/Broad_Band/LAP_CHP1_L1_2016.Rds"
 
 ## date to start run
 PROJECT_START  <- as.POSIXct("1993-01-01")  ## when both instruments were operational
-LAST_DAY_EXPR  <- as.POSIXct("2023-01-01")  ## day of last manual data clean
+# LAST_DAY_EXPR  <- as.POSIXct("2023-01-01")  ## day of last manual data clean
 
 
 
@@ -234,7 +234,7 @@ yearEND <- as.numeric(format(x = as.POSIXct(Sys.Date()), format = "%Y"))
 
 
 ## graph options
-par(mar = c(2, 4, 1.1,.5))
+par(mar = c(2, 4, 1.1, .5))
 par(pch = 19)
 xlim <- c(18, 92)
 
@@ -291,7 +291,7 @@ for (YY in yearSTA:yearEND) {
     names(CHP1_year)[names(CHP1_year) == "Date30"] <- "Date"
 
     ## __ Drop night data ------------------------------------------------------
-    CHP1_year <- CHP1_year[ Elevat > QS$sun_elev_min,    ]
+    CHP1_year <- CHP1_year[Elevat > QS$sun_elev_min, ]
     cat(sprintf(" %6d   %s\n", nrow(CHP1_year), "Records without night from CHP-1"),"\n")
 
     ## __ Zero negative values when sun is too low -----------------------------
@@ -323,7 +323,7 @@ for (YY in yearSTA:yearEND) {
     sel <- CM21_year[ Elevat < QS$sun_elev_no_neg & wattGLB < 0, .N ]
     CM21_year[        Elevat < QS$sun_elev_no_neg & wattGLB < 0, wattGLB := 0 ]
     cat(sprintf( " %6d   %s\n", sel, "Negative Records from CM-21 near sunset sunrise set to zero!"),"\n")
-stop()
+
     ## unify data
     DATA_year <- merge( CHP1_year, CM21_year, all  = TRUE  )
     DATA_year <- merge( DATA_year, tsi_build, by.x = "Date", by.y = "nominal_dates", all.x = T)
@@ -340,7 +340,10 @@ stop()
 
 
     ##  Diffuse irradiance  ----------------------------------------------------
-    DATA_year[ , wattDIF            := DATA_year$wattGLB - DATA_year$wattDIR ]
+    DATA_year[ , wattDIF            := DATA_year$wattGLB - DATA_year$wattHOR ]
+    warning(" * * wattDIF is no Diffuse radiation !! ** ")
+    cat("\n\n * * wattDIF is no Diffuse radiation !! ** \n\n")
+
 
     ##  Clearness index k_t  ---------------------------------------------------
     DATA_year[ , Clearness_Kt       := wattGLB / ( cosde(SZA) * TSIextEARTH_comb ) ]
@@ -1420,7 +1423,6 @@ stop()
                                   basename(sub("\\.R$","_", Script.Name)), YY))
     }
     ##------------------------------------------------------------------------##
-
 
 
 }
