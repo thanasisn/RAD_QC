@@ -126,7 +126,7 @@ TEST_08  <- TRUE
 TEST_09  <- TRUE
 
 ## mostly for daily plots
-DO_PLOTS     <- TRUE
+DO_PLOTS     <- FALSE  ## too many plots to render daily
 if (interactive()) {
     DO_PLOTS <- FALSE
 }
