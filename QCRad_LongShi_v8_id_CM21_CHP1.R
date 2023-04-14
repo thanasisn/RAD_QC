@@ -438,8 +438,8 @@ for (YY in yearSTA:yearEND) {
                     DATA_year$wattGLB            >  50
         DFR_prop <- DFR_A | DFR_B
 
-        DATA_year$QCF_GLB_03.1[ DFR_prop ]                       <- "Diffuse ratio comp max (11)"
-        DATA_year$QCF_DIR_03.1[ DFR_prop ]                       <- "Diffuse ratio comp max (11)"
+        DATA_year$QCF_GLB_03.1[ DFR_prop ]                      <- "Diffuse ratio comp max (11)"
+        DATA_year$QCF_DIR_03.1[ DFR_prop ]                      <- "Diffuse ratio comp max (11)"
 
         ## . . Extra filters by me -----------------------------------------####
         DFR_low <- DATA_year$DiffuseFraction_Kd < QS$dif_rati_min
