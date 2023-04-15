@@ -882,6 +882,7 @@ if (TEST_06) {
 #' \newpage
 #' ## 7. Test for obstacles
 #'
+#' This is deactivated
 #'
 #+ echo=TEST_07, include=T
 if (TEST_07) {
