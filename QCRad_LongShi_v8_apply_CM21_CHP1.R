@@ -99,11 +99,14 @@ source("~/CODE/FUNCTIONS/R/execlock.R")
 
 
 ####_  Variables init  _####
-DATA_BASE    <- "~/DATA/Broad_Band/QCRad_LongShi/"
-IN_PREFIX    <- "LAP_QCRad_LongShi_v8_id_CM21_CHP1_"
-cachedata    <- "~/RAD_QC/temp_data.Rds"
+DATA_BASE <- "~/DATA/Broad_Band/QCRad_LongShi/"
+IN_PREFIX <- "LAP_QCRad_LongShi_v8_id_CM21_CHP1_"
+cachedata <- "~/RAD_QC/temp_data.Rds"
 
 #### ~ ~ Execution control ~ ~ ####
+
+## use cach data for development only
+FORCE_NEW_DATA <- TRUE
 
 TEST_01  <- FALSE
 TEST_02  <- FALSE
@@ -142,7 +145,8 @@ fileslist <- list.files(path    = DATA_BASE,
                         full.names = TRUE)
 fileslist <- sort(fileslist)
 ## read data or load cached
-if (!file.exists(cachedata)) {
+
+if (FORCE_NEW_DATA || !file.exists(cachedata)) {
     DATA <- data.table()
     for (afl in fileslist) {
         tmp  <- readRDS(afl)
