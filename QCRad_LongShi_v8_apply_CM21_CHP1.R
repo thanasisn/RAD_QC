@@ -105,7 +105,8 @@ cachedata <- "~/RAD_QC/temp_data.Rds"
 
 #### ~ ~ Execution control ~ ~ ####
 
-## use cach data for development only
+
+## use cache data for development only
 FORCE_NEW_DATA <- TRUE
 
 TEST_01  <- FALSE
