@@ -91,7 +91,7 @@ source("~/CODE/FUNCTIONS/R/trig_deg.R")
 source("~/RAD_QC/Functions_write_data.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 
-mylock(lockfile)
+# mylock(lockfile)
 
 
 ####  Variables init  ####
@@ -204,8 +204,13 @@ categories = c(
 
 ## . Load TSI data  ------------------------------------------------------- ####
 tsi_build     <- data.table(readRDS( file = tsi_build_Rdat ))
-names(tsi_build)[names(tsi_build) == "Date"] <- "nominal_dates"
-tsi_build     <- tsi_build[, c("nominal_dates", "TSIextEARTH_comb", "tsi_1au_comb", "sun_dist")]
+names(tsi_build)[names(tsi_build) == "Date"]   <- "nominal_dates"
+names(tsi_build)[names(tsi_build) == "Source"] <- "TSI_Source"
+tsi_build     <- tsi_build[, c("nominal_dates",
+                               "TSIextEARTH_comb",
+                               "tsi_1au_comb",
+                               "sun_dist",
+                               "TSI_Source")]
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
@@ -1435,6 +1440,6 @@ for (YY in yearSTA:yearEND) {
 
 #' **END**
 #+ include=T, echo=F
-myunlock(lockfile)
+# myunlock(lockfile)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
