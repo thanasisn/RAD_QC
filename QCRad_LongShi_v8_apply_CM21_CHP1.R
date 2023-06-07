@@ -108,6 +108,7 @@ cachedata <- "~/RAD_QC/temp_data.Rds"
 
 ## use cache data for development only
 FORCE_NEW_DATA <- TRUE
+# FORCE_NEW_DATA <- FALSE
 
 TEST_01  <- FALSE
 TEST_02  <- FALSE
@@ -190,8 +191,8 @@ pander(pp, caption = "Input files")
 #'
 #+ echo=T, include=T
 QS <- list()
-QS$sun_elev_min     <-   -2 * 0.103 # 0. Drop all data when sun is below this point
-QS$sun_elev_no_neg  <-    0         # 0. Don't allow negative values below this sun angle
+QS$sun_elev_min     <- -2 * 0.103 # 0. Drop all data when sun is below this point
+QS$sun_elev_no_neg  <-  0         # 0. Don't allow negative values below this sun angle
 
 
 
@@ -693,7 +694,7 @@ if (TEST_05) {
 
     ## . . Direct --------------------------------------------------------------
     DATA[wattGLB / ClrSW_ref2 > QS$ClrSW_lim &
-         wattDIF / wattGLB    > QS$ClrSW_lim &
+         DIF_HOR / wattGLB    > QS$ClrSW_lim &
          wattGLB              > QS$glo_min   &
          Elevat               > QS$Tracking_min_elev,
          QCF_DIR_05 := "Possible no tracking (24)"]
@@ -707,7 +708,7 @@ if (TEST_05) {
 
     hist(DATA[, ClrSW_ref2 - wattDIR ], breaks = 100)
     hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100)
-    hist(DATA[, wattDIF / wattGLB    ], breaks = 100)
+    hist(DATA[, DIF_HOR / wattGLB    ], breaks = 100)
 
     if (DO_PLOTS) {
         tmp <- DATA[ !is.na(QCF_DIR_05), unique(as.Date(Date)) ]
@@ -776,9 +777,9 @@ if (TEST_06) {
     DATA[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
 
     ## . . Both ----------------------------------------------------------------
-    DATA[wattDIF - RaylDIFF > QS$Rayleigh_upper_lim,
+    DATA[DIF_HOR - RaylDIFF > QS$Rayleigh_upper_lim,
          QCF_BTH_06_1 := "Rayleigh diffuse limit (18)" ]
-    DATA[wattDIF - RaylDIFF < QS$Rayleigh_lower_lim,
+    DATA[DIF_HOR - RaylDIFF < QS$Rayleigh_lower_lim,
          QCF_BTH_06_2 := "Rayleigh diffuse limit (18)" ]
 
 }
@@ -791,14 +792,14 @@ if (TEST_06) {
     cat(pander(table(DATA$QCF_BTH_06_2, exclude = TRUE)))
     cat("\n\n")
 
-    hist( DATA[, wattDIF - RaylDIFF ], breaks = 100 )
+    hist( DATA[, DIF_HOR - RaylDIFF ], breaks = 100 )
 
     if ( any(!is.na(DATA$QCF_BTH_06_1)) ) {
-        hist( DATA[ !is.na(QCF_BTH_06_1), wattDIF - RaylDIFF ], breaks = 100)
+        hist( DATA[ !is.na(QCF_BTH_06_1), DIF_HOR - RaylDIFF ], breaks = 100)
     }
 
     if ( any(!is.na(DATA$QCF_BTH_06_2)) ) {
-        hist( DATA[ !is.na(QCF_BTH_06_2), wattDIF - RaylDIFF ], breaks = 100)
+        hist( DATA[ !is.na(QCF_BTH_06_2), DIF_HOR - RaylDIFF ], breaks = 100)
     }
 
     if (DO_PLOTS) {
@@ -813,8 +814,8 @@ if (TEST_06) {
             layout(matrix(c(1,2), 2, 1, byrow = TRUE))
             par(mar = c(2,4,2,1))
 
-            ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
-            plot( pp$Date, pp$wattDIF, "l",
+            ylim <- range(pp$DIF_HOR, pp$RaylDIFF, na.rm = T)
+            plot( pp$Date, pp$DIF_HOR, "l",
                   ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
             lines(pp$Date, pp$RaylDIFF, col = "magenta" )
             lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_upper_lim, col = "red" )
@@ -838,13 +839,13 @@ if (TEST_06) {
         ## plot on lower limit
         DATA[ !is.na(QCF_BTH_06_2) , .N]
         DATA[ !is.na(QCF_BTH_06_2) &
-                  (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) , .N]
+                  (DIF_HOR / wattGLB < QS$Rayleigh_dif_glo_r) , .N]
         DATA[ !is.na(QCF_BTH_06_2) &
-                  (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) &
+                  (DIF_HOR / wattGLB < QS$Rayleigh_dif_glo_r) &
                   wattGLB > QS$Rayleigh_glo_min , .N]
 
         tmp <- DATA[!is.na(QCF_BTH_06_2) &
-                        (wattDIF / wattGLB < QS$Rayleigh_dif_glo_r) &
+                        (DIF_HOR / wattGLB < QS$Rayleigh_dif_glo_r) &
                         wattGLB > QS$Rayleigh_glo_min ]
 
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
@@ -854,8 +855,8 @@ if (TEST_06) {
             layout(matrix(c(1,2), 2, 1, byrow = TRUE))
             par(mar = c(2,4,2,1))
 
-            ylim <- range(pp$wattDIF, pp$RaylDIFF, na.rm = T)
-            plot( pp$Date, pp$wattDIF, "l",
+            ylim <- range(pp$DIF_HOR, pp$RaylDIFF, na.rm = T)
+            plot( pp$Date, pp$DIF_HOR, "l",
                   ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
             lines(pp$Date, pp$RaylDIFF, col = "magenta" )
             lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_lower_lim, col = "red" )

@@ -345,6 +345,7 @@ for (YY in yearSTA:yearEND) {
 
 
     ##  Diffuse irradiance  ----------------------------------------------------
+    ## DHI = GHI – DNI cos(z)
     DATA_year[ , DIF_HOR            := DATA_year$wattGLB - DATA_year$wattHOR ]
     warning(" * * DIF_HOR is no Diffuse radiation !! ** ")
     cat("\n\n * * DIF_HOR is no Diffuse radiation !! ** \n\n")
