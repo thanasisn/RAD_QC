@@ -137,7 +137,7 @@ if (interactive()) {
 }
 
 ALL_YEAR <- TRUE
-# ALL_YEAR <- FALSE
+ALL_YEAR <- FALSE
 
 
 #+ echo=F, include=T
