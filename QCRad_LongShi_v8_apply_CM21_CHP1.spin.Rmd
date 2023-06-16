@@ -1,70 +1,69 @@
-# /* Copyright (C) 2022 Athanasios Natsis <natsisthanasis@gmail.com> */
-#' ---
-#' title:       "QCRad methodology apply."
-#' author:      "Natsis Athanasios"
-#' institute:   "AUTH"
-#' affiliation: "Laboratory of Atmospheric Physics"
-#' abstract:    "Data quality for radiation measurements as described by
-#'               CN Long and Y Shi, September 2006, DOE/SC-ARM/TR-074.
-#'               - The QCRad Value Added Product Surface
-#'               Radiation Measurement Quality Control Testing Including
-#'               Climatology_Long2006.pdf"
-#'
-#' documentclass: article
-#' classoption:   a4paper,oneside
-#' fontsize:      10pt
-#' geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
-#'
-#' link-citations:  yes
-#' colorlinks:      yes
-#'
-#' header-includes:
-#' - \usepackage{caption}
-#' - \usepackage{placeins}
-#' - \captionsetup{font=small}
-#'
-#' output:
-#'   bookdown::pdf_document2:
-#'     number_sections:  no
-#'     fig_caption:      no
-#'     keep_tex:         no
-#'     keep_md:          no
-#'     latex_engine:     xelatex
-#'     toc:              yes
-#'     fig_width:        8
-#'     fig_height:       5
-#'   html_document:
-#'     toc:        true
-#'     fig_width:  9
-#'     fig_height: 4
-#'
-#' date: "`r format(Sys.time(), '%F')`"
-#'
-#' ---
+---
+title:       "QCRad methodology apply."
+author:      "Natsis Athanasios"
+institute:   "AUTH"
+affiliation: "Laboratory of Atmospheric Physics"
+abstract:    "Data quality for radiation measurements as described by
+              CN Long and Y Shi, September 2006, DOE/SC-ARM/TR-074.
+              - The QCRad Value Added Product Surface
+              Radiation Measurement Quality Control Testing Including
+              Climatology_Long2006.pdf"
 
-#'
-#' **Source code: [github.com/thanasisn/RAD_QC](https://github.com/thanasisn/RAD_QC)**
-#'
-#' ### Notes ###
-#'
-#' Run for each year and apply Quality control on radiation data based on ID.
-#'
-#' The chosen levels and filters have to be evaluated with the available data.
-#'
-#' reads: QCRad_LongShi_v8_id_*
-#'
-#' exports:
-#'
-#' - `Broad_Band/QCRad_LongShi/QCRad_LongShi_v8_apply_CM21_CHP1_YYYY.Rds`
-#' - Plots at runtime or render
-#'
-#' TODO:
-#'
-#' - plot combination of flag for each point
-#' - plot cumulative graphs like the old
-#' - Plot daily graphs with all available flags
-#'
-#+ echo=F, include=T
+documentclass: article
+classoption:   a4paper,oneside
+fontsize:      10pt
+geometry:      "left=0.5in,right=0.5in,top=0.5in,bottom=0.5in"
+
+link-citations:  yes
+colorlinks:      yes
+
+header-includes:
+- \usepackage{caption}
+- \usepackage{placeins}
+- \captionsetup{font=small}
+
+output:
+  bookdown::pdf_document2:
+    number_sections:  no
+    fig_caption:      no
+    keep_tex:         no
+    keep_md:          no
+    latex_engine:     xelatex
+    toc:              yes
+    fig_width:        8
+    fig_height:       5
+  html_document:
+    toc:        true
+    fig_width:  9
+    fig_height: 4
+
+date: "`r format(Sys.time(), '%F')`"
+
+---
+
+**Source code: [github.com/thanasisn/RAD_QC](https://github.com/thanasisn/RAD_QC)**
+
+### Notes ###
+
+Run for each year and apply Quality control on radiation data based on ID.
+
+The chosen levels and filters have to be evaluated with the available data.
+
+reads: QCRad_LongShi_v8_id_*
+
+exports:
+
+- `Broad_Band/QCRad_LongShi/QCRad_LongShi_v8_apply_CM21_CHP1_YYYY.Rds`
+- Plots at runtime or render
+
+TODO:
+
+- plot combination of flag for each point
+- plot cumulative graphs like the old
+- Plot daily graphs with all available flags
+
+
+```{r echo=F, include=T}
 
 ####_  Document options _####
 knitr::opts_chunk$set(echo       =  FALSE   )
@@ -138,10 +137,11 @@ if (interactive()) {
 }
 
 ALL_YEAR <- TRUE
-# ALL_YEAR <- FALSE
+ALL_YEAR <- FALSE
 
 
-#+ echo=F, include=T
+```
+```{r echo=F, include=T}
 #### ~ ~ Load all data ~ ~ ####
 fileslist <- list.files(path    = DATA_BASE,
                         pattern = paste0(IN_PREFIX, ".*.Rds"),
@@ -172,14 +172,15 @@ if (!ALL_YEAR) {
 
 ## Obstacles definitions
 load("~/RAD_QC/Obstacles.Rda")
+```
 
 
-#'
-#' ### INPUT DATA
-#'
-#' **Data range: `r paste(range(DATA$Date), collapse = " to ")`**
-#'
-#+ echo=F, include=T
+### INPUT DATA
+
+**Data range: `r paste(range(DATA$Date), collapse = " to ")`**
+
+
+```{r echo=F, include=T}
 pp <- data.frame(basename(fileslist), file.mtime(fileslist))
 names(pp) <- c("Filename", "File mtime")
 pander(pp, caption = "Input files")
@@ -187,10 +188,13 @@ pander(pp, caption = "Input files")
 
 
 ## . . Limits definitions  ####
-#'
-#' ### Some filters definitions
-#'
-#+ echo=T, include=T
+```
+
+
+### Some filters definitions
+
+
+```{r echo=T, include=T}
 QS <- list()
 QS$sun_elev_min     <- -2 * 0.103 # 0. Drop all data when sun is below this point
 QS$sun_elev_no_neg  <-  0         # 0. Don't allow negative values below this sun angle
@@ -200,21 +204,24 @@ QS$sun_elev_no_neg  <-  0         # 0. Don't allow negative values below this su
 
 
 ####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ----------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
-#'
-#' Test values are within physical/logical limits.
-#'
-#' Direct upper constrain is a closeness to TSI at TOA. Shouldn't be any hits.
-#' or need to remove data.
-#'
-#' Global upper constrain is an modeled GHI value.
-#'
-#' These limit should not be met, they are defined neat the maximum observed
-#' values of the data set.
-#'
-#+ echo=TEST_01, include=T
+```
+
+\FloatBarrier
+\newpage
+## 1. PHYSICALLY POSSIBLE LIMITS PER BSRN
+
+Test values are within physical/logical limits.
+
+Direct upper constrain is a closeness to TSI at TOA. Shouldn't be any hits.
+or need to remove data.
+
+Global upper constrain is an modeled GHI value.
+
+These limit should not be met, they are defined neat the maximum observed
+values of the data set.
+
+
+```{r echo=TEST_01, include=T}
 if (TEST_01) {
     cat(paste("\n1. Physically Possible Limits.\n\n"))
 
@@ -238,7 +245,8 @@ if (TEST_01) {
          QCF_GLB_01 := "Physical possible limit max (6)"]
 }
 
-#+ echo=F, include=T, results="asis"
+```
+```{r echo=F, include=T, results="asis"}
 if (TEST_01) {
 
     cat(pander(table(DATA$QCF_DIR_01, exclude = NULL)))
@@ -291,22 +299,25 @@ if (TEST_01) {
     }
     # DATA$Glo_max_ref <- NULL
 }
-#' -----------------------------------------------------------------------------
+```
 
+-----------------------------------------------------------------------------
 
-
-
+```{r }
 ####  2. EXTREMELY RARE LIMITS PER BSRN  ---------------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 2. EXTREMELY RARE LIMITS PER BSRN
-#'
-#' These should be a little more restrictive than 1. in order to start
-#' catching erroneous values.
-#'
-#' The choose of those settings may be optimized with an iterative process.
-#'
-#+ echo=TEST_02, include=T
+```
+
+\FloatBarrier
+\newpage
+## 2. EXTREMELY RARE LIMITS PER BSRN
+
+These should be a little more restrictive than 1. in order to start
+catching erroneous values.
+
+The choose of those settings may be optimized with an iterative process.
+
+
+```{r echo=TEST_02, include=T}
 if (TEST_02) {
     cat(paste("\n2. Extremely Rare Limits.\n\n"))
     # Upper modeled values
@@ -333,7 +344,8 @@ if (TEST_02) {
     DATA[wattGLB > Global_max,          QCF_GLB_02 := "Extremely rare limits max (4)"]
 }
 
-#+ echo=F, include=T, results="asis"
+```
+```{r echo=F, include=T, results="asis"}
 if (TEST_02) {
 
     cat(pander(table(DATA$QCF_DIR_02, exclude = TRUE)))
@@ -384,18 +396,21 @@ if (TEST_02) {
     # DATA$Direct_max <- NULL
     # DATA$Global_max <- NULL
 }
-#' -----------------------------------------------------------------------------
+```
 
+-----------------------------------------------------------------------------
 
-
-
+```{r }
 ####  3. COMPARISON TESTS PER BSRN “non-definitive”  ---------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 3. COMPARISON TESTS PER BSRN “non-definitive”
-#'
-#'
-#+ echo=TEST_03, include=T
+```
+
+\FloatBarrier
+\newpage
+## 3. COMPARISON TESTS PER BSRN “non-definitive”
+
+
+
+```{r echo=TEST_03, include=T}
 if (TEST_03) {
     cat(paste("\n3. Comparison tests.\n\n"))
 
@@ -427,7 +442,8 @@ if (TEST_03) {
          QCF_BTH_03_2 := "Diffuse ratio comp min (12)"]
 }
 
-#+ echo=F, include=T, results="asis"
+```
+```{r echo=F, include=T, results="asis"}
 if (TEST_03) {
 
     cat(pander(table(DATA$QCF_BTH_03_1, exclude = TRUE)))
@@ -509,28 +525,31 @@ if (TEST_03) {
         }
     }
 }
-#' -----------------------------------------------------------------------------
+```
 
+-----------------------------------------------------------------------------
 
-
-
+```{r }
 ####  4. Climatological (configurable) Limits  ---------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 4. Climatological (configurable) Limits
-#'
-#' Limits the maximum expected irradiance based on climatological
-#' observations levels and the value of TSI.
-#'
-#' Some hits on first limits are expected and need manual evaluation.
-#'
-#' Hits on second limit should be problematic data.
-#'
-#' For GHI this may limit the radiation enhancement cases.
-#'
-#' Exclusions should be done case by case.
-#'
-#+ echo=TEST_04, include=T
+```
+
+\FloatBarrier
+\newpage
+## 4. Climatological (configurable) Limits
+
+Limits the maximum expected irradiance based on climatological
+observations levels and the value of TSI.
+
+Some hits on first limits are expected and need manual evaluation.
+
+Hits on second limit should be problematic data.
+
+For GHI this may limit the radiation enhancement cases.
+
+Exclusions should be done case by case.
+
+
+```{r echo=TEST_04, include=T}
 if (TEST_04) {
     cat("\n## 4. Climatological (configurable) Limits.\n\n")
 
@@ -556,7 +575,8 @@ if (TEST_04) {
          QCF_GLB_04_2 := "Second climatological limit (16)"]
 }
 
-#+ echo=F, include=T, results="asis"
+```
+```{r echo=F, include=T, results="asis"}
 if (TEST_04) {
 
     cat(pander(table(DATA$QCF_GLB_04_1, exclude = NULL)))
@@ -665,21 +685,26 @@ if (TEST_04) {
     # DATA$Dir_Secon_Clim_lim <- NULL
     # DATA$Glo_Secon_Clim_lim <- NULL
 }
-#' -----------------------------------------------------------------------------
+```
 
+-----------------------------------------------------------------------------
 
-
-
+```{r }
 ####  5. Tracker is off test  --------------------------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 5. Tracker is off test
-#'
+```
+
+\FloatBarrier
+\newpage
+## 5. Tracker is off test
+
+
+```{r }
 # This test use a diffuse model will be implemented when one is produced
 # and accepted. For now we omit it to protect from over-fitting prior to
 # make one such model.
 #
-#+ echo=TEST_05, include=T
+```
+```{r echo=TEST_05, include=T}
 if (TEST_05) {
     cat(paste("\n5. Tracking test.\n\n"))
     ## criteria
@@ -701,7 +726,8 @@ if (TEST_05) {
          QCF_DIR_05 := "Possible no tracking (24)"]
 }
 
-#+ echo=F, include=T, results="asis"
+```
+```{r echo=F, include=T, results="asis"}
 if (TEST_05) {
 
     cat(pander(table(DATA$QCF_DIR_05, exclude = T)))
@@ -732,26 +758,29 @@ if (TEST_05) {
     }
     # DATA$ClrSW_ref2 <- NULL
 }
-#' -----------------------------------------------------------------------------
+```
 
+-----------------------------------------------------------------------------
 
-
-
+```{r }
 ####  6. Rayleigh Limit Diffuse Comparison  ------------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 6. Rayleigh Limit Diffuse Comparison
-#'
-#' Compare inferred diffuse radiation with a modeled value of diffuse,
-#' based on SZA and atmospheric pressure.
-#'
-#' The upper limit denotes no tracking of CHP-1.
-#'
-#' Reasons:
-#' - Difference of Sun observation angle due to different instruments location.
-#' - Cases of instrument windows cleaning
-#'
-#+ echo=TEST_06, include=T
+```
+
+\FloatBarrier
+\newpage
+## 6. Rayleigh Limit Diffuse Comparison
+
+Compare inferred diffuse radiation with a modeled value of diffuse,
+based on SZA and atmospheric pressure.
+
+The upper limit denotes no tracking of CHP-1.
+
+Reasons:
+- Difference of Sun observation angle due to different instruments location.
+- Cases of instrument windows cleaning
+
+
+```{r echo=TEST_06, include=T}
 if (TEST_06) {
     cat(paste("\n6. Rayleigh Limit Diffuse Comparison.\n\n"))
     # criteria
@@ -785,7 +814,8 @@ if (TEST_06) {
 
 }
 
-#+ echo=F, include=T, results="asis"
+```
+```{r echo=F, include=T, results="asis"}
 if (TEST_06) {
 
     cat(pander(table(DATA$QCF_BTH_06_1, exclude = TRUE)))
@@ -879,19 +909,22 @@ if (TEST_06) {
         }
     }
 }
-#' -----------------------------------------------------------------------------
+```
 
+-----------------------------------------------------------------------------
 
-
-
+```{r }
 ####  7. Test for obstacles  ---------------------------------------------------
-#'
-#' \newpage
-#' ## 7. Test for obstacles
-#'
-#' This is deactivated
-#'
-#+ echo=TEST_07, include=T
+```
+
+
+\newpage
+## 7. Test for obstacles
+
+This is deactivated
+
+
+```{r echo=TEST_07, include=T}
 if (TEST_07) {
     cat(paste("\n7. Obstacles test.\n\n"))
 
@@ -921,37 +954,41 @@ if (TEST_07) {
 
 }
 
-#+ echo=F, include=T
+```
+```{r echo=F, include=T}
 if (TEST_07) {
 
 }
-#' -----------------------------------------------------------------------------
+```
 
+-----------------------------------------------------------------------------
 
-
-
+```{r }
 ####  8. Test for inverted values  ---------------------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 8. Test for inverted values
-#'
-#' Test the ratio of Diffuse / Global radiation.
-#' When the Diffuse is too lower than Global, (less than a % limit).
-#'
-#' This denotes obstacles on the mornings mostly, or very low
-#' signals when Sun is near the horizon.
-#' Due to the time difference of sun shine, due to geometry, location and
-#' obstacles.
-#'
-#' And possible cases of Instrument windows cleaning shadowing.
-#'
-#' Probably these value should be removed for CS when occurring on low
-#' elevation angles, as the measurements can not be considered to reflect
-#' the same condition of Sun visibility.
-#'
-#' Additional criteria is needed for any data drop.
-#'
-#+ echo=TEST_08, include=T
+```
+
+\FloatBarrier
+\newpage
+## 8. Test for inverted values
+
+Test the ratio of Diffuse / Global radiation.
+When the Diffuse is too lower than Global, (less than a % limit).
+
+This denotes obstacles on the mornings mostly, or very low
+signals when Sun is near the horizon.
+Due to the time difference of sun shine, due to geometry, location and
+obstacles.
+
+And possible cases of Instrument windows cleaning shadowing.
+
+Probably these value should be removed for CS when occurring on low
+elevation angles, as the measurements can not be considered to reflect
+the same condition of Sun visibility.
+
+Additional criteria is needed for any data drop.
+
+
+```{r echo=TEST_08, include=T}
 if (TEST_08) {
     cat(paste("\n8. Inversion test.\n\n"))
 
@@ -970,7 +1007,8 @@ if (TEST_08) {
          QCF_BTH_08_2 := "Direct > global hard (15)" ]
 }
 
-#+ echo=F
+```
+```{r echo=F}
 if (TEST_08) {
 
     cat(pander(table(DATA$QCF_BTH_08_1, exclude = TRUE)))
@@ -1044,26 +1082,27 @@ if (TEST_08) {
     }
     DATA$Relative_diffuse <- NULL
 }
-#' -----------------------------------------------------------------------------
+```
 
+-----------------------------------------------------------------------------
 
-
-
-
-
+```{r }
 ####  9. Clearness index test  ---------------------------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 9. Clearness index test
-#'
-#' This filter is mine, and is applied on GHI data.
-#'
-#' Data near elevation 0 are caused by the cos(SZA) while calculating
-#' kt = GLB / (cos(sza) * TSI).
-#'
-#' For larger elevation angles manual inspection is needed.
-#'
-#+ echo=TEST_09, include=T
+```
+
+\FloatBarrier
+\newpage
+## 9. Clearness index test
+
+This filter is mine, and is applied on GHI data.
+
+Data near elevation 0 are caused by the cos(SZA) while calculating
+kt = GLB / (cos(sza) * TSI).
+
+For larger elevation angles manual inspection is needed.
+
+
+```{r echo=TEST_09, include=T}
 if (TEST_09) {
     cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
 
@@ -1080,7 +1119,8 @@ if (TEST_09) {
 
 }
 
-#+ echo=F, include=T, results="asis"
+```
+```{r echo=F, include=T, results="asis"}
 if (TEST_09) {
 
     cat(pander(table(DATA$QCF_GLB_09, exclude = TRUE)))
@@ -1141,34 +1181,26 @@ if (TEST_09) {
         }
     }
 }
-#' -----------------------------------------------------------------------------
+```
 
+-----------------------------------------------------------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
+```{r }
 #### ~ ~  Export Data ~ ~ ####
-#+ echo=F, include=T, results="asis"
+```
+```{r echo=F, include=T, results="asis"}
 for (YYYY in unique(year(DATA$Date))) {
     write_RDS(object = DATA[ year(Date) == YYYY, ],
               file   = paste0(DATA_BASE,
                               basename(sub("\\.R$","_", Script.Name)), YYYY))
 }
+```
 
+**END**
 
-
-
-#' **END**
-#+ include=T, echo=F
+```{r include=T, echo=F}
 # myunlock(lockfile)
 tac <- Sys.time()
 cat(sprintf("%s %s@%s %s %f mins\n\n",Sys.time(),Sys.info()["login"],Sys.info()["nodename"],Script.Name,difftime(tac,tic,units="mins")))
+```
+
