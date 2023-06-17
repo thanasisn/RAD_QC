@@ -112,9 +112,6 @@ template_file  <- "~/DATA/Broad_Band/LAP_CHP1_L1_2016.Rds"
 
 ## date to start run
 PROJECT_START  <- as.POSIXct("1993-01-01")  ## when both instruments were operational
-# LAST_DAY_EXPR  <- as.POSIXct("2023-01-01")  ## day of last manual data clean
-
-
 
 
 ## . . Limits definitions  ####
