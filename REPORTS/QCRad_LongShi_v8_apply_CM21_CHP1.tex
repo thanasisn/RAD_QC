@@ -1,15 +1,15 @@
 % Options for packages loaded elsewhere
 \PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
-\PassOptionsToPackage{dvipsnames,svgnames*,x11names*}{xcolor}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
 %
 \documentclass[
   10pt,
   a4paper,oneside]{article}
+\usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-\usepackage{ifxetex,ifluatex}
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
@@ -41,10 +41,10 @@
   pdftitle={QCRad methodology apply.},
   pdfauthor={Natsis Athanasios},
   colorlinks=true,
-  linkcolor=Maroon,
-  filecolor=Maroon,
-  citecolor=Blue,
-  urlcolor=Blue,
+  linkcolor={Maroon},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
 \usepackage[left=0.5in,right=0.5in,top=0.5in,bottom=0.5in]{geometry}
@@ -88,7 +88,8 @@
 \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
-\usepackage{longtable,booktabs}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
 \makeatletter
@@ -117,10 +118,13 @@
 \usepackage{caption}
 \usepackage{placeins}
 \captionsetup{font=small}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
 
 \title{QCRad methodology apply.}
 \author{Natsis Athanasios}
-\date{2023-06-16}
+\date{2023-06-25}
 
 \begin{document}
 \maketitle
@@ -173,49 +177,49 @@ Written:  /home/athan/RAD_QC/temp_data.Rds
 \hypertarget{input-data}{%
 \subsubsection{INPUT DATA}\label{input-data}}
 
-\textbf{Data range: 1993-04-12 03:55:30 to 2023-06-15 17:59:30}
+\textbf{Data range: 1993-04-12 03:55:30 to 2023-06-24 18:02:30}
 
 \begin{longtable}[]{@{}cc@{}}
 \caption{Input files}\tabularnewline
 \toprule
-Filename & File mtime\tabularnewline
+Filename & File mtime \\
 \midrule
 \endfirsthead
 \toprule
-Filename & File mtime\tabularnewline
+Filename & File mtime \\
 \midrule
 \endhead
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1993.Rds & 2023-06-16 08:05:07.7\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1994.Rds & 2023-06-16 08:05:29.9\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1995.Rds & 2023-06-16 08:05:50.9\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1996.Rds & 2023-06-16 08:06:12.5\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1997.Rds & 2023-06-16 08:06:33.9\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1998.Rds & 2023-06-16 08:06:57.3\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1999.Rds & 2023-06-16 08:07:20.3\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2000.Rds & 2023-06-16 08:07:43.1\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2001.Rds & 2023-06-16 08:08:04.5\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2002.Rds & 2023-06-16 08:08:27.2\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2003.Rds & 2023-06-16 08:08:48.9\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2004.Rds & 2023-06-16 08:09:10.6\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2005.Rds & 2023-06-16 08:09:31.7\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2006.Rds & 2023-06-16 08:09:52.3\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2007.Rds & 2023-06-16 08:10:12.9\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2008.Rds & 2023-06-16 08:10:34.7\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2009.Rds & 2023-06-16 08:10:55.4\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2010.Rds & 2023-06-16 08:11:14.7\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2011.Rds & 2023-06-16 08:11:35.3\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2012.Rds & 2023-06-16 08:11:56.1\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2013.Rds & 2023-06-16 08:12:18.2\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2014.Rds & 2023-06-16 08:12:40.6\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2015.Rds & 2023-06-16 08:13:01.6\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2016.Rds & 2023-06-16 08:14:01.2\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2017.Rds & 2023-06-16 08:15:07.3\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2018.Rds & 2023-06-16 08:16:15.8\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2019.Rds & 2023-06-16 08:17:21.9\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2020.Rds & 2023-06-16 08:18:24.8\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2021.Rds & 2023-06-16 08:19:28.6\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2022.Rds & 2023-06-16 08:20:33.6\tabularnewline
-LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2023.Rds & 2023-06-16 08:21:01.7\tabularnewline
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1993.Rds & 2023-06-25 07:46:24.8 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1994.Rds & 2023-06-25 07:46:45.2 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1995.Rds & 2023-06-25 07:47:04.2 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1996.Rds & 2023-06-25 07:47:24.1 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1997.Rds & 2023-06-25 07:47:43.9 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1998.Rds & 2023-06-25 07:48:03.7 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_1999.Rds & 2023-06-25 07:48:23.9 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2000.Rds & 2023-06-25 07:48:43.7 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2001.Rds & 2023-06-25 07:49:03.3 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2002.Rds & 2023-06-25 07:49:23.3 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2003.Rds & 2023-06-25 07:49:43.2 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2004.Rds & 2023-06-25 07:50:03.5 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2005.Rds & 2023-06-25 07:50:23.1 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2006.Rds & 2023-06-25 07:50:42.2 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2007.Rds & 2023-06-25 07:51:01.2 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2008.Rds & 2023-06-25 07:51:21.0 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2009.Rds & 2023-06-25 07:51:40.2 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2010.Rds & 2023-06-25 07:51:57.3 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2011.Rds & 2023-06-25 07:52:16.5 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2012.Rds & 2023-06-25 07:52:35.7 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2013.Rds & 2023-06-25 07:52:55.8 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2014.Rds & 2023-06-25 07:53:15.5 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2015.Rds & 2023-06-25 07:53:34.7 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2016.Rds & 2023-06-25 07:54:23.7 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2017.Rds & 2023-06-25 07:55:18.5 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2018.Rds & 2023-06-25 07:56:13.5 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2019.Rds & 2023-06-25 07:57:08.0 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2020.Rds & 2023-06-25 07:58:01.0 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2021.Rds & 2023-06-25 07:58:54.2 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2022.Rds & 2023-06-25 07:59:47.1 \\
+LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2023.Rds & 2023-06-25 08:00:21.1 \\
 \bottomrule
 \end{longtable}
 
@@ -224,15 +228,15 @@ LAP\_QCRad\_LongShi\_v8\_id\_CM21\_CHP1\_2023.Rds & 2023-06-16 08:21:01.7\tabula
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{QS \textless{}{-}}\StringTok{ }\KeywordTok{list}\NormalTok{()}
-\NormalTok{QS}\OperatorTok{$}\NormalTok{sun\_elev\_min     \textless{}{-}}\StringTok{ }\DecValTok{{-}2} \OperatorTok{*}\StringTok{ }\FloatTok{0.103} \CommentTok{\# 0. Drop all data when sun is below this point}
-\NormalTok{QS}\OperatorTok{$}\NormalTok{sun\_elev\_no\_neg  \textless{}{-}}\StringTok{  }\DecValTok{0}         \CommentTok{\# 0. Don\textquotesingle{}t allow negative values below this sun angle}
+\NormalTok{QS }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\NormalTok{QS}\SpecialCharTok{$}\NormalTok{sun\_elev\_min     }\OtherTok{\textless{}{-}} \SpecialCharTok{{-}}\DecValTok{2} \SpecialCharTok{*} \FloatTok{0.103} \CommentTok{\# 0. Drop all data when sun is below this point}
+\NormalTok{QS}\SpecialCharTok{$}\NormalTok{sun\_elev\_no\_neg  }\OtherTok{\textless{}{-}}  \DecValTok{0}         \CommentTok{\# 0. Don\textquotesingle{}t allow negative values below this sun angle}
 
 
 
 
 
-\CommentTok{\#\#\#\#  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\DocumentationTok{\#\#\#\#  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
 \end{Highlighting}
 \end{Shaded}
 
@@ -254,27 +258,27 @@ values of the data set.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{if}\NormalTok{ (TEST\_}\DecValTok{01}\NormalTok{) \{}
-    \KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{1. Physically Possible Limits.}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
+\ControlFlowTok{if}\NormalTok{ (TEST\_01) \{}
+    \FunctionTok{cat}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{1. Physically Possible Limits.}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
 
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{dir\_SWdn\_min \textless{}{-}}\StringTok{  }\DecValTok{{-}4}  \CommentTok{\# Minimum direct value to consider valid measurement}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{dir\_SWdn\_dif \textless{}{-}}\StringTok{ }\DecValTok{327}  \CommentTok{\# Closeness to to TSI}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{glo\_SWdn\_min \textless{}{-}}\StringTok{  }\DecValTok{{-}4}  \CommentTok{\# Minimum global value to consider valid measurement}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{glo\_SWdn\_off \textless{}{-}}\StringTok{ }\DecValTok{160}  \CommentTok{\# Global departure offset above the model}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{glo\_SWdn\_amp \textless{}{-}}\StringTok{ }\FloatTok{1.3}  \CommentTok{\# Global departure factor above the model}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{dir\_SWdn\_min }\OtherTok{\textless{}{-}}  \SpecialCharTok{{-}}\DecValTok{4}  \CommentTok{\# Minimum direct value to consider valid measurement}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{dir\_SWdn\_dif }\OtherTok{\textless{}{-}} \DecValTok{327}  \CommentTok{\# Closeness to to TSI}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{glo\_SWdn\_min }\OtherTok{\textless{}{-}}  \SpecialCharTok{{-}}\DecValTok{4}  \CommentTok{\# Minimum global value to consider valid measurement}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{glo\_SWdn\_off }\OtherTok{\textless{}{-}} \DecValTok{160}  \CommentTok{\# Global departure offset above the model}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{glo\_SWdn\_amp }\OtherTok{\textless{}{-}} \FloatTok{1.3}  \CommentTok{\# Global departure factor above the model}
 
-    \CommentTok{\#\# . . Direct {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[wattDIR }\OperatorTok{\textless{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dir\_SWdn\_min,}
-\NormalTok{         QCF\_DIR\_}\DecValTok{01} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Physical possible limit min (5)"}\NormalTok{]}
-\NormalTok{    DATA[TSIextEARTH\_comb }\OperatorTok{{-}}\StringTok{ }\NormalTok{wattDIR }\OperatorTok{\textless{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dir\_SWdn\_dif,}
-\NormalTok{         QCF\_DIR\_}\DecValTok{01} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Physical possible limit max (6)"}\NormalTok{]}
+    \DocumentationTok{\#\# . . Direct {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[wattDIR }\SpecialCharTok{\textless{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dir\_SWdn\_min,}
+\NormalTok{         QCF\_DIR\_01 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Physical possible limit min (5)"}\NormalTok{]}
+\NormalTok{    DATA[TSIextEARTH\_comb }\SpecialCharTok{{-}}\NormalTok{ wattDIR }\SpecialCharTok{\textless{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dir\_SWdn\_dif,}
+\NormalTok{         QCF\_DIR\_01 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Physical possible limit max (6)"}\NormalTok{]}
 
-    \CommentTok{\#\# . . Global {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[wattGLB }\OperatorTok{\textless{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{glo\_SWdn\_min,}
-\NormalTok{         QCF\_GLB\_}\DecValTok{01} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Physical possible limit min (5)"}\NormalTok{]}
-\NormalTok{    DATA[, Glo\_max\_ref }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\NormalTok{TSIextEARTH\_comb }\OperatorTok{*}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{glo\_SWdn\_amp }\OperatorTok{*}\StringTok{ }\KeywordTok{cosde}\NormalTok{(SZA)}\OperatorTok{\^{}}\FloatTok{1.2} \OperatorTok{+}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{glo\_SWdn\_off]}
-\NormalTok{    DATA[wattGLB }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{Glo\_max\_ref,}
-\NormalTok{         QCF\_GLB\_}\DecValTok{01} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Physical possible limit max (6)"}\NormalTok{]}
+    \DocumentationTok{\#\# . . Global {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[wattGLB }\SpecialCharTok{\textless{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{glo\_SWdn\_min,}
+\NormalTok{         QCF\_GLB\_01 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Physical possible limit min (5)"}\NormalTok{]}
+\NormalTok{    DATA[, Glo\_max\_ref }\SpecialCharTok{:}\ErrorTok{=}\NormalTok{ TSIextEARTH\_comb }\SpecialCharTok{*}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{glo\_SWdn\_amp }\SpecialCharTok{*} \FunctionTok{cosde}\NormalTok{(SZA)}\SpecialCharTok{\^{}}\FloatTok{1.2} \SpecialCharTok{+}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{glo\_SWdn\_off]}
+\NormalTok{    DATA[wattGLB }\SpecialCharTok{\textgreater{}}\NormalTok{ Glo\_max\_ref,}
+\NormalTok{         QCF\_GLB\_01 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Physical possible limit max (6)"}\NormalTok{]}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
@@ -285,19 +289,19 @@ values of the data set.
 
 \begin{longtable}[]{@{}c@{}}
 \toprule
-NA\tabularnewline
+NA \\
 \midrule
 \endhead
-7787556\tabularnewline
+7795709 \\
 \bottomrule
 \end{longtable}
 
 \begin{longtable}[]{@{}c@{}}
 \toprule
-NA\tabularnewline
+NA \\
 \midrule
 \endhead
-7787556\tabularnewline
+7795709 \\
 \bottomrule
 \end{longtable}
 
@@ -320,30 +324,30 @@ The choose of those settings may be optimized with an iterative process.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{if}\NormalTok{ (TEST\_}\DecValTok{02}\NormalTok{) \{}
-    \KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{2. Extremely Rare Limits.}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
+\ControlFlowTok{if}\NormalTok{ (TEST\_02) \{}
+    \FunctionTok{cat}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{2. Extremely Rare Limits.}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
     \CommentTok{\# Upper modeled values}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{Dir\_SWdn\_amp     \textless{}{-}}\StringTok{    }\FloatTok{0.91} \CommentTok{\# Direct departure factor above the model}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{Dir\_SWdn\_off     \textless{}{-}}\StringTok{ }\DecValTok{{-}140}    \CommentTok{\# Direct departure offset above the model}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{Glo\_SWdn\_amp     \textless{}{-}}\StringTok{ }\FloatTok{1.18}    \CommentTok{\# Global departure factor above the model}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{Glo\_SWdn\_off     \textless{}{-}}\StringTok{ }\DecValTok{40}      \CommentTok{\# Global departure offset above the model}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{Dir\_SWdn\_amp     }\OtherTok{\textless{}{-}}    \FloatTok{0.91} \CommentTok{\# Direct departure factor above the model}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{Dir\_SWdn\_off     }\OtherTok{\textless{}{-}} \SpecialCharTok{{-}}\DecValTok{140}    \CommentTok{\# Direct departure offset above the model}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{Glo\_SWdn\_amp     }\OtherTok{\textless{}{-}} \FloatTok{1.18}    \CommentTok{\# Global departure factor above the model}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{Glo\_SWdn\_off     }\OtherTok{\textless{}{-}} \DecValTok{40}      \CommentTok{\# Global departure offset above the model}
     \CommentTok{\# Minimum accepted values}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{dir\_SWdn\_min\_ext \textless{}{-}}\StringTok{   }\DecValTok{{-}2}    \CommentTok{\# Extremely Rare Minimum Limits}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{glo\_SWdn\_min\_ext \textless{}{-}}\StringTok{   }\DecValTok{{-}2}    \CommentTok{\# Extremely Rare Minimum Limits}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{dir\_SWdn\_min\_ext }\OtherTok{\textless{}{-}}   \SpecialCharTok{{-}}\DecValTok{2}    \CommentTok{\# Extremely Rare Minimum Limits}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{glo\_SWdn\_min\_ext }\OtherTok{\textless{}{-}}   \SpecialCharTok{{-}}\DecValTok{2}    \CommentTok{\# Extremely Rare Minimum Limits}
     \CommentTok{\# Compute reference values}
-\NormalTok{    DATA[, Direct\_max }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\NormalTok{TSIextEARTH\_comb }\OperatorTok{*}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{Dir\_SWdn\_amp }\OperatorTok{*}\StringTok{ }\KeywordTok{cosde}\NormalTok{(SZA)}\OperatorTok{\^{}}\FloatTok{0.2} \OperatorTok{+}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{Dir\_SWdn\_off]}
-\NormalTok{    DATA[, Global\_max }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\NormalTok{TSIextEARTH\_comb }\OperatorTok{*}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{Glo\_SWdn\_amp }\OperatorTok{*}\StringTok{ }\KeywordTok{cosde}\NormalTok{(SZA)}\OperatorTok{\^{}}\FloatTok{1.2} \OperatorTok{+}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{Glo\_SWdn\_off]}
+\NormalTok{    DATA[, Direct\_max }\SpecialCharTok{:}\ErrorTok{=}\NormalTok{ TSIextEARTH\_comb }\SpecialCharTok{*}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{Dir\_SWdn\_amp }\SpecialCharTok{*} \FunctionTok{cosde}\NormalTok{(SZA)}\SpecialCharTok{\^{}}\FloatTok{0.2} \SpecialCharTok{+}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{Dir\_SWdn\_off]}
+\NormalTok{    DATA[, Global\_max }\SpecialCharTok{:}\ErrorTok{=}\NormalTok{ TSIextEARTH\_comb }\SpecialCharTok{*}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{Glo\_SWdn\_amp }\SpecialCharTok{*} \FunctionTok{cosde}\NormalTok{(SZA)}\SpecialCharTok{\^{}}\FloatTok{1.2} \SpecialCharTok{+}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{Glo\_SWdn\_off]}
     \CommentTok{\# Ignore too low values near horizon}
-\NormalTok{    DATA[Direct\_max }\OperatorTok{\textless{}}\StringTok{ }\DecValTok{3}\NormalTok{, Direct\_max }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\OtherTok{NA}\NormalTok{]}
-\NormalTok{    DATA[Global\_max }\OperatorTok{\textless{}}\StringTok{ }\DecValTok{3}\NormalTok{, Direct\_max }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\OtherTok{NA}\NormalTok{]}
+\NormalTok{    DATA[Direct\_max }\SpecialCharTok{\textless{}} \DecValTok{3}\NormalTok{, Direct\_max }\SpecialCharTok{:}\ErrorTok{=} \ConstantTok{NA}\NormalTok{]}
+\NormalTok{    DATA[Global\_max }\SpecialCharTok{\textless{}} \DecValTok{3}\NormalTok{, Direct\_max }\SpecialCharTok{:}\ErrorTok{=} \ConstantTok{NA}\NormalTok{]}
 
-    \CommentTok{\#\# . . Direct {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[wattDIR }\OperatorTok{\textless{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dir\_SWdn\_min\_ext, QCF\_DIR\_}\DecValTok{02} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Extremely rare limits min (3)"}\NormalTok{]}
-\NormalTok{    DATA[wattDIR }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{Direct\_max,          QCF\_DIR\_}\DecValTok{02} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Extremely rare limits max (4)"}\NormalTok{]}
+    \DocumentationTok{\#\# . . Direct {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[wattDIR }\SpecialCharTok{\textless{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dir\_SWdn\_min\_ext, QCF\_DIR\_02 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Extremely rare limits min (3)"}\NormalTok{]}
+\NormalTok{    DATA[wattDIR }\SpecialCharTok{\textgreater{}}\NormalTok{ Direct\_max,          QCF\_DIR\_02 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Extremely rare limits max (4)"}\NormalTok{]}
 
-    \CommentTok{\#\# . . Global {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[wattGLB }\OperatorTok{\textless{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{glo\_SWdn\_min\_ext, QCF\_GLB\_}\DecValTok{02} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Extremely rare limits min (3)"}\NormalTok{]}
-\NormalTok{    DATA[wattGLB }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{Global\_max,          QCF\_GLB\_}\DecValTok{02} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Extremely rare limits max (4)"}\NormalTok{]}
+    \DocumentationTok{\#\# . . Global {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[wattGLB }\SpecialCharTok{\textless{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{glo\_SWdn\_min\_ext, QCF\_GLB\_02 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Extremely rare limits min (3)"}\NormalTok{]}
+\NormalTok{    DATA[wattGLB }\SpecialCharTok{\textgreater{}}\NormalTok{ Global\_max,          QCF\_GLB\_02 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Extremely rare limits max (4)"}\NormalTok{]}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
@@ -352,21 +356,30 @@ The choose of those settings may be optimized with an iterative process.
 2. Extremely Rare Limits.
 \end{verbatim}
 
-\begin{longtable}[]{@{}ccc@{}}
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4366}}
+  >{\centering\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4366}}
+  >{\centering\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1268}}@{}}
 \toprule
-Extremely rare limits min (3) & Extremely rare limits max (4) & NA\tabularnewline
+\begin{minipage}[b]{\linewidth}\centering
+Extremely rare limits min (3)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Extremely rare limits max (4)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+NA
+\end{minipage} \\
 \midrule
 \endhead
-97 & 2 & 7787457\tabularnewline
+97 & 2 & 7795610 \\
 \bottomrule
 \end{longtable}
 
 \begin{longtable}[]{@{}cc@{}}
 \toprule
-Extremely rare limits max (4) & NA\tabularnewline
+Extremely rare limits max (4) & NA \\
 \midrule
 \endhead
-152 & 7787404\tabularnewline
+152 & 7795557 \\
 \bottomrule
 \end{longtable}
 
@@ -540,35 +553,35 @@ Extremely rare limits max (4) & NA\tabularnewline
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{if}\NormalTok{ (TEST\_}\DecValTok{03}\NormalTok{) \{}
-    \KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{3. Comparison tests.}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
+\ControlFlowTok{if}\NormalTok{ (TEST\_03) \{}
+    \FunctionTok{cat}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{3. Comparison tests.}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
 
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{dif\_rati\_po1  \textless{}{-}}\StringTok{  }\FloatTok{0.03}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{dif\_rati\_po2  \textless{}{-}}\StringTok{  }\FloatTok{0.08}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{dif\_sza\_break \textless{}{-}}\StringTok{ }\DecValTok{75}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{dif\_rati\_pr1  \textless{}{-}}\StringTok{  }\FloatTok{1.03}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{dif\_rati\_pr2  \textless{}{-}}\StringTok{  }\FloatTok{1.06}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{dif\_watt\_lim  \textless{}{-}}\StringTok{  }\DecValTok{10}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{dif\_rati\_po1  }\OtherTok{\textless{}{-}}  \FloatTok{0.03}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{dif\_rati\_po2  }\OtherTok{\textless{}{-}}  \FloatTok{0.08}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{dif\_sza\_break }\OtherTok{\textless{}{-}} \DecValTok{75}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{dif\_rati\_pr1  }\OtherTok{\textless{}{-}}  \FloatTok{1.03}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{dif\_rati\_pr2  }\OtherTok{\textless{}{-}}  \FloatTok{1.06}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{dif\_watt\_lim  }\OtherTok{\textless{}{-}}  \DecValTok{10}
 
-    \CommentTok{\#\# . . Proposed filter {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[DiffuseFraction\_Kd  }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_rati\_pr1  }\OperatorTok{\&}
-\StringTok{         }\NormalTok{SZA                }\OperatorTok{\textless{}=}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_sza\_break }\OperatorTok{\&}
-\StringTok{         }\NormalTok{wattGLB             }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_watt\_lim,}
-\NormalTok{         QCF\_BTH\_}\DecValTok{03}\NormalTok{\_}\DecValTok{1} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Diffuse ratio comp max (11)"}\NormalTok{]}
-\NormalTok{    DATA[DiffuseFraction\_Kd  }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_rati\_pr2  }\OperatorTok{\&}
-\StringTok{         }\NormalTok{SZA                 }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_sza\_break }\OperatorTok{\&}
-\StringTok{         }\NormalTok{wattGLB             }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_watt\_lim,}
-\NormalTok{         QCF\_BTH\_}\DecValTok{03}\NormalTok{\_}\DecValTok{1} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Diffuse ratio comp max (11)"}\NormalTok{]}
+    \DocumentationTok{\#\# . . Proposed filter {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[DiffuseFraction\_Kd  }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_rati\_pr1  }\SpecialCharTok{\&}
+\NormalTok{         SZA                }\SpecialCharTok{\textless{}=}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_sza\_break }\SpecialCharTok{\&}
+\NormalTok{         wattGLB             }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_watt\_lim,}
+\NormalTok{         QCF\_BTH\_03\_1 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Diffuse ratio comp max (11)"}\NormalTok{]}
+\NormalTok{    DATA[DiffuseFraction\_Kd  }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_rati\_pr2  }\SpecialCharTok{\&}
+\NormalTok{         SZA                 }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_sza\_break }\SpecialCharTok{\&}
+\NormalTok{         wattGLB             }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_watt\_lim,}
+\NormalTok{         QCF\_BTH\_03\_1 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Diffuse ratio comp max (11)"}\NormalTok{]}
 
-    \CommentTok{\#\# . . Extra filters by me {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[DiffuseFraction\_Kd  }\OperatorTok{\textless{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_rati\_po1  }\OperatorTok{\&}
-\StringTok{         }\NormalTok{SZA                }\OperatorTok{\textless{}=}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_sza\_break }\OperatorTok{\&}
-\StringTok{         }\NormalTok{wattGLB             }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_watt\_lim,}
-\NormalTok{         QCF\_BTH\_}\DecValTok{03}\NormalTok{\_}\DecValTok{2} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Diffuse ratio comp min (12)"}\NormalTok{]}
-\NormalTok{    DATA[DiffuseFraction\_Kd }\OperatorTok{\textless{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_rati\_po1  }\OperatorTok{\&}
-\StringTok{         }\NormalTok{SZA                }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_sza\_break }\OperatorTok{\&}
-\StringTok{         }\NormalTok{wattGLB            }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dif\_watt\_lim,}
-\NormalTok{         QCF\_BTH\_}\DecValTok{03}\NormalTok{\_}\DecValTok{2} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Diffuse ratio comp min (12)"}\NormalTok{]}
+    \DocumentationTok{\#\# . . Extra filters by me {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[DiffuseFraction\_Kd  }\SpecialCharTok{\textless{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_rati\_po1  }\SpecialCharTok{\&}
+\NormalTok{         SZA                }\SpecialCharTok{\textless{}=}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_sza\_break }\SpecialCharTok{\&}
+\NormalTok{         wattGLB             }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_watt\_lim,}
+\NormalTok{         QCF\_BTH\_03\_2 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Diffuse ratio comp min (12)"}\NormalTok{]}
+\NormalTok{    DATA[DiffuseFraction\_Kd }\SpecialCharTok{\textless{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_rati\_po1  }\SpecialCharTok{\&}
+\NormalTok{         SZA                }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_sza\_break }\SpecialCharTok{\&}
+\NormalTok{         wattGLB            }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dif\_watt\_lim,}
+\NormalTok{         QCF\_BTH\_03\_2 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Diffuse ratio comp min (12)"}\NormalTok{]}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
@@ -579,19 +592,19 @@ Extremely rare limits max (4) & NA\tabularnewline
 
 \begin{longtable}[]{@{}cc@{}}
 \toprule
-Diffuse ratio comp max (11) & NA\tabularnewline
+Diffuse ratio comp max (11) & NA \\
 \midrule
 \endhead
-240 & 7787316\tabularnewline
+277 & 7795432 \\
 \bottomrule
 \end{longtable}
 
 \begin{longtable}[]{@{}cc@{}}
 \toprule
-Diffuse ratio comp min (12) & NA\tabularnewline
+Diffuse ratio comp min (12) & NA \\
 \midrule
 \endhead
-1444 & 7786112\tabularnewline
+1444 & 7794265 \\
 \bottomrule
 \end{longtable}
 
@@ -1381,6 +1394,14 @@ Diffuse ratio comp min (12) & NA\tabularnewline
 
 \begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-12-393} \end{center}
 
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-12-394} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-12-395} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-12-396} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-12-397} \end{center}
+
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \FloatBarrier
@@ -1402,29 +1423,29 @@ Exclusions should be done case by case.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{if}\NormalTok{ (TEST\_}\DecValTok{04}\NormalTok{) \{}
-    \KeywordTok{cat}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{\#\# 4. Climatological (configurable) Limits.}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\ControlFlowTok{if}\NormalTok{ (TEST\_04) \{}
+    \FunctionTok{cat}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{\#\# 4. Climatological (configurable) Limits.}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{)}
 
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{clim\_lim\_C3 \textless{}{-}}\StringTok{ }\FloatTok{0.77}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{clim\_lim\_D3 \textless{}{-}}\StringTok{ }\FloatTok{0.81}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{clim\_lim\_C1 \textless{}{-}}\StringTok{ }\FloatTok{1.14}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{clim\_lim\_D1 \textless{}{-}}\StringTok{ }\FloatTok{1.32}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{clim\_lim\_C3 }\OtherTok{\textless{}{-}} \FloatTok{0.77}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{clim\_lim\_D3 }\OtherTok{\textless{}{-}} \FloatTok{0.81}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{clim\_lim\_C1 }\OtherTok{\textless{}{-}} \FloatTok{1.14}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{clim\_lim\_D1 }\OtherTok{\textless{}{-}} \FloatTok{1.32}
 
-    \CommentTok{\#\# . . Direct {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[, Dir\_First\_Clim\_lim }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\NormalTok{TSIextEARTH\_comb }\OperatorTok{*}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{clim\_lim\_C3 }\OperatorTok{*}\StringTok{ }\KeywordTok{cosde}\NormalTok{(SZA)}\OperatorTok{\^{}}\FloatTok{0.2} \OperatorTok{+}\StringTok{ }\DecValTok{10}\NormalTok{]}
-\NormalTok{    DATA[wattDIR }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{Dir\_First\_Clim\_lim,}
-\NormalTok{         QCF\_DIR\_}\DecValTok{04}\NormalTok{\_}\DecValTok{1} \OperatorTok{:}\ErrorTok{=}\StringTok{ "First climatological limit (17)"}\NormalTok{]}
-\NormalTok{    DATA[, Dir\_Secon\_Clim\_lim }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\NormalTok{TSIextEARTH\_comb }\OperatorTok{*}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{clim\_lim\_D3 }\OperatorTok{*}\StringTok{ }\KeywordTok{cosde}\NormalTok{(SZA)}\OperatorTok{\^{}}\FloatTok{0.2} \OperatorTok{+}\StringTok{ }\DecValTok{15}\NormalTok{]}
-\NormalTok{    DATA[wattDIR }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{Dir\_Secon\_Clim\_lim,}
-\NormalTok{         QCF\_DIR\_}\DecValTok{04}\NormalTok{\_}\DecValTok{2} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Second climatological limit (16)"}\NormalTok{]}
+    \DocumentationTok{\#\# . . Direct {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[, Dir\_First\_Clim\_lim }\SpecialCharTok{:}\ErrorTok{=}\NormalTok{ TSIextEARTH\_comb }\SpecialCharTok{*}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{clim\_lim\_C3 }\SpecialCharTok{*} \FunctionTok{cosde}\NormalTok{(SZA)}\SpecialCharTok{\^{}}\FloatTok{0.2} \SpecialCharTok{+} \DecValTok{10}\NormalTok{]}
+\NormalTok{    DATA[wattDIR }\SpecialCharTok{\textgreater{}}\NormalTok{ Dir\_First\_Clim\_lim,}
+\NormalTok{         QCF\_DIR\_04\_1 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"First climatological limit (17)"}\NormalTok{]}
+\NormalTok{    DATA[, Dir\_Secon\_Clim\_lim }\SpecialCharTok{:}\ErrorTok{=}\NormalTok{ TSIextEARTH\_comb }\SpecialCharTok{*}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{clim\_lim\_D3 }\SpecialCharTok{*} \FunctionTok{cosde}\NormalTok{(SZA)}\SpecialCharTok{\^{}}\FloatTok{0.2} \SpecialCharTok{+} \DecValTok{15}\NormalTok{]}
+\NormalTok{    DATA[wattDIR }\SpecialCharTok{\textgreater{}}\NormalTok{ Dir\_Secon\_Clim\_lim,}
+\NormalTok{         QCF\_DIR\_04\_2 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Second climatological limit (16)"}\NormalTok{]}
 
-    \CommentTok{\#\# . . Global {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[, Glo\_First\_Clim\_lim }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\NormalTok{TSIextEARTH\_comb }\OperatorTok{*}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{clim\_lim\_C1 }\OperatorTok{*}\StringTok{ }\KeywordTok{cosde}\NormalTok{(SZA)}\OperatorTok{\^{}}\FloatTok{1.2} \OperatorTok{+}\StringTok{ }\DecValTok{60}\NormalTok{]}
-\NormalTok{    DATA[wattGLB }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{Glo\_First\_Clim\_lim,}
-\NormalTok{         QCF\_GLB\_}\DecValTok{04}\NormalTok{\_}\DecValTok{1} \OperatorTok{:}\ErrorTok{=}\StringTok{ "First climatological limit (17)"}\NormalTok{]}
-\NormalTok{    DATA[, Glo\_Secon\_Clim\_lim }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\NormalTok{TSIextEARTH\_comb }\OperatorTok{*}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{clim\_lim\_D1 }\OperatorTok{*}\StringTok{ }\KeywordTok{cosde}\NormalTok{(SZA)}\OperatorTok{\^{}}\FloatTok{1.2} \OperatorTok{+}\StringTok{ }\DecValTok{60}\NormalTok{]}
-\NormalTok{    DATA[wattGLB }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{Glo\_Secon\_Clim\_lim,}
-\NormalTok{         QCF\_GLB\_}\DecValTok{04}\NormalTok{\_}\DecValTok{2} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Second climatological limit (16)"}\NormalTok{]}
+    \DocumentationTok{\#\# . . Global {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[, Glo\_First\_Clim\_lim }\SpecialCharTok{:}\ErrorTok{=}\NormalTok{ TSIextEARTH\_comb }\SpecialCharTok{*}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{clim\_lim\_C1 }\SpecialCharTok{*} \FunctionTok{cosde}\NormalTok{(SZA)}\SpecialCharTok{\^{}}\FloatTok{1.2} \SpecialCharTok{+} \DecValTok{60}\NormalTok{]}
+\NormalTok{    DATA[wattGLB }\SpecialCharTok{\textgreater{}}\NormalTok{ Glo\_First\_Clim\_lim,}
+\NormalTok{         QCF\_GLB\_04\_1 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"First climatological limit (17)"}\NormalTok{]}
+\NormalTok{    DATA[, Glo\_Secon\_Clim\_lim }\SpecialCharTok{:}\ErrorTok{=}\NormalTok{ TSIextEARTH\_comb }\SpecialCharTok{*}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{clim\_lim\_D1 }\SpecialCharTok{*} \FunctionTok{cosde}\NormalTok{(SZA)}\SpecialCharTok{\^{}}\FloatTok{1.2} \SpecialCharTok{+} \DecValTok{60}\NormalTok{]}
+\NormalTok{    DATA[wattGLB }\SpecialCharTok{\textgreater{}}\NormalTok{ Glo\_Secon\_Clim\_lim,}
+\NormalTok{         QCF\_GLB\_04\_2 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Second climatological limit (16)"}\NormalTok{]}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
@@ -1435,37 +1456,37 @@ Exclusions should be done case by case.
 
 \begin{longtable}[]{@{}cc@{}}
 \toprule
-First climatological limit (17) & NA\tabularnewline
+First climatological limit (17) & NA \\
 \midrule
 \endhead
-138 & 7787418\tabularnewline
+138 & 7795571 \\
 \bottomrule
 \end{longtable}
 
 \begin{longtable}[]{@{}c@{}}
 \toprule
-NA\tabularnewline
+NA \\
 \midrule
 \endhead
-7787556\tabularnewline
+7795709 \\
 \bottomrule
 \end{longtable}
 
 \begin{longtable}[]{@{}cc@{}}
 \toprule
-First climatological limit (17) & NA\tabularnewline
+First climatological limit (17) & NA \\
 \midrule
 \endhead
-656 & 7786900\tabularnewline
+656 & 7795053 \\
 \bottomrule
 \end{longtable}
 
 \begin{longtable}[]{@{}c@{}}
 \toprule
-NA\tabularnewline
+NA \\
 \midrule
 \endhead
-7787556\tabularnewline
+7795709 \\
 \bottomrule
 \end{longtable}
 
@@ -1623,25 +1644,25 @@ NA\tabularnewline
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{if}\NormalTok{ (TEST\_}\DecValTok{05}\NormalTok{) \{}
-    \KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{5. Tracking test.}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
-    \CommentTok{\#\# criteria}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{Tracking\_min\_elev \textless{}{-}}\StringTok{   }\DecValTok{15}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{ClrSW\_lim         \textless{}{-}}\StringTok{    }\FloatTok{0.85}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{glo\_min           \textless{}{-}}\StringTok{   }\DecValTok{25}
-    \CommentTok{\#\# Global Clear SW model}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{ClrSW\_a           \textless{}{-}}\StringTok{ }\FloatTok{1050.5}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{ClrSW\_b           \textless{}{-}}\StringTok{    }\FloatTok{1.095}
-    \CommentTok{\#\# Clear Sky Sort{-}Wave model}
-\NormalTok{    DATA[, ClrSW\_ref2 }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\NormalTok{( QS}\OperatorTok{$}\NormalTok{ClrSW\_a }\OperatorTok{/}\StringTok{ }\NormalTok{sun\_dist }\OperatorTok{\^{}}\StringTok{ }\DecValTok{2}\NormalTok{ ) }\OperatorTok{*}\StringTok{ }\KeywordTok{cosde}\NormalTok{(SZA) }\OperatorTok{\^{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{ClrSW\_b ]}
+\ControlFlowTok{if}\NormalTok{ (TEST\_05) \{}
+    \FunctionTok{cat}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{5. Tracking test.}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
+    \DocumentationTok{\#\# criteria}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{Tracking\_min\_elev }\OtherTok{\textless{}{-}}   \DecValTok{15}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{ClrSW\_lim         }\OtherTok{\textless{}{-}}    \FloatTok{0.85}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{glo\_min           }\OtherTok{\textless{}{-}}   \DecValTok{25}
+    \DocumentationTok{\#\# Global Clear SW model}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{ClrSW\_a           }\OtherTok{\textless{}{-}} \FloatTok{1050.5}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{ClrSW\_b           }\OtherTok{\textless{}{-}}    \FloatTok{1.095}
+    \DocumentationTok{\#\# Clear Sky Sort{-}Wave model}
+\NormalTok{    DATA[, ClrSW\_ref2 }\SpecialCharTok{:}\ErrorTok{=}\NormalTok{ ( QS}\SpecialCharTok{$}\NormalTok{ClrSW\_a }\SpecialCharTok{/}\NormalTok{ sun\_dist }\SpecialCharTok{\^{}} \DecValTok{2}\NormalTok{ ) }\SpecialCharTok{*} \FunctionTok{cosde}\NormalTok{(SZA) }\SpecialCharTok{\^{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{ClrSW\_b ]}
     \CommentTok{\# DATA[, ClrSW\_ref1 := TSIextEARTH\_comb * cosde(SZA) \^{} QS$ClrSW\_b ]}
 
-    \CommentTok{\#\# . . Direct {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[wattGLB }\OperatorTok{/}\StringTok{ }\NormalTok{ClrSW\_ref2 }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{ClrSW\_lim }\OperatorTok{\&}
-\StringTok{         }\NormalTok{DIF\_HOR }\OperatorTok{/}\StringTok{ }\NormalTok{wattGLB    }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{ClrSW\_lim }\OperatorTok{\&}
-\StringTok{         }\NormalTok{wattGLB              }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{glo\_min   }\OperatorTok{\&}
-\StringTok{         }\NormalTok{Elevat               }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{Tracking\_min\_elev,}
-\NormalTok{         QCF\_DIR\_}\DecValTok{05} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Possible no tracking (24)"}\NormalTok{]}
+    \DocumentationTok{\#\# . . Direct {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[wattGLB }\SpecialCharTok{/}\NormalTok{ ClrSW\_ref2 }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{ClrSW\_lim }\SpecialCharTok{\&}
+\NormalTok{         DIF\_HOR }\SpecialCharTok{/}\NormalTok{ wattGLB    }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{ClrSW\_lim }\SpecialCharTok{\&}
+\NormalTok{         wattGLB              }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{glo\_min   }\SpecialCharTok{\&}
+\NormalTok{         Elevat               }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{Tracking\_min\_elev,}
+\NormalTok{         QCF\_DIR\_05 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Possible no tracking (24)"}\NormalTok{]}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
@@ -1652,10 +1673,10 @@ NA\tabularnewline
 
 \begin{longtable}[]{@{}ccc@{}}
 \toprule
-No tracking possible (24) & Possible no tracking (24) & NA\tabularnewline
+No tracking possible (24) & Possible no tracking (24) & NA \\
 \midrule
 \endhead
-19583 & 464 & 7767509\tabularnewline
+19955 & 568 & 7775186 \\
 \bottomrule
 \end{longtable}
 
@@ -6537,6 +6558,98 @@ No tracking possible (24) & Possible no tracking (24) & NA\tabularnewline
 
 \begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2439} \end{center}
 
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2440} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2441} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2442} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2443} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2444} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2445} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2446} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2447} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2448} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2449} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2450} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2451} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2452} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2453} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2454} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2455} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2456} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2457} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2458} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2459} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2460} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2461} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2462} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2463} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2464} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2465} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2466} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2467} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2468} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2469} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2470} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2471} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2472} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2473} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2474} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2475} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2476} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2477} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2478} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2479} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2480} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2481} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2482} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2483} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2484} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-19-2485} \end{center}
+
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \FloatBarrier
@@ -6556,36 +6669,36 @@ Reasons:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{if}\NormalTok{ (TEST\_}\DecValTok{06}\NormalTok{) \{}
-    \KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{6. Rayleigh Limit Diffuse Comparison.}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
+\ControlFlowTok{if}\NormalTok{ (TEST\_06) \{}
+    \FunctionTok{cat}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{6. Rayleigh Limit Diffuse Comparison.}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
     \CommentTok{\# criteria}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{Rayleigh\_upper\_lim \textless{}{-}}\StringTok{ }\DecValTok{500}   \CommentTok{\# Upper departure diffuse limit}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{Rayleigh\_lower\_lim \textless{}{-}}\StringTok{  }\DecValTok{{-}3}   \CommentTok{\# Lower departure diffuse limit}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{Rayleigh\_dif\_glo\_r \textless{}{-}}\StringTok{   }\FloatTok{0.8} \CommentTok{\# Low limit diffuse/global \textless{} threshold}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{Rayleigh\_glo\_min   \textless{}{-}}\StringTok{  }\DecValTok{50}   \CommentTok{\# Low limit minimum global}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{Rayleigh\_upper\_lim }\OtherTok{\textless{}{-}} \DecValTok{500}   \CommentTok{\# Upper departure diffuse limit}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{Rayleigh\_lower\_lim }\OtherTok{\textless{}{-}}  \SpecialCharTok{{-}}\DecValTok{3}   \CommentTok{\# Lower departure diffuse limit}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{Rayleigh\_dif\_glo\_r }\OtherTok{\textless{}{-}}   \FloatTok{0.8} \CommentTok{\# Low limit diffuse/global \textless{} threshold}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{Rayleigh\_glo\_min   }\OtherTok{\textless{}{-}}  \DecValTok{50}   \CommentTok{\# Low limit minimum global}
     \CommentTok{\# model}
-\NormalTok{    Rayleigh\_diff \textless{}{-}}\StringTok{ }\ControlFlowTok{function}\NormalTok{(SZA, Pressure) \{}
-\NormalTok{        a    \textless{}{-}}\StringTok{   }\FloatTok{209.3}
-\NormalTok{        b    \textless{}{-}}\StringTok{  }\FloatTok{{-}708.3}
-\NormalTok{        c    \textless{}{-}}\StringTok{  }\FloatTok{1128.7}
-\NormalTok{        d    \textless{}{-}}\StringTok{  }\FloatTok{{-}911.2}
-\NormalTok{        e    \textless{}{-}}\StringTok{   }\FloatTok{287.85}
-\NormalTok{        f    \textless{}{-}}\StringTok{     }\FloatTok{0.046725}
-\NormalTok{        mu\_}\DecValTok{0}\NormalTok{ \textless{}{-}}\StringTok{ }\KeywordTok{cosde}\NormalTok{(SZA)}
-        \KeywordTok{return}\NormalTok{( a }\OperatorTok{*}\StringTok{ }\NormalTok{mu\_}\DecValTok{0}     \OperatorTok{+}
-\StringTok{                }\NormalTok{b }\OperatorTok{*}\StringTok{ }\NormalTok{mu\_}\DecValTok{0} \OperatorTok{\^{}}\StringTok{ }\DecValTok{2} \OperatorTok{+}
-\StringTok{                }\NormalTok{c }\OperatorTok{*}\StringTok{ }\NormalTok{mu\_}\DecValTok{0} \OperatorTok{\^{}}\StringTok{ }\DecValTok{3} \OperatorTok{+}
-\StringTok{                }\NormalTok{d }\OperatorTok{*}\StringTok{ }\NormalTok{mu\_}\DecValTok{0} \OperatorTok{\^{}}\StringTok{ }\DecValTok{4} \OperatorTok{+}
-\StringTok{                }\NormalTok{e }\OperatorTok{*}\StringTok{ }\NormalTok{mu\_}\DecValTok{0} \OperatorTok{\^{}}\StringTok{ }\DecValTok{5} \OperatorTok{+}
-\StringTok{                }\NormalTok{f }\OperatorTok{*}\StringTok{ }\NormalTok{mu\_}\DecValTok{0} \OperatorTok{*}\StringTok{ }\NormalTok{Pressure )}
+\NormalTok{    Rayleigh\_diff }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(SZA, Pressure) \{}
+\NormalTok{        a    }\OtherTok{\textless{}{-}}   \FloatTok{209.3}
+\NormalTok{        b    }\OtherTok{\textless{}{-}}  \SpecialCharTok{{-}}\FloatTok{708.3}
+\NormalTok{        c    }\OtherTok{\textless{}{-}}  \FloatTok{1128.7}
+\NormalTok{        d    }\OtherTok{\textless{}{-}}  \SpecialCharTok{{-}}\FloatTok{911.2}
+\NormalTok{        e    }\OtherTok{\textless{}{-}}   \FloatTok{287.85}
+\NormalTok{        f    }\OtherTok{\textless{}{-}}     \FloatTok{0.046725}
+\NormalTok{        mu\_0 }\OtherTok{\textless{}{-}} \FunctionTok{cosde}\NormalTok{(SZA)}
+        \FunctionTok{return}\NormalTok{( a }\SpecialCharTok{*}\NormalTok{ mu\_0     }\SpecialCharTok{+}
+\NormalTok{                b }\SpecialCharTok{*}\NormalTok{ mu\_0 }\SpecialCharTok{\^{}} \DecValTok{2} \SpecialCharTok{+}
+\NormalTok{                c }\SpecialCharTok{*}\NormalTok{ mu\_0 }\SpecialCharTok{\^{}} \DecValTok{3} \SpecialCharTok{+}
+\NormalTok{                d }\SpecialCharTok{*}\NormalTok{ mu\_0 }\SpecialCharTok{\^{}} \DecValTok{4} \SpecialCharTok{+}
+\NormalTok{                e }\SpecialCharTok{*}\NormalTok{ mu\_0 }\SpecialCharTok{\^{}} \DecValTok{5} \SpecialCharTok{+}
+\NormalTok{                f }\SpecialCharTok{*}\NormalTok{ mu\_0 }\SpecialCharTok{*}\NormalTok{ Pressure )}
 \NormalTok{    \}}
-\NormalTok{    DATA[, RaylDIFF  }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\KeywordTok{Rayleigh\_diff}\NormalTok{(}\DataTypeTok{SZA =}\NormalTok{ SZA, }\DataTypeTok{Pressure =}\NormalTok{ pressure) ]}
+\NormalTok{    DATA[, RaylDIFF  }\SpecialCharTok{:}\ErrorTok{=} \FunctionTok{Rayleigh\_diff}\NormalTok{(}\AttributeTok{SZA =}\NormalTok{ SZA, }\AttributeTok{Pressure =}\NormalTok{ pressure) ]}
 
-    \CommentTok{\#\# . . Both {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[DIF\_HOR }\OperatorTok{{-}}\StringTok{ }\NormalTok{RaylDIFF }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{Rayleigh\_upper\_lim,}
-\NormalTok{         QCF\_BTH\_}\DecValTok{06}\NormalTok{\_}\DecValTok{1} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Rayleigh diffuse limit (18)"}\NormalTok{ ]}
-\NormalTok{    DATA[DIF\_HOR }\OperatorTok{{-}}\StringTok{ }\NormalTok{RaylDIFF }\OperatorTok{\textless{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{Rayleigh\_lower\_lim,}
-\NormalTok{         QCF\_BTH\_}\DecValTok{06}\NormalTok{\_}\DecValTok{2} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Rayleigh diffuse limit (18)"}\NormalTok{ ]}
+    \DocumentationTok{\#\# . . Both {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[DIF\_HOR }\SpecialCharTok{{-}}\NormalTok{ RaylDIFF }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{Rayleigh\_upper\_lim,}
+\NormalTok{         QCF\_BTH\_06\_1 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Rayleigh diffuse limit (18)"}\NormalTok{ ]}
+\NormalTok{    DATA[DIF\_HOR }\SpecialCharTok{{-}}\NormalTok{ RaylDIFF }\SpecialCharTok{\textless{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{Rayleigh\_lower\_lim,}
+\NormalTok{         QCF\_BTH\_06\_2 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Rayleigh diffuse limit (18)"}\NormalTok{ ]}
 
 \NormalTok{\}}
 \end{Highlighting}
@@ -6597,19 +6710,19 @@ Reasons:
 
 \begin{longtable}[]{@{}cc@{}}
 \toprule
-Rayleigh diffuse limit (18) & NA\tabularnewline
+Rayleigh diffuse limit (18) & NA \\
 \midrule
 \endhead
-2837 & 7784719\tabularnewline
+3233 & 7792476 \\
 \bottomrule
 \end{longtable}
 
 \begin{longtable}[]{@{}cc@{}}
 \toprule
-Rayleigh diffuse limit (18) & NA\tabularnewline
+Rayleigh diffuse limit (18) & NA \\
 \midrule
 \endhead
-74857 & 7712699\tabularnewline
+76123 & 7719586 \\
 \bottomrule
 \end{longtable}
 
@@ -7891,6 +8004,38 @@ Rayleigh diffuse limit (18) & NA\tabularnewline
 
 \begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-639} \end{center}
 
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-640} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-641} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-642} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-643} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-644} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-645} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-646} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-647} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-648} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-649} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-650} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-651} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-652} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-653} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-654} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-22-655} \end{center}
+
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \newpage
@@ -7926,22 +8071,22 @@ Additional criteria is needed for any data drop.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{if}\NormalTok{ (TEST\_}\DecValTok{08}\NormalTok{) \{}
-    \KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{8. Inversion test.}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
+\ControlFlowTok{if}\NormalTok{ (TEST\_08) \{}
+    \FunctionTok{cat}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{8. Inversion test.}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
 
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{dir\_glo\_invert  \textless{}{-}}\StringTok{ }\DecValTok{5}  \CommentTok{\# Diffuse Inversion test: DIRhor {-} GLBhor \textgreater{} lim[\%]}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{dir\_glo\_glo\_off \textless{}{-}}\StringTok{ }\DecValTok{5}  \CommentTok{\# Diffuse Inversion test: apply for GLBhor \textgreater{} offset}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{dir\_glo\_invert  }\OtherTok{\textless{}{-}} \DecValTok{5}  \CommentTok{\# Diffuse Inversion test: DIRhor {-} GLBhor \textgreater{} lim[\%]}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{dir\_glo\_glo\_off }\OtherTok{\textless{}{-}} \DecValTok{5}  \CommentTok{\# Diffuse Inversion test: apply for GLBhor \textgreater{} offset}
 
-    \CommentTok{\#\# . . Both {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[, Relative\_diffuse }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\DecValTok{100} \OperatorTok{*}\StringTok{ }\NormalTok{(wattHOR }\OperatorTok{{-}}\StringTok{ }\NormalTok{wattGLB) }\OperatorTok{/}\StringTok{ }\NormalTok{wattGLB ]}
-\NormalTok{    DATA[ }\KeywordTok{is.infinite}\NormalTok{(Relative\_diffuse), Relative\_diffuse }\OperatorTok{:}\ErrorTok{=}\StringTok{ }\OtherTok{NA}\NormalTok{]}
+    \DocumentationTok{\#\# . . Both {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[, Relative\_diffuse }\SpecialCharTok{:}\ErrorTok{=} \DecValTok{100} \SpecialCharTok{*}\NormalTok{ (wattHOR }\SpecialCharTok{{-}}\NormalTok{ wattGLB) }\SpecialCharTok{/}\NormalTok{ wattGLB ]}
+\NormalTok{    DATA[ }\FunctionTok{is.infinite}\NormalTok{(Relative\_diffuse), Relative\_diffuse }\SpecialCharTok{:}\ErrorTok{=} \ConstantTok{NA}\NormalTok{]}
 
-\NormalTok{    DATA[Relative\_diffuse }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dir\_glo\_invert  }\OperatorTok{\&}
-\StringTok{                  }\NormalTok{wattGLB }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dir\_glo\_glo\_off ,}
-\NormalTok{         QCF\_BTH\_}\DecValTok{08}\NormalTok{\_}\DecValTok{1} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Direct \textgreater{} global soft (14)"}\NormalTok{ ]}
+\NormalTok{    DATA[Relative\_diffuse }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dir\_glo\_invert  }\SpecialCharTok{\&}
+\NormalTok{                  wattGLB }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dir\_glo\_glo\_off ,}
+\NormalTok{         QCF\_BTH\_08\_1 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Direct \textgreater{} global soft (14)"}\NormalTok{ ]}
 
-\NormalTok{    DATA[Relative\_diffuse }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{dir\_glo\_invert ,}
-\NormalTok{         QCF\_BTH\_}\DecValTok{08}\NormalTok{\_}\DecValTok{2} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Direct \textgreater{} global hard (15)"}\NormalTok{ ]}
+\NormalTok{    DATA[Relative\_diffuse }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{dir\_glo\_invert ,}
+\NormalTok{         QCF\_BTH\_08\_2 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Direct \textgreater{} global hard (15)"}\NormalTok{ ]}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
@@ -7954,7 +8099,7 @@ Additional criteria is needed for any data drop.
 
 | Direct > global soft (14) |   NA    |
 |:-------------------------:|:-------:|
-|           1256            | 7786300 |
+|           1256            | 7794453 |
 
 
 
@@ -7962,7 +8107,7 @@ Additional criteria is needed for any data drop.
 
 | Direct > global hard (15) |   NA    |
 |:-------------------------:|:-------:|
-|           1271            | 7786285 |
+|           1271            | 7794438 |
 \end{verbatim}
 
 \begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-28-1} \end{center}
@@ -9240,18 +9385,18 @@ For larger elevation angles manual inspection is needed.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ControlFlowTok{if}\NormalTok{ (TEST\_}\DecValTok{09}\NormalTok{) \{}
-    \KeywordTok{cat}\NormalTok{(}\KeywordTok{paste}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{9. Clearness index (global/TSI) test.}\CharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
+\ControlFlowTok{if}\NormalTok{ (TEST\_09) \{}
+    \FunctionTok{cat}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{9. Clearness index (global/TSI) test.}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{))}
 
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{CL\_idx\_max \textless{}{-}}\StringTok{  }\FloatTok{1.13}  \CommentTok{\# Upper Clearness index accepted level}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{CL\_idx\_min \textless{}{-}}\StringTok{ }\FloatTok{{-}0.001} \CommentTok{\# Lower Clearness index accepted level}
-\NormalTok{    QS}\OperatorTok{$}\NormalTok{CL\_idx\_ele \textless{}{-}}\StringTok{  }\DecValTok{8}     \CommentTok{\# Apply for elevations above this angle}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{CL\_idx\_max }\OtherTok{\textless{}{-}}  \FloatTok{1.13}  \CommentTok{\# Upper Clearness index accepted level}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{CL\_idx\_min }\OtherTok{\textless{}{-}} \SpecialCharTok{{-}}\FloatTok{0.001} \CommentTok{\# Lower Clearness index accepted level}
+\NormalTok{    QS}\SpecialCharTok{$}\NormalTok{CL\_idx\_ele }\OtherTok{\textless{}{-}}  \DecValTok{8}     \CommentTok{\# Apply for elevations above this angle}
 
-    \CommentTok{\#\# . . Global {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
-\NormalTok{    DATA[Clearness\_Kt }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{CL\_idx\_max }\OperatorTok{\&}\StringTok{ }\NormalTok{Elevat }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{CL\_idx\_ele,}
-\NormalTok{         QCF\_GLB\_}\DecValTok{09} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Clearness index limit max (19)"}\NormalTok{ ]}
-\NormalTok{    DATA[Clearness\_Kt }\OperatorTok{\textless{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{CL\_idx\_min }\OperatorTok{\&}\StringTok{ }\NormalTok{Elevat }\OperatorTok{\textgreater{}}\StringTok{ }\NormalTok{QS}\OperatorTok{$}\NormalTok{CL\_idx\_ele,}
-\NormalTok{         QCF\_GLB\_}\DecValTok{09} \OperatorTok{:}\ErrorTok{=}\StringTok{ "Clearness index limit min (20)"}\NormalTok{ ]}
+    \DocumentationTok{\#\# . . Global {-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}{-}}
+\NormalTok{    DATA[Clearness\_Kt }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{CL\_idx\_max }\SpecialCharTok{\&}\NormalTok{ Elevat }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{CL\_idx\_ele,}
+\NormalTok{         QCF\_GLB\_09 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Clearness index limit max (19)"}\NormalTok{ ]}
+\NormalTok{    DATA[Clearness\_Kt }\SpecialCharTok{\textless{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{CL\_idx\_min }\SpecialCharTok{\&}\NormalTok{ Elevat }\SpecialCharTok{\textgreater{}}\NormalTok{ QS}\SpecialCharTok{$}\NormalTok{CL\_idx\_ele,}
+\NormalTok{         QCF\_GLB\_09 }\SpecialCharTok{:}\ErrorTok{=} \StringTok{"Clearness index limit min (20)"}\NormalTok{ ]}
 
 
 \NormalTok{\}}
@@ -9262,12 +9407,21 @@ For larger elevation angles manual inspection is needed.
 9. Clearness index (global/TSI) test.
 \end{verbatim}
 
-\begin{longtable}[]{@{}ccc@{}}
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4384}}
+  >{\centering\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.4384}}
+  >{\centering\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.1233}}@{}}
 \toprule
-Clearness index limit max (19) & Clearness index limit min (20) & NA\tabularnewline
+\begin{minipage}[b]{\linewidth}\centering
+Clearness index limit max (19)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Clearness index limit min (20)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+NA
+\end{minipage} \\
 \midrule
 \endhead
-17320 & 29193 & 7741043\tabularnewline
+17388 & 29324 & 7748997 \\
 \bottomrule
 \end{longtable}
 
@@ -30219,6 +30373,96 @@ Clearness index limit max (19) & Clearness index limit min (20) & NA\tabularnewl
 
 \begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10474} \end{center}
 
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10475} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10476} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10477} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10478} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10479} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10480} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10481} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10482} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10483} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10484} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10485} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10486} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10487} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10488} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10489} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10490} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10491} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10492} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10493} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10494} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10495} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10496} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10497} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10498} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10499} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10500} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10501} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10502} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10503} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10504} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10505} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10506} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10507} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10508} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10509} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10510} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10511} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10512} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10513} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10514} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10515} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10516} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10517} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10518} \end{center}
+
+\begin{center}\includegraphics[height=0.3\textheight]{/home/athan/RAD_QC/REPORTS/QCRad_LongShi_v8_apply_CM21_CHP1_files/figure-latex/unnamed-chunk-31-10519} \end{center}
+
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 Written: /home/athan/DATA/Broad\_Band/QCRad\_LongShi/QCRad\_LongShi\_v8\_apply\_CM21\_CHP1\_1993.Rds
@@ -30348,7 +30592,7 @@ Written: /home/athan/DATA/Broad\_Band/QCRad\_LongShi/QCRad\_LongShi\_v8\_apply\_
 \textbf{END}
 
 \begin{verbatim}
-2023-06-16 09:35:14.6 athan@sagan ./QCRad_LongShi_v8_apply_CM21_CHP1.R 65.731705 mins
+2023-06-25 09:04:33.1 athan@sagan ./QCRad_LongShi_v8_apply_CM21_CHP1.R 55.798204 mins
 \end{verbatim}
 
 \end{document}
