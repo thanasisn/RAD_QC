@@ -9,5 +9,11 @@ Check all filters based on wattDIF!!!!!!!!!!!!11
 - finish the new version [ ]
 - hunt for bad data [ ]
 
+## Replace variables
+
+Clearness_Kt is created here but 
+ClearnessIndex_kt is already available from BB
 
 
+DiffuseFraction_Kd is created here but
+DiffuseFraction_kd is already available from BB
