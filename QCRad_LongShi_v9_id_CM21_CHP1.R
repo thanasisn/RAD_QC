@@ -153,7 +153,7 @@ DO_TEST_09 <- TRUE   # Test clearness index limits
 
 TESTING_NP <- 1000000
 TESTING    <- FALSE
-# TESTING    <- TRUE
+TESTING    <- TRUE
 
 # DO_TEST_01 <- FALSE # Physically Possible Limits
 # DO_TEST_02 <- F   # Extremely Rare Limits
@@ -227,13 +227,16 @@ SUS_DATA_gather <- data.table()
 yearSTA <- as.numeric(format(PROJECT_START, format = "%Y"))
 yearEND <- as.numeric(format(x = as.POSIXct(Sys.Date()), format = "%Y"))
 
-## override years
-# yearSTA <- 2022
-# yearEND <- 2022
 
-# yearSTA <- 1993
-# yearEND <- 1993
+if (TESTING) {
+    ## override years
+    yearSTA <- 2022
+    yearEND <- 2022
 
+    # yearSTA <- 1993
+    # yearEND <- 1993
+    cat("\n  Years to do", yearSTA:yearEND, "\n")
+}
 
 ## graph options
 par(mar = c(2, 4, 1.1, .5))
@@ -357,6 +360,9 @@ for (YY in yearSTA:yearEND) {
     warning(" * * DiffuseFraction_Kd is no Diffuse Fraction !! ** ")
     cat("\n\n * * DiffuseFraction_Kd is no Diffuse Fraction !! ** \n\n")
 
+
+
+stop("EE")
 
     ## create a time of day representation
     DATA_year$Times <- as.POSIXct(strftime(DATA_year$Date, format = "%H:%M:%S"), format = "%H:%M:%S" )
