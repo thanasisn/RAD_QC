@@ -310,13 +310,13 @@ if (TEST_01) {
 if (TEST_02) {
     cat(paste("\n2. Extremely Rare Limits.\n\n"))
     # Upper modeled values
-    QS$Dir_SWdn_amp     <-    0.91 # Direct departure factor above the model
-    QS$Dir_SWdn_off     <- -140    # Direct departure offset above the model
-    QS$Glo_SWdn_amp     <- 1.18    # Global departure factor above the model
-    QS$Glo_SWdn_off     <- 40      # Global departure offset above the model
+    QS$Dir_SWdn_amp     <-    0.91  # Direct departure factor above the model
+    QS$Dir_SWdn_off     <- -140     # Direct departure offset above the model
+    QS$Glo_SWdn_amp     <-    1.18  # Global departure factor above the model
+    QS$Glo_SWdn_off     <-   40     # Global departure offset above the model
     # Minimum accepted values
-    QS$dir_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
-    QS$glo_SWdn_min_ext <-   -2    # Extremely Rare Minimum Limits
+    QS$dir_SWdn_min_ext <-   -2     # Extremely Rare Minimum Limits
+    QS$glo_SWdn_min_ext <-   -2     # Extremely Rare Minimum Limits
     # Compute reference values
     DATA[, Direct_max := TSIextEARTH_comb * QS$Dir_SWdn_amp * cosde(SZA)^0.2 + QS$Dir_SWdn_off]
     DATA[, Global_max := TSIextEARTH_comb * QS$Glo_SWdn_amp * cosde(SZA)^1.2 + QS$Glo_SWdn_off]
@@ -694,10 +694,10 @@ if (TEST_05) {
     # DATA[, ClrSW_ref1 := TSIextEARTH_comb * cosde(SZA) ^ QS$ClrSW_b ]
 
     ## . . Direct --------------------------------------------------------------
-    DATA[wattGLB / ClrSW_ref2 > QS$ClrSW_lim &
+    DATA[wattGLB     / ClrSW_ref2 > QS$ClrSW_lim &
          DIFF_strict / wattGLB    > QS$ClrSW_lim &
-         wattGLB              > QS$glo_min   &
-         Elevat               > QS$Tracking_min_elev,
+         wattGLB                  > QS$glo_min   &
+         Elevat                   > QS$Tracking_min_elev,
          QCF_DIR_05 := "Possible no tracking (24)"]
 }
 
@@ -710,6 +710,8 @@ if (TEST_05) {
     hist(DATA[, ClrSW_ref2 - wattDIR ], breaks = 100)
     hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100)
     hist(DATA[, DIFF_strict / wattGLB    ], breaks = 100)
+    hist(DATA[QCF_DIR_05 := "Possible no tracking (24)", Elevat ], breaks = 100)
+
 
     if (DO_PLOTS) {
         tmp <- DATA[ !is.na(QCF_DIR_05), unique(as.Date(Date)) ]
@@ -917,8 +919,6 @@ if (TEST_07) {
     # DATA_year$QCF_DIR[    suspects ]          <- "Possible Direct Obstruction (23)"
     # DATA_year$QCF_DIR_07[ suspects ]          <- "Possible Direct Obstruction (23)"
 
-
-
 }
 
 #+ echo=F, include=T
@@ -1067,17 +1067,15 @@ if (TEST_08) {
 if (TEST_09) {
     cat(paste("\n9. Clearness index (global/TSI) test.\n\n"))
 
-    QS$CL_idx_max <-  1.13  # Upper Clearness index accepted level
-    QS$CL_idx_min <- -0.001 # Lower Clearness index accepted level
-    QS$CL_idx_ele <-  8     # Apply for elevations above this angle
+    QS$CL_idx_max      <-  1.13  # Upper Clearness index accepted level
+    QS$CL_idx_min      <- -0.001 # Lower Clearness index accepted level
+    QS$CL_idx_ele      <-  9     # Apply for elevations above this angle
 
     ## . . Global --------------------------------------------------------------
     DATA[ClearnessIndex_kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele,
          QCF_GLB_09 := "Clearness index limit max (19)" ]
     DATA[ClearnessIndex_kt < QS$CL_idx_min & Elevat > QS$CL_idx_ele,
          QCF_GLB_09 := "Clearness index limit min (20)" ]
-
-
 }
 
 #+ echo=F, include=T, results="asis"
@@ -1086,7 +1084,7 @@ if (TEST_09) {
     cat(pander(table(DATA$QCF_GLB_09, exclude = TRUE)))
     cat("\n\n")
 
-    range(DATA[Elevat > QS$CL_idx_ele, ClearnessIndex_kt], na.rm = T)
+    range(DATA[Elevat > QS$CL_idx_ele, ClearnessIndex_kt], na.rm  = TRUE)
     hist( DATA[Elevat > QS$CL_idx_ele, ClearnessIndex_kt], breaks = 100 )
 
     if (any(!is.na(DATA$QCF_GLB_09))) {
@@ -1142,15 +1140,6 @@ if (TEST_09) {
     }
 }
 #' -----------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
 
 
 
