@@ -153,7 +153,7 @@ DO_TEST_09 <- TRUE   # Test clearness index limits
 
 TESTING_NP <- 1000000
 TESTING    <- FALSE
-TESTING    <- TRUE
+# TESTING    <- TRUE
 
 # DO_TEST_01 <- FALSE # Physically Possible Limits
 # DO_TEST_02 <- F   # Extremely Rare Limits
@@ -229,10 +229,10 @@ yearEND <- as.numeric(format(x = as.POSIXct(Sys.Date()), format = "%Y"))
 
 
 if (TESTING) {
+    cat("\n\n  !!! TESTING !!!\n\n")
     ## override years
     yearSTA <- 2022
     yearEND <- 2022
-
     # yearSTA <- 1993
     # yearEND <- 1993
     cat("\n  Years to do", yearSTA:yearEND, "\n")
@@ -346,30 +346,22 @@ for (YY in yearSTA:yearEND) {
 
     ##  Diffuse irradiance  ----------------------------------------------------
     ## DHI = GHI – DNI cos(z)
-    DATA_year[ , DIF_HOR            := DATA_year$wattGLB - DATA_year$wattHOR ]
-    warning(" * * DIF_HOR is no Diffuse radiation !! ** ")
-    cat("\n\n * * DIF_HOR is no Diffuse radiation !! ** \n\n")
-
-
+    # DATA_year[ , DIFF_strict            := DATA_year$wattGLB - DATA_year$wattHOR ]
+    # warning(" * * DIFF_strict is no Diffuse radiation !! ** ")
+    # cat("\n\n * * DIFF_strict is no Diffuse radiation !! ** \n\n")
     ##  Clearness index k_t  ---------------------------------------------------
     # DATA_year[ , ClearnessIndex_kt       := wattGLB / ( cosde(SZA) * TSIextEARTH_comb ) ]
-
-
     ##  Diffuse fraction k_d  --------------------------------------------------
-    DATA_year[ , DiffuseFraction_Kd := DIF_HOR / wattGLB ]
-    warning(" * * DiffuseFraction_Kd is no Diffuse Fraction !! ** ")
-    cat("\n\n * * DiffuseFraction_Kd is no Diffuse Fraction !! ** \n\n")
-
-
-
-stop("EE")
+    # DATA_year[ , DiffuseFraction_kd := DIFF_strict / wattGLB ]
+    # warning(" * * DiffuseFraction_kd is no Diffuse Fraction !! ** ")
+    # cat("\n\n * * DiffuseFraction_kd is no Diffuse Fraction !! ** \n\n")
 
     ## create a time of day representation
     DATA_year$Times <- as.POSIXct(strftime(DATA_year$Date, format = "%H:%M:%S"), format = "%H:%M:%S" )
 
     ## replace infinite values
-    DATA_year[ is.infinite(DiffuseFraction_Kd) & DiffuseFraction_Kd > 0, DiffuseFraction_Kd := NA ]
-    DATA_year[ is.infinite(DiffuseFraction_Kd) & DiffuseFraction_Kd < 0, DiffuseFraction_Kd := NA ]
+    DATA_year[ is.infinite(DiffuseFraction_kd) & DiffuseFraction_kd > 0, DiffuseFraction_kd := NA ]
+    DATA_year[ is.infinite(DiffuseFraction_kd) & DiffuseFraction_kd < 0, DiffuseFraction_kd := NA ]
 
 
 
@@ -439,10 +431,10 @@ stop("EE")
         cat(paste("\n3. Comparison tests.\n\n"))
 
         ## . . Proposed filter ---------------------------------------------####
-        DFR_A    <- DATA_year$DiffuseFraction_Kd >   1.05 &
+        DFR_A    <- DATA_year$DiffuseFraction_kd >   1.05 &
                     DATA_year$SZA                <= 75    &
                     DATA_year$wattGLB            >  50
-        DFR_B    <- DATA_year$DiffuseFraction_Kd >   1.10 &
+        DFR_B    <- DATA_year$DiffuseFraction_kd >   1.10 &
                     DATA_year$SZA                >  75    &
                     DATA_year$SZA                <  93    &
                     DATA_year$wattGLB            >  50
@@ -452,11 +444,11 @@ stop("EE")
         DATA_year$QCF_DIR_03.1[ DFR_prop ]                      <- "Diffuse ratio comp max (11)"
 
         ## . . Extra filters by me -----------------------------------------####
-        DFR_low <- DATA_year$DiffuseFraction_Kd < QS$dif_rati_min
+        DFR_low <- DATA_year$DiffuseFraction_kd < QS$dif_rati_min
         DATA_year$QCF_GLB_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
         DATA_year$QCF_DIR_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
 
-        DFR_hig <- DATA_year$DiffuseFraction_Kd > QS$dif_rati_max
+        DFR_hig <- DATA_year$DiffuseFraction_kd > QS$dif_rati_max
         DATA_year$QCF_GLB_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
         DATA_year$QCF_DIR_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
 
@@ -508,7 +500,7 @@ stop("EE")
 
         ## apply test
         DATA_year[ wattGLB / ClrSW   > QS$ClrSW_lim &
-                   DIF_HOR / wattGLB > QS$ClrSW_lim,
+                   DIFF_strict / wattGLB > QS$ClrSW_lim,
                    QCF_DIR_05 := "No tracking possible (24)" ]
 
         sel <- sum(!is.na(DATA_year$QCF_DIR_05))
@@ -538,8 +530,8 @@ stop("EE")
                          f * mu_0 * DATA_year$pressure
 
         selg <-  DATA_year$wattGLB > 50
-        seld <- (DATA_year$DIF_HOR / DATA_year$wattGLB) < 0.8
-        selr <-  DATA_year$DIF_HOR < (Rayleigh_diff - 1.0)
+        seld <- (DATA_year$DIFF_strict / DATA_year$wattGLB) < 0.8
+        selr <-  DATA_year$DIFF_strict < (Rayleigh_diff - 1.0)
 
         Rayleigh_lim <- selg & seld & selr
 
@@ -606,9 +598,7 @@ stop("EE")
                    QCF_GLB_09 := "Clearness index limit max (19)" ]
         DATA_year[ ClearnessIndex_kt < QS$CL_idx_min,
                    QCF_GLB_09 := "Clearness index limit min (20)" ]
-
     } ##END if DO_TEST_09
-
 
 
     ####  All unflagged data are good  #########################################
@@ -785,11 +775,11 @@ stop("EE")
     } ##END if all(DO_TEST_01, DO_TEST_02)
 
 
-    if (DO_TEST_03 & !all(is.na(DATA_year$DiffuseFraction_Kd))) {
+    if (DO_TEST_03 & !all(is.na(DATA_year$DiffuseFraction_kd))) {
         ## . . Plot comparison test 3. -------------------------------------####
 
         ## Direct diffuse fraction problems
-        yrange = range( DATA_year$DiffuseFraction_Kd, na.rm = T )
+        yrange = range( DATA_year$DiffuseFraction_kd, na.rm = T )
         if (yrange[1] < -1) yrange[1] = -1
         if (yrange[2] >  2) yrange[2] =  2
         ## the factor is the same for all radiations
@@ -798,7 +788,7 @@ stop("EE")
 
         ####  Diffuse Fraction by SZA  ####
         cat("\n\n")
-        plot( DATA_year$SZA[Ggood | Dgood], DATA_year$DiffuseFraction_Kd[Ggood | Dgood],
+        plot( DATA_year$SZA[Ggood | Dgood], DATA_year$DiffuseFraction_kd[Ggood | Dgood],
               ylim = yrange,
               ylab = "Diffuse fraction",
               cex = .1)
@@ -811,9 +801,9 @@ stop("EE")
         abline( h = QS$dif_rati_min, lwd = 2, col = "blue")
 
         ## plot flagged
-        points(DATA_year$SZA[hard], DATA_year$DiffuseFraction_Kd[hard],
+        points(DATA_year$SZA[hard], DATA_year$DiffuseFraction_kd[hard],
                col = "magenta", cex = 0.5)
-        points(DATA_year$SZA[soft], DATA_year$DiffuseFraction_Kd[soft],
+        points(DATA_year$SZA[soft], DATA_year$DiffuseFraction_kd[soft],
                col = "cyan",    cex = 0.5)
 
         title(main = paste("Comparison test 3.", YY))
@@ -825,7 +815,7 @@ stop("EE")
 
         ####  Diffuse fraction by azimuth  ####
         cat("\n\n")
-        plot( DATA_year$Azimuth[Ggood | Dgood], DATA_year$DiffuseFraction_Kd[Ggood | Dgood],
+        plot( DATA_year$Azimuth[Ggood | Dgood], DATA_year$DiffuseFraction_kd[Ggood | Dgood],
               ylim = yrange,
               ylab = "Diffuse fraction", xlab = "Azimuth",
               cex = .1)
@@ -839,9 +829,9 @@ stop("EE")
         abline(h = QS$dif_rati_min, lwd = 2, col = "blue")
 
         ## plot flagged
-        points(DATA_year$Azimuth[hard], DATA_year$DiffuseFraction_Kd[hard],
+        points(DATA_year$Azimuth[hard], DATA_year$DiffuseFraction_kd[hard],
                col = "magenta", cex = 0.5)
-        points(DATA_year$Azimuth[soft], DATA_year$DiffuseFraction_Kd[soft],
+        points(DATA_year$Azimuth[soft], DATA_year$DiffuseFraction_kd[soft],
                col = "cyan",    cex = 0.5)
 
         title(main = paste("Comparison test 3.", YY))
@@ -985,7 +975,7 @@ stop("EE")
 
         ## plot flagged
         ss = which(DATA_year$QCF_DIR == "No tracking possible (24)")
-        points( DATA_year$SZA[ss], DATA_year$DIF_HOR[ss],
+        points( DATA_year$SZA[ss], DATA_year$DIFF_strict[ss],
                 cex = .5, col = "cyan" )
 
         ## plot by Azimuth
@@ -993,17 +983,17 @@ stop("EE")
               cex = .1,
               xlab = "Azimuth", ylab = "Direct Irradiance" )
         title(main = paste("Tracker off test 5.",YY))
-        points( DATA_year$Azimuth[ss], DATA_year$DIF_HOR[ss],
+        points( DATA_year$Azimuth[ss], DATA_year$DIFF_strict[ss],
                 cex = .5, col = "cyan" )
     }##END if DO_TEST_05
 
 
-    if (DO_TEST_06 & !all(is.na(DATA_year$DIF_HOR)) ) {
+    if (DO_TEST_06 & !all(is.na(DATA_year$DIFF_strict)) ) {
         ## . . Plot Rayleigh Limit Diffuse test 6. -------------------------####
 
         ## plot by SZA
         cat("\n\n")
-        plot( DATA_year$SZA[Dgood | Ggood], DATA_year$DIF_HOR[Dgood | Ggood],
+        plot( DATA_year$SZA[Dgood | Ggood], DATA_year$DIFF_strict[Dgood | Ggood],
               cex = .1,
               xlim = xlim,
               xlab = "SZA", ylab = "Diffuse Irradiance" )
@@ -1011,7 +1001,7 @@ stop("EE")
 
         ## plot flagged
         ss <- which(DATA_year$QCF_DIR == "Rayleigh diffuse limit (18)")
-        points( DATA_year$SZA[ss], DATA_year$DIF_HOR[ss],
+        points( DATA_year$SZA[ss], DATA_year$DIFF_strict[ss],
                 cex = .7, col = "magenta" )
         legend("topright",
                legend = c("Diffuse (inferred)", "Rayleigh limit" ),
@@ -1020,14 +1010,14 @@ stop("EE")
 
         ## plot by Azimuth
         cat("\n\n")
-        plot( DATA_year$Azimuth[Dgood | Ggood], DATA_year$DIF_HOR[Dgood | Ggood],
+        plot( DATA_year$Azimuth[Dgood | Ggood], DATA_year$DIFF_strict[Dgood | Ggood],
               cex = .1,
               xlab = "Azimuth", ylab = "Diffuse Irradiance" )
         title(main = paste("Rayleigh Limit Diffuse Comparison test 6.", YY))
 
         ## plot flagged
         ss <- which(DATA_year$QCF_DIR == "Rayleigh diffuse limit (18)")
-        points( DATA_year$Azimuth[ss], DATA_year$DIF_HOR[ss],
+        points( DATA_year$Azimuth[ss], DATA_year$DIFF_strict[ss],
                 cex = .7, col = "magenta" )
         legend("topright",
                legend = c("Diffuse (inferred)", "Rayleigh limit" ),
@@ -1063,12 +1053,12 @@ stop("EE")
     }##END if DO_TEST_07
 
 
-    if (DO_TEST_08 & !all(is.na(DATA_year$DIF_HOR))) {
+    if (DO_TEST_08 & !all(is.na(DATA_year$DIFF_strict))) {
         ## . . 8. Plot Diffuse inversion test ------------------------------####
 
         ##  plot direct by SZA
         cat("\n\n")
-        plot( DATA_year$SZA[Dgood | Ggood], DATA_year$DIF_HOR[Dgood | Ggood],
+        plot( DATA_year$SZA[Dgood | Ggood], DATA_year$DIFF_strict[Dgood | Ggood],
               cex = .1,
               xlim = xlim,
               xlab = "SZA", ylab = "Diffuse Irradiance" )
@@ -1078,10 +1068,10 @@ stop("EE")
         ss <- which(DATA_year$QCF_BTH_08 == "Direct > global soft (14)")
         tt <- which(DATA_year$QCF_BTH_08 == "Direct > global hard (15)")
 
-        points( DATA_year$SZA[ss], DATA_year$DIF_HOR[ss],
+        points( DATA_year$SZA[ss], DATA_year$DIFF_strict[ss],
                 cex = .7, col = "magenta" )
 
-        points( DATA_year$SZA[tt], DATA_year$DIF_HOR[tt],
+        points( DATA_year$SZA[tt], DATA_year$DIFF_strict[tt],
                 cex = .7, col = "cyan" )
 
         legend("topright",
@@ -1092,7 +1082,7 @@ stop("EE")
 
         ## plot direct by Azimuth
         cat("\n\n")
-        plot( DATA_year$Azimuth[Dgood | Ggood], DATA_year$DIF_HOR[Dgood | Ggood],
+        plot( DATA_year$Azimuth[Dgood | Ggood], DATA_year$DIFF_strict[Dgood | Ggood],
               cex = .1,
               xlab = "Azimuth", ylab = "Diffuse Irradiance")
         title(main = paste("Diffuse inversion test 8.",YY))
@@ -1101,10 +1091,10 @@ stop("EE")
         ss <- which(DATA_year$QCF_BTH_08 == "Direct > global soft (14)")
         tt <- which(DATA_year$QCF_BTH_08 == "Direct > global hard (15)")
 
-        points( DATA_year$Azimuth[ss], DATA_year$DIF_HOR[ss],
+        points( DATA_year$Azimuth[ss], DATA_year$DIFF_strict[ss],
                 cex = .7, col = "magenta" )
 
-        points( DATA_year$Azimuth[tt], DATA_year$DIF_HOR[tt],
+        points( DATA_year$Azimuth[tt], DATA_year$DIFF_strict[tt],
                 cex = .7, col = "cyan" )
 
         legend("topright",
@@ -1275,10 +1265,10 @@ stop("EE")
 
 
     ## . . Plot all problems on Diffuse ------------------------------------####
-    if (!all(is.na(DATA_year$DIF_HOR))) {
+    if (!all(is.na(DATA_year$DIFF_strict))) {
         ## by SZA
         cat("\n\n")
-        plot( DATA_year$SZA, DATA_year$DIF_HOR,
+        plot( DATA_year$SZA, DATA_year$DIFF_strict,
               cex = .1,
               xlab = "SZA", ylab = "Diffuse Irradiance" )
 
@@ -1286,10 +1276,10 @@ stop("EE")
         prob1 <- !(DATA_year$QCF_DIR %in% c("good"))
         prob2 <- !(DATA_year$QCF_GLB %in% c("good"))
 
-        points(DATA_year$SZA[prob1], DATA_year$DIF_HOR[prob1],
+        points(DATA_year$SZA[prob1], DATA_year$DIFF_strict[prob1],
                cex = 0.7,
                col = palete_rand[ DATA_year$QCF_DIR[prob1] ])
-        points(DATA_year$SZA[prob2], DATA_year$DIF_HOR[prob2],
+        points(DATA_year$SZA[prob2], DATA_year$DIFF_strict[prob2],
                cex = 0.7,
                col = palete_rand[ DATA_year$QCF_GLB[prob2] ])
 
@@ -1308,10 +1298,10 @@ stop("EE")
 
 
     ## . . Plot all problems on Diffuse fraction ---------------------------####
-    if (!all(is.na(DATA_year$DiffuseFraction_Kd))) {
+    if (!all(is.na(DATA_year$DiffuseFraction_kd))) {
         ## by SZA
         cat("\n\n")
-        plot( DATA_year$SZA, DATA_year$DiffuseFraction_Kd,
+        plot( DATA_year$SZA, DATA_year$DiffuseFraction_kd,
               cex = .1,
               xlab = "SZA", ylab = "Diffuse fraction" )
 
@@ -1319,10 +1309,10 @@ stop("EE")
         prob1 <- !(DATA_year$QCF_DIR %in% c("good"))
         prob2 <- !(DATA_year$QCF_GLB %in% c("good"))
 
-        points( DATA_year$SZA[prob1], DATA_year$DiffuseFraction_Kd[prob1],
+        points( DATA_year$SZA[prob1], DATA_year$DiffuseFraction_kd[prob1],
                 cex = 0.7,
                 col = palete_rand[ DATA_year$QCF_DIR[prob1] ])
-        points( DATA_year$SZA[prob2], DATA_year$DiffuseFraction_Kd[prob2],
+        points( DATA_year$SZA[prob2], DATA_year$DiffuseFraction_kd[prob2],
                 cex = 0.7,
                 col = palete_rand[ DATA_year$QCF_GLB[prob2] ])
 

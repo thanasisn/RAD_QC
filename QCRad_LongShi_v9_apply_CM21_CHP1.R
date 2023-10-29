@@ -407,21 +407,21 @@ if (TEST_03) {
     QS$dif_watt_lim  <-  10
 
     ## . . Proposed filter -----------------------------------------------------
-    DATA[DiffuseFraction_Kd  > QS$dif_rati_pr1  &
+    DATA[DiffuseFraction_kd  > QS$dif_rati_pr1  &
          SZA                <= QS$dif_sza_break &
          wattGLB             > QS$dif_watt_lim,
          QCF_BTH_03_1 := "Diffuse ratio comp max (11)"]
-    DATA[DiffuseFraction_Kd  > QS$dif_rati_pr2  &
+    DATA[DiffuseFraction_kd  > QS$dif_rati_pr2  &
          SZA                 > QS$dif_sza_break &
          wattGLB             > QS$dif_watt_lim,
          QCF_BTH_03_1 := "Diffuse ratio comp max (11)"]
 
     ## . . Extra filters by me -------------------------------------------------
-    DATA[DiffuseFraction_Kd  < QS$dif_rati_po1  &
+    DATA[DiffuseFraction_kd  < QS$dif_rati_po1  &
          SZA                <= QS$dif_sza_break &
          wattGLB             > QS$dif_watt_lim,
          QCF_BTH_03_2 := "Diffuse ratio comp min (12)"]
-    DATA[DiffuseFraction_Kd < QS$dif_rati_po1  &
+    DATA[DiffuseFraction_kd < QS$dif_rati_po1  &
          SZA                > QS$dif_sza_break &
          wattGLB            > QS$dif_watt_lim,
          QCF_BTH_03_2 := "Diffuse ratio comp min (12)"]
@@ -435,13 +435,13 @@ if (TEST_03) {
     cat(pander(table(DATA$QCF_BTH_03_2, exclude = TRUE)))
     cat("\n\n")
 
-    years <- DATA[ !is.na(DiffuseFraction_Kd), unique(year(Date)) ]
+    years <- DATA[ !is.na(DiffuseFraction_kd), unique(year(Date)) ]
     for (ay in years) {
         pp <- DATA[year(Date) == ay]
         ylim <- c(-0.5, 1.5)
 
         par(mar = c(4,4,2,1))
-        plot( pp$SZA, pp$DiffuseFraction_Kd,
+        plot( pp$SZA, pp$DiffuseFraction_kd,
               ylab = "Diffuse fraction", xlab = "SZA", ylim = ylim,
               cex = .1)
         title(paste("3_", ay))
@@ -452,22 +452,22 @@ if (TEST_03) {
         segments(               0, QS$dif_rati_po1, QS$dif_sza_break, QS$dif_rati_po1, col = "blue" )
         segments(QS$dif_sza_break, QS$dif_rati_po2,               93, QS$dif_rati_po2, col = "blue" )
 
-        points( pp[!is.na(QCF_BTH_03_1), SZA], pp[!is.na(QCF_BTH_03_1), DiffuseFraction_Kd],
+        points( pp[!is.na(QCF_BTH_03_1), SZA], pp[!is.na(QCF_BTH_03_1), DiffuseFraction_kd],
                 cex = .2, col = "red")
-        points( pp[!is.na(QCF_BTH_03_2), SZA], pp[!is.na(QCF_BTH_03_2), DiffuseFraction_Kd],
+        points( pp[!is.na(QCF_BTH_03_2), SZA], pp[!is.na(QCF_BTH_03_2), DiffuseFraction_kd],
                 cex = .2, col = "cyan")
 
 
         par(mar = c(4,4,2,1))
-        plot( pp$Azimuth, pp$DiffuseFraction_Kd,
+        plot( pp$Azimuth, pp$DiffuseFraction_kd,
               ylim = ylim,
               ylab = "Diffuse fraction", xlab = "Azimuth",
               cex = .1)
         title(paste("3_", ay))
 
-        points( pp[!is.na(QCF_BTH_03_1), Azimuth], pp[!is.na(QCF_BTH_03_1), DiffuseFraction_Kd],
+        points( pp[!is.na(QCF_BTH_03_1), Azimuth], pp[!is.na(QCF_BTH_03_1), DiffuseFraction_kd],
                 cex = .2, col = "red")
-        points( pp[!is.na(QCF_BTH_03_2), Azimuth], pp[!is.na(QCF_BTH_03_2), DiffuseFraction_Kd],
+        points( pp[!is.na(QCF_BTH_03_2), Azimuth], pp[!is.na(QCF_BTH_03_2), DiffuseFraction_kd],
                 cex = .2, col = "cyan")
     }
 
@@ -478,7 +478,7 @@ if (TEST_03) {
             layout(matrix(c(1,2), 2, 1, byrow = TRUE))
             par(mar = c(2,4,2,1))
 
-            plot( pp$Date, pp$DiffuseFraction_Kd, "l",
+            plot( pp$Date, pp$DiffuseFraction_kd, "l",
                   col = "cyan", ylab = "Diffuse Fraction", xlab = "")
 
             abline(h = QS$dif_rati_pr1, col = "red")
@@ -695,7 +695,7 @@ if (TEST_05) {
 
     ## . . Direct --------------------------------------------------------------
     DATA[wattGLB / ClrSW_ref2 > QS$ClrSW_lim &
-         DIF_HOR / wattGLB    > QS$ClrSW_lim &
+         DIFF_strict / wattGLB    > QS$ClrSW_lim &
          wattGLB              > QS$glo_min   &
          Elevat               > QS$Tracking_min_elev,
          QCF_DIR_05 := "Possible no tracking (24)"]
@@ -709,7 +709,7 @@ if (TEST_05) {
 
     hist(DATA[, ClrSW_ref2 - wattDIR ], breaks = 100)
     hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100)
-    hist(DATA[, DIF_HOR / wattGLB    ], breaks = 100)
+    hist(DATA[, DIFF_strict / wattGLB    ], breaks = 100)
 
     if (DO_PLOTS) {
         tmp <- DATA[ !is.na(QCF_DIR_05), unique(as.Date(Date)) ]
@@ -778,9 +778,9 @@ if (TEST_06) {
     DATA[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
 
     ## . . Both ----------------------------------------------------------------
-    DATA[DIF_HOR - RaylDIFF > QS$Rayleigh_upper_lim,
+    DATA[DIFF_strict - RaylDIFF > QS$Rayleigh_upper_lim,
          QCF_BTH_06_1 := "Rayleigh diffuse limit (18)" ]
-    DATA[DIF_HOR - RaylDIFF < QS$Rayleigh_lower_lim,
+    DATA[DIFF_strict - RaylDIFF < QS$Rayleigh_lower_lim,
          QCF_BTH_06_2 := "Rayleigh diffuse limit (18)" ]
 
 }
@@ -793,14 +793,14 @@ if (TEST_06) {
     cat(pander(table(DATA$QCF_BTH_06_2, exclude = TRUE)))
     cat("\n\n")
 
-    hist( DATA[, DIF_HOR - RaylDIFF ], breaks = 100 )
+    hist( DATA[, DIFF_strict - RaylDIFF ], breaks = 100 )
 
     if ( any(!is.na(DATA$QCF_BTH_06_1)) ) {
-        hist( DATA[ !is.na(QCF_BTH_06_1), DIF_HOR - RaylDIFF ], breaks = 100)
+        hist( DATA[ !is.na(QCF_BTH_06_1), DIFF_strict - RaylDIFF ], breaks = 100)
     }
 
     if ( any(!is.na(DATA$QCF_BTH_06_2)) ) {
-        hist( DATA[ !is.na(QCF_BTH_06_2), DIF_HOR - RaylDIFF ], breaks = 100)
+        hist( DATA[ !is.na(QCF_BTH_06_2), DIFF_strict - RaylDIFF ], breaks = 100)
     }
 
     if (DO_PLOTS) {
@@ -815,8 +815,8 @@ if (TEST_06) {
             layout(matrix(c(1,2), 2, 1, byrow = TRUE))
             par(mar = c(2,4,2,1))
 
-            ylim <- range(pp$DIF_HOR, pp$RaylDIFF, na.rm = T)
-            plot( pp$Date, pp$DIF_HOR, "l",
+            ylim <- range(pp$DIFF_strict, pp$RaylDIFF, na.rm = T)
+            plot( pp$Date, pp$DIFF_strict, "l",
                   ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
             lines(pp$Date, pp$RaylDIFF, col = "magenta" )
             lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_upper_lim, col = "red" )
@@ -840,13 +840,13 @@ if (TEST_06) {
         ## plot on lower limit
         DATA[ !is.na(QCF_BTH_06_2) , .N]
         DATA[ !is.na(QCF_BTH_06_2) &
-                  (DIF_HOR / wattGLB < QS$Rayleigh_dif_glo_r) , .N]
+                  (DIFF_strict / wattGLB < QS$Rayleigh_dif_glo_r) , .N]
         DATA[ !is.na(QCF_BTH_06_2) &
-                  (DIF_HOR / wattGLB < QS$Rayleigh_dif_glo_r) &
+                  (DIFF_strict / wattGLB < QS$Rayleigh_dif_glo_r) &
                   wattGLB > QS$Rayleigh_glo_min , .N]
 
         tmp <- DATA[!is.na(QCF_BTH_06_2) &
-                        (DIF_HOR / wattGLB < QS$Rayleigh_dif_glo_r) &
+                        (DIFF_strict / wattGLB < QS$Rayleigh_dif_glo_r) &
                         wattGLB > QS$Rayleigh_glo_min ]
 
         for (ad in sort(unique(c(as.Date(tmp$Date))))) {
@@ -856,8 +856,8 @@ if (TEST_06) {
             layout(matrix(c(1,2), 2, 1, byrow = TRUE))
             par(mar = c(2,4,2,1))
 
-            ylim <- range(pp$DIF_HOR, pp$RaylDIFF, na.rm = T)
-            plot( pp$Date, pp$DIF_HOR, "l",
+            ylim <- range(pp$DIFF_strict, pp$RaylDIFF, na.rm = T)
+            plot( pp$Date, pp$DIFF_strict, "l",
                   ylim = ylim, col = "cyan", ylab = "Diffuse", xlab = "")
             lines(pp$Date, pp$RaylDIFF, col = "magenta" )
             lines(pp$Date, pp$RaylDIFF + QS$Rayleigh_lower_lim, col = "red" )
