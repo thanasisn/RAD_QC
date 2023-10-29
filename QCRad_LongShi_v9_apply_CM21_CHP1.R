@@ -51,11 +51,11 @@
 #'
 #' The chosen levels and filters have to be evaluated with the available data.
 #'
-#' reads: QCRad_LongShi_v8_id_*
+#' reads: QCRad_LongShi_v9_id_*
 #'
 #' exports:
 #'
-#' - `Broad_Band/QCRad_LongShi/QCRad_LongShi_v8_apply_CM21_CHP1_YYYY.Rds`
+#' - `Broad_Band/QCRad_LongShi/QCRad_LongShi_v9_apply_CM21_CHP1_YYYY.Rds`
 #' - Plots at runtime or render
 #'
 #' TODO:
@@ -80,7 +80,7 @@ knitr::opts_chunk$set(cache      =  FALSE   )
 ## __ Set environment  ---------------------------------------------------------
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "./QCRad_LongShi_v8_apply_CM21_CHP1.R"
+Script.Name <- "./QCRad_LongShi_v9_apply_CM21_CHP1.R"
 lockfile    <- paste0("~/RAD_QC/RUNTIME/",
                       basename(sub("\\.R$",".stopfile", Script.Name)))
 if (!interactive()) {
@@ -100,7 +100,7 @@ source("~/CODE/FUNCTIONS/R/execlock.R")
 
 ####_  Variables init  _####
 DATA_BASE <- "~/DATA/Broad_Band/QCRad_LongShi/"
-IN_PREFIX <- "LAP_QCRad_LongShi_v8_id_CM21_CHP1_"
+IN_PREFIX <- "LAP_QCRad_LongShi_v9_id_CM21_CHP1_"
 cachedata <- "~/RAD_QC/temp_data.Rds"
 
 #### ~ ~ Execution control ~ ~ ####

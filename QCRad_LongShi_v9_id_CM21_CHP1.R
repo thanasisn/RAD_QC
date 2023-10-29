@@ -76,7 +76,7 @@ knitr::opts_chunk$set(cache      =  FALSE   )
 ####_  Set environment  _####
 Sys.setenv(TZ = "UTC")
 tic <- Sys.time()
-Script.Name <- "./QCRad_LongShi_v8_id_CM21_CHP1.R"
+Script.Name <- "./QCRad_LongShi_v9_id_CM21_CHP1.R"
 lockfile    <- paste0("~/RAD_QC/RUNTIME/",
                       basename(sub("\\.R$",".stopfile", Script.Name)))
 if (!interactive()) {
