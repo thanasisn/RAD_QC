@@ -92,7 +92,7 @@ library(scales)
 library(data.table)
 library(pander)
 source("~/CODE/FUNCTIONS/R/trig_deg.R")
-source("~/RAD_QC/Functions_write_data.R")
+source("~/CODE/R_myRtools/myRtools/R/write_.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 
 # mylock(lockfile)
@@ -103,8 +103,8 @@ DATA_BASE <- "~/DATA/Broad_Band/QCRad_LongShi/"
 IN_PREFIX <- "LAP_QCRad_LongShi_v9_id_CM21_CHP1_"
 cachedata <- "~/RAD_QC/temp_data.Rds"
 
-#### ~ ~ Execution control ~ ~ ####
 
+#### ~ ~ Execution control ~ ~ ####
 
 ## use cache data for development only
 FORCE_NEW_DATA <- TRUE
@@ -192,8 +192,8 @@ pander(pp, caption = "Input files")
 #'
 #+ echo=T, include=T
 QS <- list()
-QS$sun_elev_min     <- -2 * 0.103 # 0. Drop all data when sun is below this point
-QS$sun_elev_no_neg  <-  0         # 0. Don't allow negative values below this sun angle
+QS$sun_elev_min    <- -2 * 0.103 # 0. Drop all data when sun is below this point
+QS$sun_elev_no_neg <-  0         # 0. Don't allow negative values below this sun angle
 
 
 
@@ -710,7 +710,8 @@ if (TEST_05) {
     hist(DATA[, ClrSW_ref2 - wattDIR ], breaks = 100)
     hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100)
     hist(DATA[, DIFF_strict / wattGLB    ], breaks = 100)
-    hist(DATA[QCF_DIR_05 := "Possible no tracking (24)", Elevat ], breaks = 100)
+
+    hist(DATA[!is.na(QCF_DIR_05), Elevat ], breaks = 100)
 
 
     if (DO_PLOTS) {
