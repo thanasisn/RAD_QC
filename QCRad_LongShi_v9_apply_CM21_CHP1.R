@@ -104,6 +104,8 @@ IN_PREFIX <- "LAP_QCRad_LongShi_v9_id_CM21_CHP1_"
 cachedata <- "~/RAD_QC/temp_data.Rds"
 
 
+
+
 #### ~ ~ Execution control ~ ~ ####
 
 ## use cache data for development only
@@ -138,7 +140,7 @@ if (interactive()) {
 }
 
 ALL_YEAR <- TRUE
-# ALL_YEAR <- FALSE
+ALL_YEAR <- FALSE
 
 
 #+ echo=F, include=T
