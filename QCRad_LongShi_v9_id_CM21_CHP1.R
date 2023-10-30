@@ -344,24 +344,8 @@ for (YY in yearSTA:yearEND) {
     levels(DATA_year$QCF_GLB) <- categories
 
 
-    ##  Diffuse irradiance  ----------------------------------------------------
-    ## DHI = GHI – DNI cos(z)
-    # DATA_year[ , DIFF_strict            := DATA_year$wattGLB - DATA_year$wattHOR ]
-    # warning(" * * DIFF_strict is no Diffuse radiation !! ** ")
-    # cat("\n\n * * DIFF_strict is no Diffuse radiation !! ** \n\n")
-    ##  Clearness index k_t  ---------------------------------------------------
-    # DATA_year[ , ClearnessIndex_kt       := wattGLB / ( cosde(SZA) * TSIextEARTH_comb ) ]
-    ##  Diffuse fraction k_d  --------------------------------------------------
-    # DATA_year[ , DiffuseFraction_kd := DIFF_strict / wattGLB ]
-    # warning(" * * DiffuseFraction_kd is no Diffuse Fraction !! ** ")
-    # cat("\n\n * * DiffuseFraction_kd is no Diffuse Fraction !! ** \n\n")
-
     ## create a time of day representation
     DATA_year$Times <- as.POSIXct(strftime(DATA_year$Date, format = "%H:%M:%S"), format = "%H:%M:%S" )
-
-    ## replace infinite values
-    DATA_year[ is.infinite(DiffuseFraction_kd) & DiffuseFraction_kd > 0, DiffuseFraction_kd := NA ]
-    DATA_year[ is.infinite(DiffuseFraction_kd) & DiffuseFraction_kd < 0, DiffuseFraction_kd := NA ]
 
 
 

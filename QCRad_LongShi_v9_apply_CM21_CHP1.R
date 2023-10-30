@@ -1011,8 +1011,14 @@ if (TEST_08) {
     cat(pander(table(DATA$QCF_BTH_08_2, exclude = TRUE)))
     cat("\n\n")
 
-    hist(DATA[ !is.na(QCF_BTH_08_1), Relative_diffuse], breaks = 100)
-    hist(DATA[ !is.na(QCF_BTH_08_2), Relative_diffuse], breaks = 100)
+    DATA[!is.na(QCF_BTH_08_1), Relative_diffuse]
+
+    if (length(DATA[!is.na(QCF_BTH_08_1), Relative_diffuse]) != 0) {
+        hist(DATA[!is.na(QCF_BTH_08_1), Relative_diffuse], breaks = 100)
+    }
+    if (length(DATA[!is.na(QCF_BTH_08_2), Relative_diffuse]) != 0) {
+        hist(DATA[!is.na(QCF_BTH_08_2), Relative_diffuse], breaks = 100)
+    }
 
     hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  Elevat])
     hist(DATA[ Relative_diffuse > QS$dir_glo_invert & Elevat  > 3,                  wattHOR - wattGLB])
