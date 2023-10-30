@@ -138,7 +138,7 @@ if (interactive()) {
 }
 
 ALL_YEAR <- TRUE
-ALL_YEAR <- FALSE
+# ALL_YEAR <- FALSE
 
 
 #+ echo=F, include=T
@@ -148,6 +148,20 @@ fileslist <- list.files(path    = DATA_BASE,
                         full.names = TRUE)
 fileslist <- sort(fileslist)
 ## read data or load cached
+
+if (!ALL_YEAR) {
+    cat("\n\n Partial data run ! \n\n")
+
+    select <- paste0("_", c(
+        2022,
+        2023
+    ), ".Rds", collapse = "|"
+    )
+
+    fileslist <- grep(select, fileslist, value = TRUE)
+    cachedata <- sub("\\.Rds","_partial\\.Rds", cachedata)
+}
+
 
 if (FORCE_NEW_DATA || !file.exists(cachedata)) {
     DATA <- data.table()
@@ -160,12 +174,6 @@ if (FORCE_NEW_DATA || !file.exists(cachedata)) {
 } else {
     DATA <- readRDS(cachedata)
     cat("\n\n**USING CACHED DATA!!**\n\n")
-}
-
-
-if (!ALL_YEAR) {
-    cat("Partial data run")
-    DATA <- DATA[year(Date) >= 2023, ]
 }
 
 
@@ -223,6 +231,9 @@ if (TEST_01) {
     QS$glo_SWdn_min <-  -4  # Minimum global value to consider valid measurement
     QS$glo_SWdn_off <- 160  # Global departure offset above the model
     QS$glo_SWdn_amp <- 1.3  # Global departure factor above the model
+
+    DATA[, QCF_DIR_01 := NA]
+    DATA[, QCF_GLB_01 := NA]
 
     ## . . Direct --------------------------------------------------------------
     DATA[wattDIR < QS$dir_SWdn_min,
@@ -324,6 +335,9 @@ if (TEST_02) {
     DATA[Direct_max < 3, Direct_max := NA]
     DATA[Global_max < 3, Direct_max := NA]
 
+    DATA[, QCF_DIR_02 := NA]
+    DATA[, QCF_GLB_02 := NA]
+
     ## . . Direct --------------------------------------------------------------
     DATA[wattDIR < QS$dir_SWdn_min_ext, QCF_DIR_02 := "Extremely rare limits min (3)"]
     DATA[wattDIR > Direct_max,          QCF_DIR_02 := "Extremely rare limits max (4)"]
@@ -405,6 +419,9 @@ if (TEST_03) {
     QS$dif_rati_pr1  <-  1.03
     QS$dif_rati_pr2  <-  1.06
     QS$dif_watt_lim  <-  10
+
+    DATA[, QCF_BTH_03_1 := NA]
+    DATA[, QCF_BTH_03_2 := NA]
 
     ## . . Proposed filter -----------------------------------------------------
     DATA[DiffuseFraction_kd  > QS$dif_rati_pr1  &
@@ -538,6 +555,11 @@ if (TEST_04) {
     QS$clim_lim_D3 <- 0.81
     QS$clim_lim_C1 <- 1.14
     QS$clim_lim_D1 <- 1.32
+
+    DATA[, QCF_DIR_04_1 := NA]
+    DATA[, QCF_DIR_04_2 := NA]
+    DATA[, QCF_GLB_04_1 := NA]
+    DATA[, QCF_GLB_04_2 := NA]
 
     ## . . Direct --------------------------------------------------------------
     DATA[, Dir_First_Clim_lim := TSIextEARTH_comb * QS$clim_lim_C3 * cosde(SZA)^0.2 + 10]
@@ -683,7 +705,7 @@ if (TEST_04) {
 if (TEST_05) {
     cat(paste("\n5. Tracking test.\n\n"))
     ## criteria
-    QS$Tracking_min_elev <-   15
+    QS$Tracking_min_elev <-    5
     QS$ClrSW_lim         <-    0.85
     QS$glo_min           <-   25
     ## Global Clear SW model
@@ -692,6 +714,8 @@ if (TEST_05) {
     ## Clear Sky Sort-Wave model
     DATA[, ClrSW_ref2 := ( QS$ClrSW_a / sun_dist ^ 2 ) * cosde(SZA) ^ QS$ClrSW_b ]
     # DATA[, ClrSW_ref1 := TSIextEARTH_comb * cosde(SZA) ^ QS$ClrSW_b ]
+
+    DATA[, QCF_DIR_05 := NA]
 
     ## . . Direct --------------------------------------------------------------
     DATA[wattGLB     / ClrSW_ref2 > QS$ClrSW_lim &
@@ -710,12 +734,7 @@ if (TEST_05) {
     hist(DATA[, ClrSW_ref2 - wattDIR ], breaks = 100)
     hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100)
     hist(DATA[, DIFF_strict / wattGLB], breaks = 100)
-
-    hist(DATA[QCF_DIR_05 == "Possible no tracking (24)", Elevat ], breaks = 100)
-
-    DATA[QCF_DIR_05 == "Possible no tracking (24)"  ]
-    DATA[ !is.na(QCF_DIR_05) ]
-
+    hist(DATA[!is.na(QCF_DIR_05), Elevat], breaks = 100)
 
     if (DO_PLOTS) {
         tmp <- DATA[ !is.na(QCF_DIR_05), unique(as.Date(Date)) ]
@@ -782,6 +801,9 @@ if (TEST_06) {
                 f * mu_0 * Pressure )
     }
     DATA[, RaylDIFF  := Rayleigh_diff(SZA = SZA, Pressure = pressure) ]
+
+    DATA[, QCF_BTH_06_1 := NA]
+    DATA[, QCF_BTH_06_2 := NA]
 
     ## . . Both ----------------------------------------------------------------
     DATA[DIFF_strict - RaylDIFF > QS$Rayleigh_upper_lim,
@@ -959,8 +981,13 @@ if (TEST_07) {
 if (TEST_08) {
     cat(paste("\n8. Inversion test.\n\n"))
 
-    QS$dir_glo_invert  <- 5  # Diffuse Inversion test: DIRhor - GLBhor > lim[%]
-    QS$dir_glo_glo_off <- 5  # Diffuse Inversion test: apply for GLBhor > offset
+    QS$dir_glo_invert   <- 5  # Diffuse Inversion test: DIRhor - GLBhor > lim[%]
+    QS$dir_glo_glo_off  <- 5  # Diffuse Inversion test: apply for GLBhor > offset
+    ## TODO
+    QS$dir_glo_min_elev <- 5
+
+    DATA[, QCF_BTH_08_1 := NA]
+    DATA[, QCF_BTH_08_2 := NA]
 
     ## . . Both ----------------------------------------------------------------
     DATA[, Relative_diffuse := 100 * (wattHOR - wattGLB) / wattGLB ]
@@ -1074,6 +1101,8 @@ if (TEST_09) {
     QS$CL_idx_max      <-  1.13  # Upper Clearness index accepted level
     QS$CL_idx_min      <- -0.001 # Lower Clearness index accepted level
     QS$CL_idx_ele      <-  9     # Apply for elevations above this angle
+
+    DATA[, QCF_GLB_09 := NA]
 
     ## . . Global --------------------------------------------------------------
     DATA[ClearnessIndex_kt > QS$CL_idx_max & Elevat > QS$CL_idx_ele,

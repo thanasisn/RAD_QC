@@ -194,7 +194,7 @@ categories = c(
     paste("Obstacle Biology build (21)"),
     paste("Biology Building (22)"),
     paste("Possible Direct Obstruction (23)"),
-    paste("No tracking possible (24)")
+    paste("Possible no tracking (24)")
 )
 
 
@@ -232,7 +232,7 @@ if (TESTING) {
     cat("\n\n  !!! TESTING !!!\n\n")
     ## override years
     yearSTA <- 2022
-    yearEND <- 2022
+    yearEND <- 2023
     # yearSTA <- 1993
     # yearEND <- 1993
     cat("\n  Years to do", yearSTA:yearEND, "\n")
@@ -501,7 +501,7 @@ for (YY in yearSTA:yearEND) {
         ## apply test
         DATA_year[ wattGLB / ClrSW   > QS$ClrSW_lim &
                    DIFF_strict / wattGLB > QS$ClrSW_lim,
-                   QCF_DIR_05 := "No tracking possible (24)" ]
+                   QCF_DIR_05 := "Possible no tracking (24)" ]
 
         sel <- sum(!is.na(DATA_year$QCF_DIR_05))
 
@@ -974,7 +974,7 @@ for (YY in yearSTA:yearEND) {
         title(main = paste("Tracker off test 5.",YY))
 
         ## plot flagged
-        ss = which(DATA_year$QCF_DIR == "No tracking possible (24)")
+        ss = which(DATA_year$QCF_DIR == "Possible no tracking (24)")
         points( DATA_year$SZA[ss], DATA_year$DIFF_strict[ss],
                 cex = .5, col = "cyan" )
 
