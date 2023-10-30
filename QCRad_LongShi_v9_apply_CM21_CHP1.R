@@ -709,9 +709,12 @@ if (TEST_05) {
 
     hist(DATA[, ClrSW_ref2 - wattDIR ], breaks = 100)
     hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100)
-    hist(DATA[, DIFF_strict / wattGLB    ], breaks = 100)
+    hist(DATA[, DIFF_strict / wattGLB], breaks = 100)
 
-    hist(DATA[!is.na(QCF_DIR_05), Elevat ], breaks = 100)
+    hist(DATA[QCF_DIR_05 == "Possible no tracking (24)", Elevat ], breaks = 100)
+
+    DATA[QCF_DIR_05 == "Possible no tracking (24)"  ]
+    DATA[ !is.na(QCF_DIR_05) ]
 
 
     if (DO_PLOTS) {
