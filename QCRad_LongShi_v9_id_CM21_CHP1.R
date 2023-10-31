@@ -143,7 +143,7 @@ load("~/RAD_QC/Obstacles.Rda")
 
 # DO_TEST_01 <- TRUE   # DEPRECATED Physically Possible Limits
 # DO_TEST_02 <- TRUE   # DEPRECATED Extremely Rare Limits
-DO_TEST_03 <- TRUE   # Comparison tests
+# DO_TEST_03 <- TRUE   # DEPRECATED Comparison tests
 DO_TEST_04 <- TRUE   # Climatological (configurable) Limits.
 DO_TEST_05 <- TRUE   # Tracking check
 DO_TEST_06 <- TRUE   # Rayleigh Limit Diffuse Comparison
@@ -157,7 +157,7 @@ TESTING    <- TRUE
 
 DO_TEST_01 <- FALSE # Physically Possible Limits
 DO_TEST_02 <- FALSE # Extremely Rare Limits
-# DO_TEST_03 <- F   # Comparison tests
+DO_TEST_03 <- FALSE # Comparison tests
 # DO_TEST_04 <- FALSE # Climatological (configurable) Limits.
 # DO_TEST_05 <- F   # Tracking check
 # DO_TEST_06 <- F   # Rayleigh Limit Diffuse Comparison
@@ -350,66 +350,6 @@ for (YY in yearSTA:yearEND) {
 
 
     #### ~ ~ ~ ~ START OF FLAGGING ~ ~ ~  ~ ####################################
-
-    if (DO_TEST_01) {
-        ####  1. PHYSICALLY POSSIBLE LIMITS PER BSRN  ##########################
-        cat(paste("\n1. Physically Possible Limits.\n\n"))
-
-        ## . . Direct ------------------------------------------------------####
-        DSWdn_min <- DATA_year$wattDIR  <  QS$dir_SWdn_min
-        DSWdn_max <- DATA_year$wattDIR  >  DATA_year$TSIextEARTH_comb
-
-        DATA_year$QCF_DIR_01[ DSWdn_min ]                         <- "Physical possible limit min (5)"
-        DATA_year$QCF_DIR_01[ DSWdn_max ]                         <- "Physical possible limit max (6)"
-
-        ## . . Global ----------------------------------------------------------
-        GSWdn_min                 <- DATA_year$wattGLB  <  QS$glo_SWdn_min
-        Global_max_physical_limit <- DATA_year$TSIextEARTH_comb * 1.5 * cosde(DATA_year$SZA)^1.2 + 100
-        GSWdn_max                 <- DATA_year$wattGLB  >  Global_max_physical_limit
-
-        DATA_year$QCF_GLB_01[ GSWdn_min ]                         <- "Physical possible limit min (5)"
-        DATA_year$QCF_GLB_02[ GSWdn_max ]                         <- "Physical possible limit max (6)"
-
-        ## . . Info ------------------------------------------------------------
-        cat(sprintf( " %6d    %s\n\n",      sum(DSWdn_max, na.rm = T), "Direct Records above physical limit (6)"))
-        cat(sprintf( " %6d    %s [%s]\n\n", sum(DSWdn_min, na.rm = T), "Direct Records below physical limit (5)", QS$dir_SWdn_min))
-        cat(sprintf( " %6d    %s\n\n",      sum(GSWdn_max, na.rm = T), "Global Records above physical limit (6)"))
-        cat(sprintf( " %6d    %s [%s]\n\n", sum(GSWdn_min, na.rm = T), "Global Records below physical limit (5)", QS$glo_SWdn_min))
-
-        rm(DSWdn_max, DSWdn_min, GSWdn_max, GSWdn_min)
-    } ##END if DO_TEST_01
-
-
-
-    if (DO_TEST_02) {
-        ####  2. EXTREMELY RARE LIMITS PER BSRN  ###############################
-        cat(paste("\n2. Extremely Rare Limits.\n\n"))
-
-        ## . . Direct ------------------------------------------------------####
-        Direct_max_extremely_rare <- DATA_year$TSIextEARTH_comb * 0.95 * cosde(DATA_year$SZA)^0.2 + 10
-        DSWdn_min_ext             <- DATA_year$wattDIR  <  QS$dir_SWdn_min_ext
-        DSWdn_max_ext             <- DATA_year$wattDIR  >  Direct_max_extremely_rare
-
-        DATA_year$QCF_DIR_02[ DSWdn_min_ext ]                         <- "Extremely rare limits min (3)"
-        DATA_year$QCF_DIR_02[ DSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
-
-        ## . . Global ------------------------------------------------------####
-        Global_max_extremely_rare <- DATA_year$TSIextEARTH_comb * 1.2 * cosde(DATA_year$SZA)^1.2 + 50
-        GSWdn_min_ext             <- DATA_year$wattGLB  <  QS$glo_SWdn_min_ext
-        GSWdn_max_ext             <- DATA_year$wattGLB  >  Global_max_extremely_rare
-
-        DATA_year$QCF_GLB_02[ GSWdn_min_ext ]                         <- "Extremely rare limits min (3)"
-        DATA_year$QCF_GLB_02[ GSWdn_max_ext ]                         <- "Extremely rare limits max (4)"
-
-        ## . . Info --------------------------------------------------------####
-        cat(sprintf(" %6d    %s\n\n",      sum(DSWdn_max_ext, na.rm = T), "Direct records above extremely rare limit max (4)"))
-        cat(sprintf(" %6d    %s [%s]\n\n", sum(DSWdn_min_ext, na.rm = T), "Direct records below extremely rare limit min (3)", QS$dir_SWdn_min_ext))
-        cat(sprintf(" %6d    %s\n\n",      sum(GSWdn_max_ext, na.rm = T), "Global records above extremely rare limit max (4)"))
-        cat(sprintf(" %6d    %s [%s]\n\n", sum(GSWdn_min_ext, na.rm = T), "Global records below extremely rare limit min (3)", QS$glo_SWdn_min_ext))
-
-        rm(DSWdn_max_ext, DSWdn_min_ext, GSWdn_max_ext, GSWdn_min_ext)
-    } ##END if DO_TEST_02
-
 
     if (DO_TEST_03) {
         ####  3. COMPARISON TESTS PER BSRN “non-definitive” ####################
@@ -610,154 +550,6 @@ for (YY in yearSTA:yearEND) {
     ## get valid data vectors
     Dgood <- DATA_year$QCF_DIR == "good"
     Ggood <- DATA_year$QCF_GLB == "good"
-
-    if (all(DO_TEST_01, DO_TEST_02)) {
-        if (any(!is.na(DATA_year$wattDIR))) {
-            ## . . Plot Direct irradiance and tests 1. and 2. --------------####
-            ylim <- range( QS$dir_SWdn_min,
-                           DATA_year$wattDIR,
-                           DATA_year$TSIextEARTH_comb,
-                           Direct_max_extremely_rare,
-                           na.rm = T)
-
-            ####  plot direct by SZA  ####
-            cat("\n\n")
-            plot( DATA_year$SZA[Dgood], DATA_year$wattDIR[Dgood],
-                  cex = .1,
-                  xlim = xlim,  ylim = ylim,
-                  xlab = "SZA", ylab = "Direct Irradiance" )
-            ## 1. Physical possible limit max (6)
-            points(DATA_year$SZA, DATA_year$TSIextEARTH_comb, cex = .2,  col = alpha("red",  0.05))
-            ## 2. Extremely rare limits max (4)
-            points(DATA_year$SZA, Direct_max_extremely_rare,  cex = .2,  col = alpha("blue", 0.05))
-            ## 1. Physical possible limit min (5)
-            abline(h = QS$dir_SWdn_min,                       lwd = 1.5, col = "red")
-            ## 2. Extremely rare limits min (3)
-            abline(h = QS$dir_SWdn_min_ext,                   lwd = 1.5, col = "blue")
-
-            ## plot flagged
-            rare <- which(DATA_year$QCF_DIR %in%
-                              c("Extremely rare limits min (3)", "Extremely rare limits max (4)"))
-            phys <- which(DATA_year$QCF_DIR %in%
-                              c("Physical possible limit min (5)", "Physical possible limit max (6)"))
-
-            points(DATA_year$SZA[rare], DATA_year$wattDIR[rare], cex = .7, col = "cyan")
-            points(DATA_year$SZA[phys], DATA_year$wattDIR[phys], cex = .7, col = "magenta")
-
-            title(main = paste("Direct Beam Physical limits tests 1. and 2.",YY))
-            legend("topright",
-                   legend = c("Global measurements", "Physical limits", "Rare limits", "Rare measurements", "Extreme measurements" ),
-                   col    = c("black",               "red"            , "blue",        "cyan",              "magenta"),
-                   pch = 19, bty = "n", cex = 0.8 )
-
-            ####  plot direct by azimuth  ####
-            cat("\n\n")
-            plot( DATA_year$Azimuth[Dgood], DATA_year$wattDIR[Dgood],
-                  cex = .1,
-                  ylim = ylim,
-                  xlab = "Azimuth", ylab = "Direct Irradiance" )
-            ## 1. Physical possible limit max (6)
-            points(DATA_year$Azimuth, DATA_year$TSIextEARTH_comb,  cex = .1,  col = alpha("red", 0.05))
-            ## 2. Extremely rare limits max (4)
-            points(DATA_year$Azimuth, Direct_max_extremely_rare,   cex = .1,  col = alpha("blue",0.05))
-            ## 1. Physical possible limit min (5)
-            abline(h = QS$dir_SWdn_min,                            lwd = 1.5, col = "red")
-            ## 2. Extremely rare limits min (3)
-            abline(h = QS$dir_SWdn_min_ext,                        lwd = 1.5, col = "blue")
-
-            ## plot flagged
-            rare <- which( DATA_year$QCF_DIR %in%
-                               c("Extremely rare limits min (3)", "Extremely rare limits max (4)"))
-            phys <- which( DATA_year$QCF_DIR %in%
-                               c("Physical possible limit min (5)", "Physical possible limit max (6)"))
-
-            points(DATA_year$Azimuth[rare], DATA_year$wattDIR[rare], cex = .7, col = "cyan")
-            points(DATA_year$Azimuth[phys], DATA_year$wattDIR[phys], cex = .7, col = "magenta")
-
-            title(main = paste("Direct Beam Physical limits tests 1. and 2.", YY))
-            legend("topright",
-                   legend = c("Global measurements", "Physical limits", "Rare limits", "Rare measurements", "Extreme measurements"),
-                   col    = c("black",               "red",             "blue",        "cyan",              "magenta"),
-                   pch = 19, bty = "n", cex = 0.8 )
-
-            ## clean
-            rm(Direct_max_extremely_rare, rare, phys)
-        }
-
-
-        if (any(!is.na(DATA_year$wattGLB))) {
-            ## . . Plot Global irradiance and test 1. and 2. ---------------####
-            ylim <- range(QS$glo_SWdn_min,
-                          DATA_year$wattGLB,
-                          Global_max_physical_limit,
-                          Global_max_extremely_rare,
-                          na.rm = TRUE)
-
-            ####  plot global by SZA  ####
-            cat("\n\n")
-            plot(  DATA_year$SZA[Ggood], DATA_year$wattGLB[Ggood],
-                   cex = .1,
-                   xlim = xlim,  ylim = ylim,
-                   xlab = "SZA", ylab = "Global Irradiance")
-            ## 1. Physical possible limit max (6)
-            points(DATA_year$SZA, Global_max_physical_limit, cex = .1,  col = alpha("red",  0.05))
-            ## 2. Extremely rare limits max (4)
-            points(DATA_year$SZA, Global_max_extremely_rare, cex = .1,  col = alpha("blue", 0.05))
-            ## 1. Physical possible limit min (5)
-            abline(h = QS$glo_SWdn_min,                      lwd = 1.5, col = "red")
-            ## 2. "Extremely rare limits min (3)"
-            abline(h = QS$glo_SWdn_min_ext,                  lwd = 1.5, col = "blue")
-
-            ## plot flagged
-            rare <- which(DATA_year$QCF_GLB %in%
-                              c("Extremely rare limits min (3)", "Extremely rare limits max (4)"))
-            phys <- which(DATA_year$QCF_GLB %in%
-                              c("Physical possible limit min (5)", "Physical possible limit max (6)"))
-
-            points(DATA_year$SZA[rare], DATA_year$wattGLB[rare], cex = .7, col = "cyan")
-            points(DATA_year$SZA[phys], DATA_year$wattGLB[phys], cex = .7, col = "magenta")
-
-            title(main = paste("Global Physical limits tests 1. and 2.",YY))
-            legend("topright",
-                   legend = c("Global measurements", "Physical limits", "Rare limits", "Rare measurements", "Extreme measurements" ),
-                   col    = c("black",               "red"            , "blue",        "cyan",              "magenta"),
-                   pch = 19, bty = "n", cex = 0.8 )
-
-
-            ####  plot global by azimuth  ####
-            cat("\n\n")
-            plot(  DATA_year$Azimuth[Ggood], DATA_year$wattGLB[Ggood],
-                   cex  = .1,
-                   ylim = ylim,
-                   xlab = "Azimuth", ylab = "Global Irradiance" )
-            ## 1. Physical possible limit max (6)
-            points(DATA_year$Azimuth, Global_max_physical_limit, cex = .1,  col = alpha("red", 0.05))
-            ## 2. Extremely rare limits max (4)
-            points(DATA_year$Azimuth, Global_max_extremely_rare, cex = .1,  col = alpha("blue",0.05))
-            ## 1. Physical possible limit min (5)
-            abline(h = QS$glo_SWdn_min,                        lwd = 1.5, col = "red")
-            ## 2. "Extremely rare limits min (3)"
-            abline(h = QS$glo_SWdn_min_ext,                    lwd = 1.5, col = "blue")
-
-            ## plot flagged
-            rare <- which(DATA_year$QCF_GLB %in%
-                              c("Extremely rare limits min (3)",   "Extremely rare limits max (4)"))
-            phys <- which(DATA_year$QCF_GLB %in%
-                              c("Physical possible limit min (5)", "Physical possible limit max (6)"))
-
-            points(DATA_year$Azimuth[rare], DATA_year$wattGLB[rare], cex = .7, col = "cyan"   )
-            points(DATA_year$Azimuth[phys], DATA_year$wattGLB[phys], cex = .7, col = "magenta")
-
-            title(main = paste("Global Physical limits tests 1. and 2.",YY))
-            legend("topright",
-                   legend = c("Global measurements", "Physical limits", "Rare limits", "Rare measurements", "Extreme measurements"),
-                   col    = c("black",               "red"            , "blue",        "cyan",              "magenta"),
-                   pch = 19, bty = "n", cex = 0.8 )
-
-            ## clean
-            rm(Global_max_physical_limit, Global_max_extremely_rare, rare, phys)
-        }
-    } ##END if all(DO_TEST_01, DO_TEST_02)
 
 
     if (DO_TEST_03 & !all(is.na(DATA_year$DiffuseFraction_kd))) {
