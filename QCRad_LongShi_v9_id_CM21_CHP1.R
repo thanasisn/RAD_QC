@@ -141,7 +141,7 @@ QS <- list(
 
 load("~/RAD_QC/Obstacles.Rda")
 
-DO_TEST_01 <- TRUE   # Physically Possible Limits
+# DO_TEST_01 <- TRUE   # DEPRECATED Physically Possible Limits
 DO_TEST_02 <- TRUE   # Extremely Rare Limits
 DO_TEST_03 <- TRUE   # Comparison tests
 DO_TEST_04 <- TRUE   # Climatological (configurable) Limits.
@@ -153,9 +153,9 @@ DO_TEST_09 <- TRUE   # Test clearness index limits
 
 TESTING_NP <- 1000000
 TESTING    <- FALSE
-# TESTING    <- TRUE
+TESTING    <- TRUE
 
-# DO_TEST_01 <- FALSE # Physically Possible Limits
+DO_TEST_01 <- FALSE # Physically Possible Limits
 # DO_TEST_02 <- F   # Extremely Rare Limits
 # DO_TEST_03 <- F   # Comparison tests
 # DO_TEST_04 <- FALSE # Climatological (configurable) Limits.
@@ -380,6 +380,7 @@ for (YY in yearSTA:yearEND) {
     } ##END if DO_TEST_01
 
 
+
     if (DO_TEST_02) {
         ####  2. EXTREMELY RARE LIMITS PER BSRN  ###############################
         cat(paste("\n2. Extremely Rare Limits.\n\n"))
@@ -410,6 +411,14 @@ for (YY in yearSTA:yearEND) {
     } ##END if DO_TEST_02
 
 
+    table(DATA_year$QCF_DIR_02)
+    table(DATA_year$QCF_GLB_02)
+
+    table(DATA_year$QCv9_02_dir_flag)
+    table(DATA_year$QCv9_02_dir_flag)
+
+
+stop("DDD")
     if (DO_TEST_03) {
         ####  3. COMPARISON TESTS PER BSRN “non-definitive” ####################
         cat(paste("\n3. Comparison tests.\n\n"))
