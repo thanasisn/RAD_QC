@@ -351,41 +351,6 @@ for (YY in yearSTA:yearEND) {
 
     #### ~ ~ ~ ~ START OF FLAGGING ~ ~ ~  ~ ####################################
 
-    if (DO_TEST_03) {
-        ####  3. COMPARISON TESTS PER BSRN “non-definitive” ####################
-        cat(paste("\n3. Comparison tests.\n\n"))
-
-        ## . . Proposed filter ---------------------------------------------####
-        DFR_A    <- DATA_year$DiffuseFraction_kd >   1.05 &
-                    DATA_year$SZA                <= 75    &
-                    DATA_year$wattGLB            >  50
-        DFR_B    <- DATA_year$DiffuseFraction_kd >   1.10 &
-                    DATA_year$SZA                >  75    &
-                    DATA_year$SZA                <  93    &
-                    DATA_year$wattGLB            >  50
-        DFR_prop <- DFR_A | DFR_B
-
-        DATA_year$QCF_GLB_03.1[ DFR_prop ]                      <- "Diffuse ratio comp max (11)"
-        DATA_year$QCF_DIR_03.1[ DFR_prop ]                      <- "Diffuse ratio comp max (11)"
-
-        ## . . Extra filters by me -----------------------------------------####
-        DFR_low <- DATA_year$DiffuseFraction_kd < QS$dif_rati_min
-        DATA_year$QCF_GLB_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
-        DATA_year$QCF_DIR_03.2[ DFR_low ]                       <- "Diffuse ratio comp min (12)"
-
-        DFR_hig <- DATA_year$DiffuseFraction_kd > QS$dif_rati_max
-        DATA_year$QCF_GLB_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
-        DATA_year$QCF_DIR_03.2[ DFR_hig ]                       <- "Diffuse ratio comp max (13)"
-
-        ## . . Info --------------------------------------------------------####
-        cat(sprintf(" %6d    %s\n\n", sum(DFR_prop, na.rm = T), "Records above diffuse ratio propose limit     (11)"))
-        cat(sprintf(" %6d    %s\n\n", sum(DFR_low,  na.rm = T), "Records below our extra diffuse ratio limit   (12)"))
-        cat(sprintf(" %6d    %s\n\n", sum(DFR_hig,  na.rm = T), "Records above our extra diffuse ratio limit   (13)"))
-
-        rm(DFR_prop, DFR_low, DFR_hig, DFR_A, DFR_B)
-    } ##END if DO_TEST_03
-
-
     if (DO_TEST_04) {
         ####  4. Climatological (configurable) Limits  #########################
         cat(paste("\n4. Climatological (configurable) Limits.\n\n"))
@@ -551,74 +516,6 @@ for (YY in yearSTA:yearEND) {
     Dgood <- DATA_year$QCF_DIR == "good"
     Ggood <- DATA_year$QCF_GLB == "good"
 
-
-    if (DO_TEST_03 & !all(is.na(DATA_year$DiffuseFraction_kd))) {
-        ## . . Plot comparison test 3. -------------------------------------####
-
-        ## Direct diffuse fraction problems
-        yrange = range( DATA_year$DiffuseFraction_kd, na.rm = T )
-        if (yrange[1] < -1) yrange[1] = -1
-        if (yrange[2] >  2) yrange[2] =  2
-        ## the factor is the same for all radiations
-        hard <- which( DATA_year$QCF_DIR %in%   "Diffuse ratio comp max (11)" )
-        soft <- which( DATA_year$QCF_DIR %in% c("Diffuse ratio comp min (12)", "Diffuse ratio comp max (13)"))
-
-        ####  Diffuse Fraction by SZA  ####
-        cat("\n\n")
-        plot( DATA_year$SZA[Ggood | Dgood], DATA_year$DiffuseFraction_kd[Ggood | Dgood],
-              ylim = yrange,
-              ylab = "Diffuse fraction",
-              cex = .1)
-        ## 3. Diffuse ratio comp max (11)
-        segments( 0, 1.05, 75, 1.05, lwd = 2, col = "red" )
-        segments(75, 1.10, 93, 1.10, lwd = 2, col = "red" )
-        ## 3. Diffuse ratio comp min (12)
-        abline( h = QS$dif_rati_max, lwd = 2, col = "blue")
-        ## 3. Diffuse ratio comp max (13)
-        abline( h = QS$dif_rati_min, lwd = 2, col = "blue")
-
-        ## plot flagged
-        points(DATA_year$SZA[hard], DATA_year$DiffuseFraction_kd[hard],
-               col = "magenta", cex = 0.5)
-        points(DATA_year$SZA[soft], DATA_year$DiffuseFraction_kd[soft],
-               col = "cyan",    cex = 0.5)
-
-        title(main = paste("Comparison test 3.", YY))
-        legend("topleft",
-               legend = c("Global measurements", "Max diff proposed", "Our limits", "Rare measurements", "Extreme measurements"),
-               col    = c("black",               "red",               "blue",       "cyan",              "magenta"),
-               pch = 19, bty = "n", cex = 0.8 )
-
-
-        ####  Diffuse fraction by azimuth  ####
-        cat("\n\n")
-        plot( DATA_year$Azimuth[Ggood | Dgood], DATA_year$DiffuseFraction_kd[Ggood | Dgood],
-              ylim = yrange,
-              ylab = "Diffuse fraction", xlab = "Azimuth",
-              cex = .1)
-
-        ## 3. Diffuse ratio comp max (11)
-        segments(0, 1.05, 360, 1.05, lwd = 2, lty = 2, col = "red")
-        segments(0, 1.10, 360, 1.10, lwd = 2, lty = 2, col = "red")
-        ## 3. Diffuse ratio comp min (12)
-        abline(h = QS$dif_rati_max, lwd = 2, col = "blue")
-        ## 3. Diffuse ratio comp max (13)
-        abline(h = QS$dif_rati_min, lwd = 2, col = "blue")
-
-        ## plot flagged
-        points(DATA_year$Azimuth[hard], DATA_year$DiffuseFraction_kd[hard],
-               col = "magenta", cex = 0.5)
-        points(DATA_year$Azimuth[soft], DATA_year$DiffuseFraction_kd[soft],
-               col = "cyan",    cex = 0.5)
-
-        title(main = paste("Comparison test 3.", YY))
-        legend("topright",
-               legend = c("Global measurements", "Max diff proposed", "Our limits", "Rare measurements", "Extreme measurements"),
-               col    = c("black",               "red",               "blue",       "cyan",              "magenta"),
-               pch = 19, bty = "n", cex = 0.8 )
-
-        rm(hard, soft)
-    }##END if DO_TEST_03
 
 
     if (DO_TEST_04 & !all(is.na(DATA_year$wattDIR))) {
