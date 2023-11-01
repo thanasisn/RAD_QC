@@ -144,7 +144,7 @@ load("~/RAD_QC/Obstacles.Rda")
 # DO_TEST_01 <- TRUE   # DEPRECATED Physically Possible Limits
 # DO_TEST_02 <- TRUE   # DEPRECATED Extremely Rare Limits
 # DO_TEST_03 <- TRUE   # DEPRECATED Comparison tests
-DO_TEST_04 <- TRUE   # Climatological (configurable) Limits.
+# DO_TEST_04 <- TRUE   # DEPRECATED Climatological (configurable) Limits.
 DO_TEST_05 <- TRUE   # Tracking check
 DO_TEST_06 <- TRUE   # Rayleigh Limit Diffuse Comparison
 DO_TEST_07 <- TRUE   # Obstacles removal
@@ -158,7 +158,7 @@ TESTING    <- TRUE
 DO_TEST_01 <- FALSE # Physically Possible Limits
 DO_TEST_02 <- FALSE # Extremely Rare Limits
 DO_TEST_03 <- FALSE # Comparison tests
-# DO_TEST_04 <- FALSE # Climatological (configurable) Limits.
+DO_TEST_04 <- FALSE # Climatological (configurable) Limits.
 # DO_TEST_05 <- F   # Tracking check
 # DO_TEST_06 <- F   # Rayleigh Limit Diffuse Comparison
 DO_TEST_07 <- F   # Obstacles removal

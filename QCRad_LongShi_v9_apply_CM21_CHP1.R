@@ -125,7 +125,7 @@ TEST_09  <- FALSE
 # TEST_01  <- TRUE  # DEPRECATED
 # TEST_02  <- TRUE  # DEPRECATED
 # TEST_03  <- TRUE  # DEPRECATED
-TEST_04  <- TRUE
+# TEST_04  <- TRUE  # DEPRECATED
 TEST_05  <- TRUE
 TEST_06  <- TRUE
 # TEST_07  <- TRUE
@@ -260,8 +260,6 @@ if (TEST_04) {
 
 #+ echo=F, include=T, results="asis"
 if (TEST_04) {
-
-
 
     if (DO_PLOTS) {
 
