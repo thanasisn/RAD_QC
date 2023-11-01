@@ -380,9 +380,6 @@ for (YY in yearSTA:yearEND) {
         ####  5. Tracker off test  #############################################
         cat(paste("\n5. Tracking test.\n\n"))
         ## . . Direct ------------------------------------------------------####
-        ## This test use a diffuse model will be implemented when one is produced
-        ## and accepted. For now we omit it to protect from over-fitting prior to
-        ## make one such model.
 
         ## Create Clear Sky Sort-Wave model
         DATA_year[ , ClrSW := ( QS$ClrSW_a / sun_dist**2 ) * cosde(SZA)**QS$ClrSW_b ]
