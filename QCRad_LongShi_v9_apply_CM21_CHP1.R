@@ -343,10 +343,6 @@ if (TEST_04) {
         }
 
     }
-    # DATA$Dir_First_Clim_lim <- NULL
-    # DATA$Glo_First_Clim_lim <- NULL
-    # DATA$Dir_Secon_Clim_lim <- NULL
-    # DATA$Glo_Secon_Clim_lim <- NULL
 }
 #' -----------------------------------------------------------------------------
 
