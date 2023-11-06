@@ -145,7 +145,7 @@ load("~/RAD_QC/Obstacles.Rda")
 # DO_TEST_02 <- TRUE   # DEPRECATED Extremely Rare Limits
 # DO_TEST_03 <- TRUE   # DEPRECATED Comparison tests
 # DO_TEST_04 <- TRUE   # DEPRECATED Climatological (configurable) Limits.
-DO_TEST_05 <- TRUE   # Tracking check
+# DO_TEST_05 <- TRUE   # DEPRECATED Tracking check
 DO_TEST_06 <- TRUE   # Rayleigh Limit Diffuse Comparison
 DO_TEST_07 <- TRUE   # Obstacles removal
 DO_TEST_08 <- TRUE   # Test for inverted values
@@ -159,7 +159,7 @@ DO_TEST_01 <- FALSE # Physically Possible Limits
 DO_TEST_02 <- FALSE # Extremely Rare Limits
 DO_TEST_03 <- FALSE # Comparison tests
 DO_TEST_04 <- FALSE # Climatological (configurable) Limits.
-# DO_TEST_05 <- F   # Tracking check
+DO_TEST_05 <- FALSE # Tracking check
 # DO_TEST_06 <- F   # Rayleigh Limit Diffuse Comparison
 DO_TEST_07 <- F   # Obstacles removal
 # DO_TEST_08 <- FALSE # Test for inverted values
@@ -352,28 +352,6 @@ for (YY in yearSTA:yearEND) {
     #### ~ ~ ~ ~ START OF FLAGGING ~ ~ ~  ~ ####################################
 
 
-
-    if (DO_TEST_05) {
-        ####  5. Tracker off test  #############################################
-        cat(paste("\n5. Tracking test.\n\n"))
-        ## . . Direct ------------------------------------------------------####
-
-        ## Create Clear Sky Sort-Wave model
-        DATA_year[ , ClrSW := ( QS$ClrSW_a / sun_dist**2 ) * cosde(SZA)**QS$ClrSW_b ]
-
-
-        ## apply test
-        DATA_year[ wattGLB / ClrSW   > QS$ClrSW_lim &
-                   DIFF_strict / wattGLB > QS$ClrSW_lim,
-                   QCF_DIR_05 := "Possible no tracking (24)" ]
-
-        sel <- sum(!is.na(DATA_year$QCF_DIR_05))
-
-        ## . . Info --------------------------------------------------------####
-        cat(sprintf( " %6d    %s\n\n", sel, "Records marked with possible tracking problem        (24)"))
-    } ##END if DO_TEST_05
-
-
     if (DO_TEST_06) {
         ####  6. Rayleigh Limit Diffuse Comparison  ############################
         cat(paste("\n6. Rayleigh Limit Diffuse Comparison.\n\n"))
@@ -489,34 +467,6 @@ for (YY in yearSTA:yearEND) {
     ## get valid data vectors
     Dgood <- DATA_year$QCF_DIR == "good"
     Ggood <- DATA_year$QCF_GLB == "good"
-
-
-
-
-    if (DO_TEST_05 & !all(is.na(DATA_year$wattDIR))) {
-        ## . . Plot Tracker off test 5. ------------------------------------####
-
-        ## plot by SZA
-        cat("\n\n")
-        plot( DATA_year$SZA[Dgood], DATA_year$wattDIR[Dgood],
-              cex = .1,
-              xlim = xlim,
-              xlab = "SZA", ylab = "Direct Irradiance" )
-        title(main = paste("Tracker off test 5.",YY))
-
-        ## plot flagged
-        ss = which(DATA_year$QCF_DIR == "Possible no tracking (24)")
-        points( DATA_year$SZA[ss], DATA_year$DIFF_strict[ss],
-                cex = .5, col = "cyan" )
-
-        ## plot by Azimuth
-        plot( DATA_year$Azimuth[Dgood], DATA_year$wattDIR[Dgood],
-              cex = .1,
-              xlab = "Azimuth", ylab = "Direct Irradiance" )
-        title(main = paste("Tracker off test 5.",YY))
-        points( DATA_year$Azimuth[ss], DATA_year$DIFF_strict[ss],
-                cex = .5, col = "cyan" )
-    }##END if DO_TEST_05
 
 
     if (DO_TEST_06 & !all(is.na(DATA_year$DIFF_strict)) ) {

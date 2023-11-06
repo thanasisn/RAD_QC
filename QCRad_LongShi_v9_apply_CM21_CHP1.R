@@ -126,7 +126,7 @@ TEST_09  <- FALSE
 # TEST_02  <- TRUE  # DEPRECATED
 # TEST_03  <- TRUE  # DEPRECATED
 # TEST_04  <- TRUE  # DEPRECATED
-TEST_05  <- TRUE
+# TEST_05  <- TRUE  # DEPRECATED
 TEST_06  <- TRUE
 # TEST_07  <- TRUE
 TEST_08  <- TRUE
@@ -207,76 +207,6 @@ QS <- list()
 
 
 
-
-
-
-
-####  5. Tracker is off test  --------------------------------------------------
-#' \FloatBarrier
-#' \newpage
-#' ## 5. Tracker is off test
-#'
-# This test use a diffuse model will be implemented when one is produced
-# and accepted. For now we omit it to protect from over-fitting prior to
-# make one such model.
-#
-#+ echo=TEST_05, include=T
-if (TEST_05) {
-    cat(paste("\n5. Tracking test.\n\n"))
-    ## criteria
-    QS$Tracking_min_elev <-    5
-    QS$ClrSW_lim         <-    0.85
-    QS$glo_min           <-   25
-    ## Global Clear SW model
-    QS$ClrSW_a           <- 1050.5
-    QS$ClrSW_b           <-    1.095
-    ## Clear Sky Sort-Wave model
-    DATA[, ClrSW_ref2 := ( QS$ClrSW_a / sun_dist ^ 2 ) * cosde(SZA) ^ QS$ClrSW_b ]
-    # DATA[, ClrSW_ref1 := TSIextEARTH_comb * cosde(SZA) ^ QS$ClrSW_b ]
-
-    DATA[, QCF_DIR_05 := NA]
-
-    ## . . Direct --------------------------------------------------------------
-    DATA[wattGLB     / ClrSW_ref2 > QS$ClrSW_lim &
-         DIFF_strict / wattGLB    > QS$ClrSW_lim &
-         wattGLB                  > QS$glo_min   &
-         Elevat                   > QS$Tracking_min_elev,
-         QCF_DIR_05 := "Possible no tracking (24)"]
-}
-
-#+ echo=F, include=T, results="asis"
-if (TEST_05) {
-
-    cat(pander(table(DATA$QCF_DIR_05, exclude = T)))
-    cat("\n\n")
-
-    hist(DATA[, ClrSW_ref2 - wattDIR ], breaks = 100)
-    hist(DATA[, wattGLB / ClrSW_ref2 ], breaks = 100)
-    hist(DATA[, DIFF_strict / wattGLB], breaks = 100)
-    hist(DATA[!is.na(QCF_DIR_05), Elevat], breaks = 100)
-
-    if (DO_PLOTS) {
-        tmp <- DATA[ !is.na(QCF_DIR_05), unique(as.Date(Date)) ]
-        # tmp <- sample(DATA[!is.na(wattDIR), unique(as.Date(Date))], 10)
-        for (ad in sort(tmp)) {
-            pp <- DATA[ as.Date(Date) == ad, ]
-            ylim <- range(pp$ClrSW_ref2, pp$wattDIR, pp$wattGLB, na.rm = T)
-            plot(pp$Date, pp$wattDIR, "l", col = "blue",
-                 ylim = ylim, xlab = "", ylab = "wattDIR")
-            lines(pp$Date, pp$wattGLB, col = "green")
-            title(paste("5_", as.Date(ad, origin = "1970-01-01")))
-            ## plot limits
-            # lines(pp$Date, pp$ClrSW_ref1, col = "pink")
-            lines(pp$Date, pp$ClrSW_ref2, col = "cyan")
-            ## mark offending data
-            points(pp[!is.na(QCF_DIR_05), Date],
-                   pp[!is.na(QCF_DIR_05), wattDIR],
-                   col = "red", pch = 1)
-        }
-    }
-    # DATA$ClrSW_ref2 <- NULL
-}
-#' -----------------------------------------------------------------------------
 
 
 
