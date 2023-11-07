@@ -230,7 +230,7 @@ if (TEST_06) {
     cat(paste("\n6. Rayleigh Limit Diffuse Comparison.\n\n"))
     # criteria
     QS$Rayleigh_upper_lim <- 500   # Upper departure diffuse limit
-    QS$Rayleigh_lower_lim <-  -3   # Lower departure diffuse limit
+    QS$Rayleigh_lower_lim <-  -1   # Lower departure diffuse limit
     QS$Rayleigh_dif_glo_r <-   0.8 # Low limit diffuse/global < threshold
     QS$Rayleigh_glo_min   <-  50   # Low limit minimum global
     # model
