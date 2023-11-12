@@ -146,7 +146,7 @@ load("~/RAD_QC/Obstacles.Rda")
 # DO_TEST_03 <- TRUE   # DEPRECATED Comparison tests
 # DO_TEST_04 <- TRUE   # DEPRECATED Climatological (configurable) Limits.
 # DO_TEST_05 <- TRUE   # DEPRECATED Tracking check
-DO_TEST_06 <- TRUE   # Rayleigh Limit Diffuse Comparison
+# DO_TEST_06 <- TRUE   # DEPRECATED Rayleigh Limit Diffuse Comparison
 DO_TEST_07 <- TRUE   # Obstacles removal
 DO_TEST_08 <- TRUE   # Test for inverted values
 DO_TEST_09 <- TRUE   # Test clearness index limits
@@ -160,7 +160,7 @@ DO_TEST_02 <- FALSE # Extremely Rare Limits
 DO_TEST_03 <- FALSE # Comparison tests
 DO_TEST_04 <- FALSE # Climatological (configurable) Limits.
 DO_TEST_05 <- FALSE # Tracking check
-# DO_TEST_06 <- F   # Rayleigh Limit Diffuse Comparison
+DO_TEST_06 <- FALSE # Rayleigh Limit Diffuse Comparison
 DO_TEST_07 <- F   # Obstacles removal
 # DO_TEST_08 <- FALSE # Test for inverted values
 # DO_TEST_09 <- FALSE # Test clearness index limits
