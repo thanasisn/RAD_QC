@@ -147,7 +147,7 @@ load("~/RAD_QC/Obstacles.Rda")
 # DO_TEST_04 <- TRUE   # DEPRECATED Climatological (configurable) Limits.
 # DO_TEST_05 <- TRUE   # DEPRECATED Tracking check
 # DO_TEST_06 <- TRUE   # DEPRECATED Rayleigh Limit Diffuse Comparison
-DO_TEST_07 <- TRUE   # Obstacles removal
+# DO_TEST_07 <- TRUE   # Obstacles removal
 DO_TEST_08 <- TRUE   # Test for inverted values
 DO_TEST_09 <- TRUE   # Test clearness index limits
 
@@ -350,40 +350,6 @@ for (YY in yearSTA:yearEND) {
 
 
     #### ~ ~ ~ ~ START OF FLAGGING ~ ~ ~  ~ ####################################
-
-
-    if (DO_TEST_06) {
-        ####  6. Rayleigh Limit Diffuse Comparison  ############################
-        cat(paste("\n6. Rayleigh Limit Diffuse Comparison.\n\n"))
-
-        a =   209.3
-        b =  -708.3
-        c =  1128.7
-        d =  -911.2
-        e =   287.85
-        f =     0.046725
-
-        mu_0 <- cosde(DATA_year$SZA)
-        Rayleigh_diff <- a * mu_0    +
-                         b * mu_0**2 +
-                         c * mu_0**3 +
-                         d * mu_0**4 +
-                         e * mu_0**5 +
-                         f * mu_0 * DATA_year$pressure
-
-        selg <-  DATA_year$wattGLB > 50
-        seld <- (DATA_year$DIFF_strict / DATA_year$wattGLB) < 0.8
-        selr <-  DATA_year$DIFF_strict < (Rayleigh_diff - 1.0)
-
-        Rayleigh_lim <- selg & seld & selr
-
-        ## . . Both --------------------------------------------------------####
-        DATA_year$QCF_GLB[ is.na(DATA_year$QCF_GLB) & Rayleigh_lim ] <- "Rayleigh diffuse limit (18)"
-        DATA_year$QCF_DIR[ is.na(DATA_year$QCF_DIR) & Rayleigh_lim ] <- "Rayleigh diffuse limit (18)"
-        DATA_year$QCF_BTH_06[ Rayleigh_lim ]                         <- "Rayleigh diffuse limit (18)"
-
-    } ##END if DO_TEST_06
-
 
     if (DO_TEST_07) {
         ####  7. Test for obstacles  ###########################################
