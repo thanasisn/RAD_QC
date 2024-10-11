@@ -14,16 +14,12 @@ exec 2> >(tee -i "${ERR_FILE}" >&2)
 info "START :: $0 :: $* ::"
 
 
-
 info "LongShi Identification"
-Rscript "$(dirname "$0")/QCRad_LongShi_v8_id_CM21_CHP1.R"
+Rscript "$HOME/RAD_QC/QCRad_LongShi_v8_id_CM21_CHP1.R"
 
 
 info "LongShi Application"
-Rscript "$(dirname "$0")/QCRad_LongShi_v8_apply_CM21_CHP1.R"
-
-
-
+Rscript "$HOME/RAD_QC/QCRad_LongShi_v8_apply_CM21_CHP1.R"
 
 
 
