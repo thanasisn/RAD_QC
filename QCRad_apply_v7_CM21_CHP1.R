@@ -36,7 +36,6 @@
 #' date: "`r format(Sys.time(), '%F')`"
 #' ---
 
-
 #+ echo=F, include=T
 
 ####_  Document options _####
@@ -70,7 +69,6 @@ Script.Name <- tryCatch({ funr::sys.script() },
                             return("QCRad_appl_") })
 if (!interactive()) {
     pdf(    file = paste0("~/Aerosols/REPORTS/runtime/", basename(sub("\\.R$",".pdf",  Script.Name))))
-    sink(   file = paste0("~/Aerosols/REPORTS/runtime/", basename(sub("\\.R$",".out",  Script.Name))), split = TRUE)
     filelock::lock(paste0("~/Aerosols/REPORTS/runtime/", basename(sub("\\.R$",".lock", Script.Name))), timeout = 0)
 }
 
@@ -97,14 +95,13 @@ PLOTS_OUT      <- "/home/athan/Aerosols/DATA/Graphs/Level_2/QCRad_id/"
 SUSPECTS_EXP   <- "/home/athan/DATA/Broad_Band/LAP_QCRad_SUSPECTS"
 
 ## other inputs
-tsi_build_Rdat <- "/home/athan/DATA/SUN/TSI_COMPOSITE.Rds"
+tsi_build_Rdat <- "/home/athan/DATA/SUN/TSI_COMPOSITE_legacy.Rds"
 template_file  <- "/home/athan/DATA/Broad_Band/LAP_CHP1_L1_2016.Rds"
 
 ## date to start run
 PROJECT_START  <- as.POSIXct("1993-01-01")  ## when both instruments were operational
 # LAST_DAY_EXPR  <- as.POSIXct("2022-07-07")  ## day of last manual data clean
 LAST_DAY_EXPR  <- Sys.time()                ## Ignore limit on last day
-
 
 
 ## . . Limits definitions  ####

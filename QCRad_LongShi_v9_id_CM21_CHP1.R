@@ -81,7 +81,6 @@ lockfile    <- paste0("~/RAD_QC/RUNTIME/",
                       basename(sub("\\.R$",".stopfile", Script.Name)))
 if (!interactive()) {
     pdf( file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".pdf", Script.Name))))
-    sink(file = paste0("~/RAD_QC/RUNTIME/", basename(sub("\\.R$",".out", Script.Name))), split = TRUE)
 }
 
 library(scales)
@@ -92,7 +91,6 @@ source("~/RAD_QC/Functions_write_data.R")
 source("~/CODE/FUNCTIONS/R/execlock.R")
 
 # mylock(lockfile)
-
 
 ####  Variables init  ####
 
@@ -107,7 +105,7 @@ PLOTS_OUT      <- "~/Aerosols/DATA/Graphs/Level_2/QCRad_id/"
 SUSPECTS_EXP   <- "~/DATA/Broad_Band/LAP_QCRad_SUSPECTS"
 
 ## other inputs
-tsi_build_Rdat <- "~/DATA/SUN/TSI_COMPOSITE.Rds"
+tsi_build_Rdat <- "~/DATA/SUN/TSI_COMPOSITE_legacy.Rds"
 template_file  <- "~/DATA/Broad_Band/LAP_CHP1_L1_2016.Rds"
 
 ## date to start run
