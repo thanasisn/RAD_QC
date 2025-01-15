@@ -140,7 +140,6 @@ if (interactive()) {
 ALL_YEAR <- TRUE
 ALL_YEAR <- FALSE
 
-
 #+ echo=F, include=T
 #### ~ ~ Load all data ~ ~ ####
 fileslist <- list.files(path    = DATA_BASE,
@@ -165,7 +164,7 @@ if (FORCE_NEW_DATA || !file.exists(cachedata)) {
 
 if (!ALL_YEAR) {
     cat("Partial data run")
-    DATA <- DATA[year(Date) >= 2023, ]
+    DATA <- DATA[year(Date) >= 2024, ]
 }
 
 
