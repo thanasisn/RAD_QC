@@ -108,7 +108,7 @@ cachedata <- "~/RAD_QC/temp_data.Rds"
 
 ## use cache data for development only
 FORCE_NEW_DATA <- TRUE
-# FORCE_NEW_DATA <- FALSE
+FORCE_NEW_DATA <- FALSE
 
 TEST_01  <- FALSE
 TEST_02  <- FALSE
